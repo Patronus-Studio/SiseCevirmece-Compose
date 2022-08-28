@@ -13,13 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,13 +38,42 @@ fun HomeScreen() {
             .fillMaxSize()
             .background(BlueViolet)
     ) {
+        Space(0.02)
+        Title()
+        Space(0.05)
         UserPic()
+        Space(0.02)
         Username()
         LevelBar()
+        Space(0.03)
         HomeCards()
+        Space(0.05)
         PlayButton()
     }
+}
 
+@Preview
+@Composable
+private fun Title() {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Text(
+            text = stringResource(R.string.app_name_with_blank),
+            style = TextStyle(
+                color = Color.White,
+                shadow = Shadow(
+                    DavysGrey, offset = Offset(0f, 0f), blurRadius = 16f
+                )
+            ),
+            fontSize = 24.sp, fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun Space(ratio:Double){
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val spaceSize = (screenWidth * ratio).dp
+    Spacer(modifier = Modifier.height(spaceSize))
 }
 
 @Preview

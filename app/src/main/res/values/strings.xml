@@ -1,8 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">SiseCevirmece</string>
     <string name="add_category">Kategori Ekle</string>
     <string name="store">Mağaza</string>
     <string name="my_profile">Profilim</string>
     <string name="play">OYNA</string>
     <string name="level">Level</string>
+    <string name="app_name_with_blank">Şişe Çevirmece</string>
 </resources>
