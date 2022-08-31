@@ -110,3 +110,8 @@ fun LevelBar(currentStar:Int = 38,nextLevelNeedStar :Int = 40,currentLevel: Stri
 
     }
 }
+
+@Composable
+fun CircleImage(imageUrl:String,clickImage:()->Unit){
+
+}
