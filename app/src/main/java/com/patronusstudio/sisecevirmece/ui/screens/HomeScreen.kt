@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -37,6 +38,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
+import com.patronusstudio.sisecevirmece.data.model.Avatar
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
@@ -92,7 +94,7 @@ private fun UserPicHousting() {
     if (isClicked.value) {
         OpenDialog {
             isClicked.value = false
-            if(it != null) currentImage.value= it
+            if (it != null) currentImage.value = it
         }
     }
     UserPic(0.4, currentImage.value) {
@@ -103,8 +105,8 @@ private fun UserPicHousting() {
 @Composable
 private fun UserPic(
     ratio: Double,
-    imageUrl: String,
-    clickedImage: (String?) -> Unit
+    avatar: Avatar,
+    clickedImage: (Avatar?) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val isLoading = remember { mutableStateOf(true) }
@@ -119,10 +121,11 @@ private fun UserPic(
                 .size(imageSize)
                 .clip(CircleShape)
                 .background(Color.White)
+                .shadow(4.dp)
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
+                    .data(avatar.url)
                     .crossfade(true).build(),
                 contentDescription = "Profile picture",
                 contentScale = ContentScale.Crop,
@@ -218,7 +221,7 @@ private fun PlayButton() {
 
 //fun OpenDialog(isClicked: MutableState<Boolean>) {
 @Composable
-fun OpenDialog(dismiss: (String?) -> Unit) {
+fun OpenDialog(dismiss: (Avatar?) -> Unit) {
     //AnimatedVisibility(visible = isClicked.value) {
     val list = List(11) {
         getSamplePhotoUrl()
@@ -228,7 +231,7 @@ fun OpenDialog(dismiss: (String?) -> Unit) {
     AnimatedVisibility(visible = true) {
         Dialog(
             onDismissRequest = {
-                               dismiss(null)
+                dismiss(null)
             },
             properties = DialogProperties(
                 dismissOnBackPress = true,
