@@ -1,17 +1,21 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -22,14 +26,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patronusstudio.sisecevirmece.R
-import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
-import com.patronusstudio.sisecevirmece.ui.theme.Mustard
-import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
-import com.patronusstudio.sisecevirmece.ui.theme.UnitedNationsBlue
+import com.patronusstudio.sisecevirmece.ui.theme.*
 
 @Preview
 @Composable
-fun LevelBar(currentStar:Int = 38,nextLevelNeedStar :Int = 40,currentLevel: String = "7") {
+fun LevelBar(currentStar: Int = 38, nextLevelNeedStar: Int = 40, currentLevel: String = "7") {
     val width = LocalConfiguration.current.screenWidthDp
     val contentWidth = (width * 0.5).dp
     val contentHeight = (width * 0.20).dp
@@ -68,7 +69,10 @@ fun LevelBar(currentStar:Int = 38,nextLevelNeedStar :Int = 40,currentLevel: Stri
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "$currentLevel/$nextLevelNeedStar", style = TextStyle(color = Color.White))
+                    Text(
+                        text = "$currentLevel/$nextLevelNeedStar",
+                        style = TextStyle(color = Color.White)
+                    )
                     Image(
                         modifier = Modifier.size(starSize),
                         painter = painterResource(id = R.drawable.star),
@@ -111,7 +115,48 @@ fun LevelBar(currentStar:Int = 38,nextLevelNeedStar :Int = 40,currentLevel: Stri
     }
 }
 
+@Preview
 @Composable
-fun CircleImage(imageUrl:String,clickImage:()->Unit){
+private fun UserPic() {
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val imageSize = (screenWidth * 0.4).dp
+
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(imageSize)
+                .clip(CircleShape)
+                .background(Color.White)
+                .shadow(4.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.player_girl), contentDescription = "",
+                modifier = Modifier.fillMaxSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(GreyTranspancy20)
+            )
+            Canvas(modifier = Modifier
+                .fillMaxSize(), onDraw = {
+                val rect = Rect(Offset.Zero, size)
+                val yellowSize = Size(rect.width + 100f, rect.height - 100f)
+                drawLine(
+                    Color.Yellow,
+                    start = yellowSize.center,
+                    end = rect.topRight,
+                    strokeWidth = 20f
+                )
+                val blueSize = Size(rect.width - 100f, rect.height + 100f)
+                drawLine(
+                    Color.Blue,
+                    start = blueSize.center,
+                    end = rect.bottomLeft,
+                    strokeWidth = 20f
+                )
+            })
+        }
+    }
 
 }
