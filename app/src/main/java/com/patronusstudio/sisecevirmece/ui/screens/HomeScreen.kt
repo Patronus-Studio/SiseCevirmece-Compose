@@ -37,11 +37,13 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
 import com.patronusstudio.sisecevirmece.data.model.Avatar
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
+import com.patronusstudio.sisecevirmece.ui.widgets.UserPicLocked
 
 @Composable
 fun HomeScreen() {
@@ -253,8 +255,14 @@ fun OpenDialog(dismiss: (Avatar?) -> Unit) {
                                     .wrapContentSize()
                                     .padding(vertical = 8.dp)
                             ) {
-                                UserPic(0.25, itemValue) {
-                                    dismiss(itemValue)
+                                if (itemValue.statu == AvatarStatu.BUYED) {
+                                    UserPic(ratio = 0.25, avatar = itemValue) {
+                                        dismiss(itemValue)
+                                    }
+                                } else {
+                                    UserPicLocked(ratio = 0.25, avatar = itemValue) {
+
+                                    }
                                 }
                             }
                         })

@@ -6,18 +6,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -25,7 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.lockImageUrl
+import com.patronusstudio.sisecevirmece.data.model.Avatar
 import com.patronusstudio.sisecevirmece.ui.theme.*
 
 @Preview
@@ -115,22 +119,24 @@ fun LevelBar(currentStar: Int = 38, nextLevelNeedStar: Int = 40, currentLevel: S
     }
 }
 
-@Preview
 @Composable
-private fun UserPic() {
+fun UserPicLocked(
+    ratio: Double,
+    avatar: Avatar,
+    clickedImage: (Avatar?) -> Unit
+) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val imageSize = (screenWidth * 0.4).dp
-
+    val imageSize = (screenWidth * ratio).dp
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
                 .size(imageSize)
                 .clip(CircleShape)
-                .background(Color.White)
-                .shadow(4.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.player_girl), contentDescription = "",
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(avatar.url)
+                    .crossfade(true)
+                    .build(), contentDescription = "",
                 modifier = Modifier.fillMaxSize()
             )
             Box(
@@ -143,19 +149,38 @@ private fun UserPic() {
                 val rect = Rect(Offset.Zero, size)
                 val yellowSize = Size(rect.width + 100f, rect.height - 100f)
                 drawLine(
-                    Color.Yellow,
+                    Color.White,
                     start = yellowSize.center,
                     end = rect.topRight,
-                    strokeWidth = 20f
+                    strokeWidth = 20f, cap = StrokeCap.Square
                 )
                 val blueSize = Size(rect.width - 100f, rect.height + 100f)
                 drawLine(
-                    Color.Blue,
+                    Color.White,
                     start = blueSize.center,
                     end = rect.bottomLeft,
-                    strokeWidth = 20f
+                    strokeWidth = 20f, cap = StrokeCap.Square
                 )
             })
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(lockImageUrl)
+                        .crossfade(true).build(),
+                    contentDescription = "Profile picture",
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.Center)
+                        .border(2.dp, color = Color.White, shape = CircleShape)
+                        .padding(8.dp)
+                        .clickable {
+                            clickedImage(null)
+                        }
+                )
+            }
         }
     }
 
