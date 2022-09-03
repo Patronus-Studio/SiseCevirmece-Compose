@@ -8,22 +8,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -34,8 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
@@ -43,7 +36,7 @@ import com.patronusstudio.sisecevirmece.data.model.Avatar
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
-import com.patronusstudio.sisecevirmece.ui.widgets.UserPicLocked
+import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
 
 @Composable
 fun HomeScreen() {
@@ -92,6 +85,7 @@ fun Space(ratio: Double) {
 @Composable
 private fun UserPicHousting() {
     val currentImage = remember { mutableStateOf(getSamplePhotoUrl()) }
+    currentImage.value.statu = AvatarStatu.BUYED
     val isClicked = remember { mutableStateOf(false) }
     if (isClicked.value) {
         OpenDialog {
@@ -103,53 +97,6 @@ private fun UserPicHousting() {
         isClicked.value = true
     }
 }
-
-@Composable
-private fun UserPic(
-    ratio: Double,
-    avatar: Avatar,
-    clickedImage: (Avatar?) -> Unit
-) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp
-    val isLoading = remember { mutableStateOf(true) }
-
-    val imageSize = (screenWidth * ratio).dp
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        if (isLoading.value) {
-            CircularProgressIndicator()
-        }
-        Box(
-            modifier = Modifier
-                .size(imageSize)
-                .clip(CircleShape)
-                .background(Color.White)
-                .shadow(4.dp)
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(avatar.url)
-                    .crossfade(true).build(),
-                contentDescription = "Profile picture",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        clickedImage(null)
-                    },
-                onLoading = {
-                    isLoading.value = true
-                }, onSuccess = {
-                    isLoading.value = false
-                },
-                onError = {
-                    isLoading.value = false
-                }
-            )
-        }
-    }
-
-}
-
 
 @Composable
 private fun Username(username: String = "Süleyman Sezer") {
@@ -255,13 +202,9 @@ fun OpenDialog(dismiss: (Avatar?) -> Unit) {
                                     .wrapContentSize()
                                     .padding(vertical = 8.dp)
                             ) {
-                                if (itemValue.statu == AvatarStatu.BUYED) {
-                                    UserPic(ratio = 0.25, avatar = itemValue) {
+                                UserPic(ratio = 0.25, avatar = itemValue) {
+                                    if (itemValue.statu == AvatarStatu.BUYED) {
                                         dismiss(itemValue)
-                                    }
-                                } else {
-                                    UserPicLocked(ratio = 0.25, avatar = itemValue) {
-
                                     }
                                 }
                             }
