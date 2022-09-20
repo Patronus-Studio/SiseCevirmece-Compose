@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
+import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
 import com.patronusstudio.sisecevirmece.ui.theme.SiseCevirmeceTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    HomeScreen()
+                   LoginScreen()
                 }
             }
         }
