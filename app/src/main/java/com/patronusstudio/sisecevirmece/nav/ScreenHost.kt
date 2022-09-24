@@ -16,26 +16,34 @@ fun ScreenHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = NavLoginScreen.screenName) {
         val screenEnterAnimation = NavOptions.Builder().setEnterAnim(android.R.anim.fade_in)
             .setExitAnim(android.R.anim.fade_out).build()
-        composable(route = NavLoginScreen.screenName) {
+        composable(route = NavLoginScreen.screenName) { navBackStackEntry ->
             LoginScreen {
                 when (it) {
-                    LoginScreenNavEnums.LOGIN -> navController.navigate(
-                        NavHomeScreen.screenName,
-                        screenEnterAnimation
-                    )
+                    LoginScreenNavEnums.LOGIN -> {
+                        navController.navigate(
+                            NavHomeScreen.screenName + "/Süleyman/Sezer",
+                            screenEnterAnimation
+                        )
+                    }
                     LoginScreenNavEnums.REGISTER -> navController.navigate(
-                        NavHomeScreen.screenName,
+                        NavHomeScreen.screenWithArgs,
                         screenEnterAnimation
                     )
                     LoginScreenNavEnums.FORGET_PASSWORD -> navController.navigate(
-                        NavHomeScreen.screenName,
+                        NavHomeScreen.screenWithArgs,
                         screenEnterAnimation
                     )
                 }
             }
         }
-        composable(route = NavHomeScreen.screenName) {
-            HomeScreen()
+        composable(
+            route = NavHomeScreen.screenWithArgs,
+            arguments = NavHomeScreen.arguments
+        )
+        { navBackStackEntry ->
+            val name = navBackStackEntry.arguments?.getString(NavHomeScreen.name)
+            val surname = navBackStackEntry.arguments?.getString(NavHomeScreen.surname)
+            HomeScreen(name ?: "")
         }
     }
 
