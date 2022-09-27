@@ -8,16 +8,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,10 +34,13 @@ import com.patronusstudio.sisecevirmece.ui.theme.Mustard
 import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
     val viewModel = viewModel<LoginViewModel>()
+    val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
@@ -50,10 +51,17 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
 
+
     val state = viewModel.token.collectAsState().value
-    if (state.isEmpty().not()) {
-        goToAnotherScreen(LoginScreenNavEnums.LOGIN, state)
-        viewModel.setTokenEmpty()
+    LaunchedEffect(key1 = state) {
+        if (state.isNotEmpty()) {
+            withContext(Dispatchers.IO) {
+                viewModel.setUserToken(context)
+            }
+            goToAnotherScreen(LoginScreenNavEnums.LOGIN, state)
+        } else {
+            viewModel.userTokenControl(context)
+        }
     }
 
     Column(

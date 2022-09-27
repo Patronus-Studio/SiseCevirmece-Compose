@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import com.patronusstudio.sisecevirmece.NavHomeScreen
 import com.patronusstudio.sisecevirmece.NavLoginScreen
 import com.patronusstudio.sisecevirmece.NavRegisterScreen
@@ -23,8 +24,9 @@ fun ScreenHost(navController: NavHostController) {
                 when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavHomeScreen.screenName + "/{$token}",
-                            screenEnterAnimation
+                            NavHomeScreen.screenName + "/{$token}", navOptions {
+                                popUpTo(0)
+                            }
                         )
                     }
                     LoginScreenNavEnums.REGISTER -> navController.navigate(
