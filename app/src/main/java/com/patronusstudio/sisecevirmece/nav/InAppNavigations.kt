@@ -7,7 +7,6 @@ interface InAppNavigations {
     val screenName:String
 }
 
-
 object NavLoginScreen : InAppNavigations {
     override val screenName: String
         get() = "LoginScreen"

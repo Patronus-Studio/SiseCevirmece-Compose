@@ -101,9 +101,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
         GoogleSignIn()
         Spacer(modifier = Modifier.height(heightRatio04))
         AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
-            LoadingAnimation {
-
-            }
+            LoadingAnimation()
         }
     }
 }
