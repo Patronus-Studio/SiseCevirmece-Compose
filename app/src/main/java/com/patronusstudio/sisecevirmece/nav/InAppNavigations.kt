@@ -17,19 +17,13 @@ object NavHomeScreen : InAppNavigations {
     override val screenName: String
         get() = "HomeScreen"
 
-    var name = "name"
-    var surname = "surname"
-    val screenWithArgs = "${screenName}/{$name}/{$surname}"
+    var token = "token"
+    val screenWithArgs = "${screenName}/{$token}"
 
     val arguments = listOf(
-        navArgument(name) {
-            NavType.StringType
-            nullable = true
-        },
-        navArgument(surname) {
+        navArgument(token) {
             NavType.StringType
             nullable = true
         }
     )
 }
-

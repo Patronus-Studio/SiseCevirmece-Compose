@@ -17,11 +17,11 @@ fun ScreenHost(navController: NavHostController) {
         val screenEnterAnimation = NavOptions.Builder().setEnterAnim(android.R.anim.fade_in)
             .setExitAnim(android.R.anim.fade_out).build()
         composable(route = NavLoginScreen.screenName) { navBackStackEntry ->
-            LoginScreen {
-                when (it) {
+            LoginScreen { loginEnum, token ->
+                when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavHomeScreen.screenName + "/Süleyman/Sezer",
+                            NavHomeScreen.screenName + "/{$token}",
                             screenEnterAnimation
                         )
                     }
@@ -39,12 +39,9 @@ fun ScreenHost(navController: NavHostController) {
         composable(
             route = NavHomeScreen.screenWithArgs,
             arguments = NavHomeScreen.arguments
-        )
-        { navBackStackEntry ->
-            val name = navBackStackEntry.arguments?.getString(NavHomeScreen.name)
-            val surname = navBackStackEntry.arguments?.getString(NavHomeScreen.surname)
-            HomeScreen(name ?: "")
+        ) { navBackStackEntry ->
+            val token = navBackStackEntry.arguments?.getString(NavHomeScreen.token)
+            HomeScreen(token ?: "")
         }
     }
-
 }

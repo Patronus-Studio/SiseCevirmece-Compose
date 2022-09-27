@@ -39,7 +39,7 @@ import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
 
 @Composable
-fun HomeScreen(name: String) {
+fun HomeScreen(token: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +50,7 @@ fun HomeScreen(name: String) {
         Space(0.05)
         UserPicHousting()
         Space(0.02)
-        Username(name)
+        Username(token)
         LevelBar()
         Space(0.03)
         HomeCards()

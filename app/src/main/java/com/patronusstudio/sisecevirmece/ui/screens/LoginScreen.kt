@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,7 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,13 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.utils.checkEmailCorrect
+import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.Mustard
 import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
@@ -39,7 +41,8 @@ import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
 
 @Composable
-fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
+fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
+    val viewModel = viewModel<LoginViewModel>()
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
@@ -50,9 +53,11 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
 
-    val emailError = remember { mutableStateOf(false) }
-    val userEmail = remember { mutableStateOf("") }
-    val userPassword = remember { mutableStateOf("") }
+    val state = viewModel.token.collectAsState().value
+    if(state.isEmpty().not()){
+        goToAnotherScreen(LoginScreenNavEnums.LOGIN,state)
+        viewModel.setTokenEmpty()
+    }
 
     Column(
         modifier = Modifier
@@ -62,20 +67,44 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     ) {
         TopImage(widthRatio80, heightRatio40)
         Spacer(modifier = Modifier.height(heightRatio10))
-        Email(emailError, userEmail, widthRatio80)
+        Email(viewModel.emailError.collectAsState().value,
+            viewModel.userEmail.collectAsState().value, widthRatio80, { email ->
+                viewModel.setUserEmail(email)
+            }, {
+                val result = viewModel.userEmail.value.checkEmailCorrect()
+                viewModel.setUserEmailError(result.not())
+            })
         Spacer(modifier = Modifier.height(heightRatio04))
-        Password(userPassword, widthRatio80)
+        Password(
+            viewModel.userPassword.collectAsState().value,
+            viewModel.isPasswordTrailLocked.collectAsState().value,
+            widthRatio80,
+            {
+                viewModel.setUserPassword(it)
+            },
+            {
+                if (viewModel.isPasswordTrailLocked.value) {
+                    viewModel.setTrailIconClicked(false)
+                } else {
+                    viewModel.setTrailIconClicked(true)
+                }
+            })
         Spacer(modifier = Modifier.height(heightRatio04))
         LoginButton(widthRatio80) {
-            goToAnotherScreen(LoginScreenNavEnums.LOGIN)
+            viewModel.loginWithEmailPass()
         }
         Spacer(modifier = Modifier.height(heightRatio02))
         SignInText(widthRatio80, widthRatio10) {
-            goToAnotherScreen(LoginScreenNavEnums.REGISTER)
+            //goToAnotherScreen(LoginScreenNavEnums.REGISTER, LoginRequestModel())
         }
         Spacer(modifier = Modifier.height(heightRatio04))
         GoogleSignIn()
         Spacer(modifier = Modifier.height(heightRatio04))
+        AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
+            LoadingAnimation {
+
+            }
+        }
     }
 }
 
@@ -93,35 +122,40 @@ fun TopImage(widthRatio80: Dp, heightRatio40: Dp) {
 }
 
 @Composable
-fun Email(isThereError: MutableState<Boolean>, userEmail: MutableState<String>, widthSize: Dp) {
+fun Email(
+    isThereError: Boolean,
+    userEmail: String,
+    widthSize: Dp,
+    emailChanged: (String) -> Unit,
+    focusChanged: () -> Unit
+) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val userEmailTrailIcon = remember { mutableStateOf(R.drawable.mail) }
     Column {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .onFocusEvent {
-                if (it.hasFocus.not() && userEmail.value
-                        .isEmpty()
-                        .not()
-                ) {
-                    checkEmailCorrect(userEmail.value).run {
-                        isThereError.value = this.not()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent {
+                    if (it.hasFocus.not() && userEmail
+                            .isEmpty()
+                            .not()
+                    ) {
+                        focusChanged()
                     }
-                }
-            }, contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             CustomTextField(
                 widthSize = widthSize,
                 textFieldColors = getTextFieldColor(),
                 hintText = "Email adresi",
-                changedText = userEmail.value,
+                changedText = userEmail,
                 onValueChange = {
-                    userEmail.value = it
+                    emailChanged(it)
                 }, trailingIcon = userEmailTrailIcon.value,
-                isError = isThereError.value
+                isError = isThereError
             )
         }
-        AnimatedVisibility(visible = isThereError.value) {
+        AnimatedVisibility(visible = isThereError) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.width((screenWidth * 0.11).dp))
                 Box(modifier = Modifier.width(widthSize)) {
@@ -139,28 +173,26 @@ fun Email(isThereError: MutableState<Boolean>, userEmail: MutableState<String>, 
 }
 
 @Composable
-fun Password(userPassword: MutableState<String>, widthSize: Dp) {
-    val isLocked = remember { mutableStateOf(true) }
-    val secondTextTrailIcon = remember { mutableStateOf(R.drawable.lock) }
+fun Password(
+    userPassword: String,
+    isLocked: Boolean,
+    widthSize: Dp,
+    passwordChanged: (String) -> Unit,
+    trailClicked: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         CustomTextField(
             widthSize = widthSize,
             textFieldColors = getTextFieldColor(),
             hintText = "Şifre",
-            changedText = userPassword.value,
+            changedText = userPassword,
             onValueChange = {
-                userPassword.value = it
+                passwordChanged(it)
             },
-            trailingIcon = secondTextTrailIcon.value,
+            trailingIcon = if (isLocked) R.drawable.lock else R.drawable.unlocked,
             trailingIconListener = {
-                if (isLocked.value) {
-                    isLocked.value = false
-                    secondTextTrailIcon.value = R.drawable.unlocked
-                } else {
-                    isLocked.value = true
-                    secondTextTrailIcon.value = R.drawable.lock
-                }
-            }, visualTransformation = if (isLocked.value) PasswordVisualTransformation()
+                trailClicked()
+            }, visualTransformation = if (isLocked) PasswordVisualTransformation()
             else VisualTransformation.None, isError = false
         )
     }

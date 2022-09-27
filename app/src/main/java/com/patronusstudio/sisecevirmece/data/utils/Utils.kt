@@ -3,11 +3,11 @@ package com.patronusstudio.sisecevirmece.data.utils
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-fun checkEmailCorrect(email: String): Boolean {
-    if (email.isEmpty()) {
+fun String.checkEmailCorrect(): Boolean {
+    if (this.isEmpty()) {
         return false
     }
-    val droppedLastBackspace = email.dropLastWhile {
+    val droppedLastBackspace = this.dropLastWhile {
         it == ' '
     }
     val pttn = "^\\D.+@.+\\.[a-z]+"
