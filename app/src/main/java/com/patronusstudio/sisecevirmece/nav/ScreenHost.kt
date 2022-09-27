@@ -7,18 +7,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import com.patronusstudio.sisecevirmece.NavHomeScreen
+import com.patronusstudio.sisecevirmece.NavLandingScreen
 import com.patronusstudio.sisecevirmece.NavLoginScreen
 import com.patronusstudio.sisecevirmece.NavRegisterScreen
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
+import com.patronusstudio.sisecevirmece.ui.screens.LandingScreen
 import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
 import com.patronusstudio.sisecevirmece.ui.screens.RegisterScreen
 
 @Composable
 fun ScreenHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = NavLoginScreen.screenName) {
+    NavHost(navController = navController, startDestination = NavLandingScreen.screenName) {
         val screenEnterAnimation = NavOptions.Builder().setEnterAnim(android.R.anim.fade_in)
             .setExitAnim(android.R.anim.fade_out).build()
+        composable(route = NavLandingScreen.screenName){
+            LandingScreen()
+        }
         composable(route = NavLoginScreen.screenName) { navBackStackEntry ->
             LoginScreen { loginEnum, token ->
                 when (loginEnum) {
