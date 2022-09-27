@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.patronusstudio.sisecevirmece.data.ScreenHost
 import com.patronusstudio.sisecevirmece.ui.theme.SiseCevirmeceTheme
 
 class MainActivity : ComponentActivity() {
@@ -15,11 +18,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SiseCevirmeceTheme {
+                val navController = rememberNavController()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    HomeScreen()
+                    ScreenHost(navController = navController)
                 }
             }
         }
