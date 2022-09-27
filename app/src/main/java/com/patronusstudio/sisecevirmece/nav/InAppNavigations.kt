@@ -26,3 +26,9 @@ object NavHomeScreen : InAppNavigations {
         }
     )
 }
+
+object NavRegisterScreen: InAppNavigations{
+    override val screenName: String
+        get() = "RegisterScreen"
+
+}

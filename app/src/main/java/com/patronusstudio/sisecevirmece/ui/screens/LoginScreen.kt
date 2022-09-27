@@ -1,6 +1,5 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -32,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
-import com.patronusstudio.sisecevirmece.data.utils.checkEmailCorrect
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.Mustard
@@ -41,7 +38,7 @@ import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
 
 @Composable
-fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
+fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
     val viewModel = viewModel<LoginViewModel>()
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
@@ -54,8 +51,8 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
     val heightRatio02 = (heightSize * 0.02).dp
 
     val state = viewModel.token.collectAsState().value
-    if(state.isEmpty().not()){
-        goToAnotherScreen(LoginScreenNavEnums.LOGIN,state)
+    if (state.isEmpty().not()) {
+        goToAnotherScreen(LoginScreenNavEnums.LOGIN, state)
         viewModel.setTokenEmpty()
     }
 
@@ -67,13 +64,9 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
     ) {
         TopImage(widthRatio80, heightRatio40)
         Spacer(modifier = Modifier.height(heightRatio10))
-        Email(viewModel.emailError.collectAsState().value,
-            viewModel.userEmail.collectAsState().value, widthRatio80, { email ->
-                viewModel.setUserEmail(email)
-            }, {
-                val result = viewModel.userEmail.value.checkEmailCorrect()
-                viewModel.setUserEmailError(result.not())
-            })
+        UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
+            viewModel.setUsername(username)
+        }
         Spacer(modifier = Modifier.height(heightRatio04))
         Password(
             viewModel.userPassword.collectAsState().value,
@@ -95,7 +88,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String) -> Unit) {
         }
         Spacer(modifier = Modifier.height(heightRatio02))
         SignInText(widthRatio80, widthRatio10) {
-            //goToAnotherScreen(LoginScreenNavEnums.REGISTER, LoginRequestModel())
+            goToAnotherScreen(LoginScreenNavEnums.REGISTER, null)
         }
         Spacer(modifier = Modifier.height(heightRatio04))
         GoogleSignIn()
@@ -120,52 +113,27 @@ fun TopImage(widthRatio80: Dp, heightRatio40: Dp) {
 }
 
 @Composable
-fun Email(
-    isThereError: Boolean,
-    userEmail: String,
+fun UsernameView(
+    username: String,
     widthSize: Dp,
-    emailChanged: (String) -> Unit,
-    focusChanged: () -> Unit
+    usernameChanged: (String) -> Unit
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp
-    val userEmailTrailIcon = remember { mutableStateOf(R.drawable.mail) }
+    val userEmailTrailIcon = remember { mutableStateOf(R.drawable.user) }
     Column {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .onFocusEvent {
-                    if (it.hasFocus.not() && userEmail
-                            .isEmpty()
-                            .not()
-                    ) {
-                        focusChanged()
-                    }
-                }, contentAlignment = Alignment.Center
+                .fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             CustomTextField(
                 widthSize = widthSize,
                 textFieldColors = getTextFieldColor(),
-                hintText = "Email adresi",
-                changedText = userEmail,
+                hintText = "Kullanıcı Adı",
+                changedText = username,
                 onValueChange = {
-                    emailChanged(it)
-                }, trailingIcon = userEmailTrailIcon.value,
-                isError = isThereError
+                    usernameChanged(it)
+                },
+                trailingIcon = userEmailTrailIcon.value,
             )
-        }
-        AnimatedVisibility(visible = isThereError) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.width((screenWidth * 0.11).dp))
-                Box(modifier = Modifier.width(widthSize)) {
-                    Text(
-                        text = "Girilen email adresi hatalı", style = TextStyle(
-                            color = Color.Red, fontSize =
-                            14.sp
-                        )
-                    )
-                }
-                Spacer(modifier = Modifier.width((screenWidth * 0.09).dp))
-            }
         }
     }
 }
@@ -187,7 +155,7 @@ fun Password(
             onValueChange = {
                 passwordChanged(it)
             },
-            trailingIcon = if (isLocked) R.drawable.lock else R.drawable.unlocked,
+            trailingIcon = if (isLocked) R.drawable.lock else R.drawable.unlock,
             trailingIconListener = {
                 trailClicked()
             }, visualTransformation = if (isLocked) PasswordVisualTransformation()

@@ -13,31 +13,19 @@ class LoginViewModel : ViewModel() {
 
     private val repository by lazy { Repository() }
 
-    var token = MutableStateFlow("")
-        private set
-    var userEmail = MutableStateFlow("")
-        private set
-    var userPassword = MutableStateFlow("")
-        private set
-    var emailError = MutableStateFlow(false)
-        private set
-    var isPasswordTrailLocked = MutableStateFlow(true)
-        private set
-    var isAnimationShow = MutableStateFlow(false)
-        private set
-    var isThereError = MutableStateFlow(Pair(false,""))
-        private set
-
-    fun setUserEmail(mail: String) {
-        userEmail.value = mail
-    }
+    val token = MutableStateFlow("")
+    val username = MutableStateFlow("")
+    val userPassword = MutableStateFlow("")
+    val isPasswordTrailLocked = MutableStateFlow(true)
+    val isAnimationShow = MutableStateFlow(false)
+    val isThereError = MutableStateFlow(Pair(false,""))
 
     fun setUserPassword(password: String) {
         userPassword.value = password
     }
 
-    fun setUserEmailError(boolean: Boolean) {
-        emailError.value = boolean
+    fun setUsername(username:String){
+        this.username.value = username
     }
 
     fun setTrailIconClicked(boolean: Boolean) {

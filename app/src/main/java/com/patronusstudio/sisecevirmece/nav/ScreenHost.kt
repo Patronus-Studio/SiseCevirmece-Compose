@@ -7,9 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.patronusstudio.sisecevirmece.NavHomeScreen
 import com.patronusstudio.sisecevirmece.NavLoginScreen
+import com.patronusstudio.sisecevirmece.NavRegisterScreen
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
 import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
+import com.patronusstudio.sisecevirmece.ui.screens.RegisterScreen
 
 @Composable
 fun ScreenHost(navController: NavHostController) {
@@ -26,7 +28,7 @@ fun ScreenHost(navController: NavHostController) {
                         )
                     }
                     LoginScreenNavEnums.REGISTER -> navController.navigate(
-                        NavHomeScreen.screenWithArgs,
+                        NavRegisterScreen.screenName,
                         screenEnterAnimation
                     )
                     LoginScreenNavEnums.FORGET_PASSWORD -> navController.navigate(
@@ -42,6 +44,9 @@ fun ScreenHost(navController: NavHostController) {
         ) { navBackStackEntry ->
             val token = navBackStackEntry.arguments?.getString(NavHomeScreen.token)
             HomeScreen(token ?: "")
+        }
+        composable(route = NavRegisterScreen.screenName){
+            RegisterScreen()
         }
     }
 }

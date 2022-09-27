@@ -19,46 +19,47 @@ import com.patronusstudio.sisecevirmece.ui.theme.Purple700
 
 @Composable
 fun CustomTextField(
-        widthSize: Dp,
-        textFieldColors: TextFieldColors,
-        hintText: String,
-        changedText: String,
-        onValueChange: (String) -> Unit,
-        @DrawableRes trailingIcon: Int? = null,
-        trailingIconListener: (() -> Unit)? = null,
-        visualTransformation: VisualTransformation = VisualTransformation.None,
-        maxLine: Int = 1,
-        isError: Boolean = false) {
+    widthSize: Dp,
+    textFieldColors: TextFieldColors,
+    hintText: String,
+    changedText: String,
+    onValueChange: (String) -> Unit,
+    @DrawableRes trailingIcon: Int? = null,
+    trailingIconListener: (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    maxLine: Int = 1,
+    isError: Boolean = false
+) {
 
     OutlinedTextField(
-            value = changedText,
-            onValueChange = onValueChange,
-            placeholder = {
-                AnimatedVisibility(visible = changedText.isEmpty()) {
-                    Text(text = hintText)
-                }
-            },
-            trailingIcon = if (trailingIcon == null) null else {
-                {
-                    val modifier = Modifier
-                    if (trailingIconListener != null) {
-                        modifier.clickable {
+        value = changedText,
+        onValueChange = onValueChange,
+        placeholder = {
+            AnimatedVisibility(visible = changedText.isEmpty()) {
+                Text(text = hintText)
+            }
+        },
+        trailingIcon = if (trailingIcon == null) null else {
+            {
+                Image(painter = painterResource(id = trailingIcon), contentDescription = "star",
+                    modifier = if (trailingIconListener != null) {
+                        Modifier.clickable {
                             trailingIconListener()
                         }
-                    }
-                    Image(painter = painterResource(id = trailingIcon), contentDescription = "star",
-                            modifier = modifier)
-                }
-            },
-            modifier = Modifier.width(widthSize),
-            colors = textFieldColors, visualTransformation = visualTransformation,
-            maxLines = maxLine, isError = isError,
+                    } else Modifier)
+            }
+        },
+        modifier = Modifier.width(widthSize),
+        colors = textFieldColors, visualTransformation = visualTransformation,
+        maxLines = maxLine, isError = isError,
     )
 }
 
 @Composable
 fun getTextFieldColor(): TextFieldColors {
-    return TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White,
-            focusedBorderColor = Color.Green, unfocusedBorderColor = Purple700,
-            errorBorderColor = Color.Red)
+    return TextFieldDefaults.outlinedTextFieldColors(
+        backgroundColor = Color.White,
+        focusedBorderColor = Color.Green, unfocusedBorderColor = Purple700,
+        errorBorderColor = Color.Red
+    )
 }
