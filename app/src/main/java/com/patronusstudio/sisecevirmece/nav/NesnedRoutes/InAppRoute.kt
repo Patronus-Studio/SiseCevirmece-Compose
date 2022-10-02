@@ -43,7 +43,9 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             arguments = NavInAppScreens.HomeScreen.arguments
         ) { navBackStackEntry ->
             val token = navBackStackEntry.arguments?.getString(NavInAppScreens.HomeScreen.token)
-            HomeScreen(token ?: "")
+            HomeScreen(token ?: ""){
+                navController.popBackStack()
+            }
         }
 
     }

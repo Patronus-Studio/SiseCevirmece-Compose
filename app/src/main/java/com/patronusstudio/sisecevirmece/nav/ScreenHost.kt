@@ -5,9 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.patronusstudio.sisecevirmece.NavAppLandingScreens
+import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.NavSplashScreen
-import com.patronusstudio.sisecevirmece.nav.NesnedRoutes.passToInAppRoute
 import com.patronusstudio.sisecevirmece.nav.NesnedRoutes.passToAppLandingRoute
+import com.patronusstudio.sisecevirmece.nav.NesnedRoutes.passToInAppRoute
 import com.patronusstudio.sisecevirmece.ui.screens.SplashScreen
 
 @Composable
@@ -18,7 +19,8 @@ fun ScreenHost(navController: NavHostController) {
     ) {
         composable(route = NavSplashScreen.SplashScreens.routeName) {
             SplashScreen {
-                if (it) navController.navigate(NavAppLandingScreens.RootNesned.routeName)
+                if (it) navController.navigate(NavInAppScreens.RootNesned.routeName)
+                else navController.navigate(NavAppLandingScreens.RootNesned.routeName)
             }
         }
         this.passToAppLandingRoute(navController)

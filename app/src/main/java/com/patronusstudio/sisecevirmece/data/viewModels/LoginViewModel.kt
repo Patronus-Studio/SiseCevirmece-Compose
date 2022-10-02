@@ -1,11 +1,11 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.content.Context
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.model.LoginRequestModel
-import com.patronusstudio.sisecevirmece.data.network.Repository
+import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
+import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,8 @@ import kotlinx.coroutines.withContext
 
 class LoginViewModel() : ViewModel() {
 
-    private val repository by lazy { Repository() }
+    private val networkRepository by lazy { NetworkRepository() }
+    private val localRepository by lazy { LocalRepository() }
 
     private val _token = MutableStateFlow("")
     val token = _token.asStateFlow()
@@ -44,7 +45,7 @@ class LoginViewModel() : ViewModel() {
         CoroutineScope(Dispatchers.Main).launch {
             isAnimationShow.value = true
             val user_token =withContext(Dispatchers.IO){
-                repository.getUserTokenOnLocal(context)
+                localRepository.getUserTokenOnLocal(context)
             }
             user_token.firstOrNull()?.let {
                 _token.value = it
@@ -54,14 +55,14 @@ class LoginViewModel() : ViewModel() {
     }
 
     suspend fun setUserToken(context: Context){
-        repository.setUserTokenOnLocal(context,_token.value)
+        localRepository.setUserTokenOnLocal(context,_token.value)
     }
 
     fun loginWithEmailPass() {
         CoroutineScope(Dispatchers.Main).launch {
             setAnimShow(true)
-           val loginRequestModel = LoginRequestModel(username.value, userPassword.value)
-            val result = repository.loginWithUsernamePass(loginRequestModel)
+            val loginRequestModel = LoginRequestModel(username.value, userPassword.value)
+            val result = networkRepository.loginWithUsernamePass(loginRequestModel)
             if(result.body() != null && result.isSuccessful){
                 if(result.body()!!.status == HttpStatusEnum.OK){
                     _token.value = result.body()!!.token

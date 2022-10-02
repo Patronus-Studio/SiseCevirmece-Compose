@@ -2,8 +2,9 @@ package com.patronusstudio.sisecevirmece.ui.screens
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,13 +35,16 @@ import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
 import com.patronusstudio.sisecevirmece.data.model.Avatar
+import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 @Composable
-fun HomeScreen(token: String) {
+fun HomeScreen(token: String,exists:()->Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +60,7 @@ fun HomeScreen(token: String) {
         Space(0.03)
         HomeCards()
         Space(0.05)
-        PlayButton()
+        PlayButton(exists)
     }
 }
 
@@ -143,20 +148,36 @@ private fun HomeCards() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun PlayButton() {
+private fun PlayButton(exists:()->Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
+    val isExistClicked = remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = isExistClicked.value){
+        if(isExistClicked.value){
+            val result = this.async {
+                LocalRepository().removeUserToken(context)
+            }
+            result.await()
+            exists()
+        }
+    }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier
                 .width(width = (width * 0.8).dp)
                 .padding(vertical = 16.dp)
-                .clickable {
+                .combinedClickable(onClick = {
                     Toast
                         .makeText(context, "Oyna", Toast.LENGTH_SHORT)
                         .show()
-                },
+                }, onLongClick = {
+                    exists()
+                }),
             backgroundColor = Mustard,
             shape = RoundedCornerShape(16.dp)
         ) {
