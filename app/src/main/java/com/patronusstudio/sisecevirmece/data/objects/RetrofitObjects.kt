@@ -16,6 +16,7 @@ object RetrofitObjects {
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://bottleflip.herokuapp.com")
         .addConverterFactory(GsonConverterFactory.create())
+        .client(okHttpClient)
         .build()
     val service = retrofit.create(BottleService::class.java)
 }

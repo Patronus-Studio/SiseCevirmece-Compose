@@ -41,7 +41,7 @@ enum class GenderEnum(val enumType: String) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(passToHome: (String) -> Unit) {
     val viewModel = viewModel<RegisterViewModel>()
     val mContext = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
@@ -68,10 +68,15 @@ fun RegisterScreen() {
     LaunchedEffect(key1 = sheetState.currentValue) {
         if (sheetState.currentValue == ModalBottomSheetValue.Hidden) viewModel.clearErrorMessage()
     }
+    LaunchedEffect(key1 = viewModel.userToken.collectAsState().value) {
+        if (viewModel.userToken.value != null) {
+            passToHome(viewModel.userToken.value!!)
+        }
+    }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        sheetShape = RoundedCornerShape(16.dp),
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContent = {
             Box(
                 modifier = Modifier

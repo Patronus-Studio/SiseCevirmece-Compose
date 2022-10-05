@@ -17,7 +17,13 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
         route = NavInAppScreens.RootNesned.routeName
     ) {
         composable(route = NavInAppScreens.RegisterScreen.routeName) {
-            RegisterScreen()
+            RegisterScreen { userToken ->
+                navController.navigate(
+                    NavInAppScreens.HomeScreen.routeName + "/{$userToken}", navOptions {
+                        popUpTo(0)
+                    }
+                )
+            }
         }
         composable(route = NavInAppScreens.LoginScreen.routeName) { navBackStackEntry ->
             LoginScreen { loginEnum, token ->
@@ -43,7 +49,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             arguments = NavInAppScreens.HomeScreen.arguments
         ) { navBackStackEntry ->
             val token = navBackStackEntry.arguments?.getString(NavInAppScreens.HomeScreen.token)
-            HomeScreen(token ?: ""){
+            HomeScreen(token ?: "") {
                 navController.popBackStack()
             }
         }

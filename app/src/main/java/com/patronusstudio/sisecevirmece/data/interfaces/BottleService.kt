@@ -1,12 +1,11 @@
 package com.patronusstudio.sisecevirmece.data.interfaces
 
-import com.patronusstudio.sisecevirmece.data.model.LoginRequestModel
-import com.patronusstudio.sisecevirmece.data.model.LoginResponseModel
-import com.patronusstudio.sisecevirmece.data.model.UserModelRegister
-import com.patronusstudio.sisecevirmece.data.model.UserModelResponse
+import com.patronusstudio.sisecevirmece.data.model.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface BottleService {
 
@@ -15,4 +14,10 @@ interface BottleService {
 
     @POST("/register")
     suspend fun register(@Body registerModel: UserModelRegister): Response<UserModelResponse>
+
+    @POST("/emailControl")
+    suspend fun checkEmail(@Query("email") email: String): Response<SampleResponse>
+
+    @POST("/usernameControl")
+    suspend fun checkUsername(@Query("username") username: String): Response<SampleResponse>
 }
