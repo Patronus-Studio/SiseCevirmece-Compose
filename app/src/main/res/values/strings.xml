@@ -6,4 +6,5 @@
     <string name="play">OYNA</string>
     <string name="level">Level</string>
     <string name="app_name_with_blank">Şişe Çevirmece</string>
+    <string name="getting_some_error">Bir hatayla karşılaşıldı.</string>
 </resources>

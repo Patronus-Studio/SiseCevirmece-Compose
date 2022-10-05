@@ -13,7 +13,7 @@ import com.patronusstudio.sisecevirmece.ui.screens.LandingThirdScreen
 
 fun NavGraphBuilder.passToAppLandingRoute(navController: NavHostController) {
     navigation(
-        startDestination = NavAppLandingScreens.First.routeName,
+        startDestination = NavAppLandingScreens.Fourth.routeName,
         route = NavAppLandingScreens.RootNesned.routeName
     ) {
         composable(route = NavAppLandingScreens.First.routeName) {
