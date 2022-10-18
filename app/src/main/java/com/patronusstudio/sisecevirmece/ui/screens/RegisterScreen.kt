@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.GenderEnum
 import com.patronusstudio.sisecevirmece.data.utils.checkEmailCorrect
 import com.patronusstudio.sisecevirmece.data.viewModels.RegisterViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
@@ -32,13 +33,6 @@ import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
 import kotlinx.coroutines.launch
-
-enum class GenderEnum(val enumType: String) {
-    MALE("0"),
-    FEMALE("1"),
-    NONE("-1")
-}
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -86,6 +80,9 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
                     .fillMaxSize()
                     .background(BlueViolet)
             ) {
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    SampleAnimation(R.raw.register)
+                }
                 EmailView(viewModel.emailError.collectAsState().value,
                     viewModel.userEmail.collectAsState().value, widthRatio80, { email ->
                         viewModel.setUserEmail(email)
@@ -100,7 +97,6 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
                         viewModel.setUsername(it)
                     })
                 Spacer(modifier = Modifier.height(heightRatio04))
-
                 Password(
                     userPassword = viewModel.userPassword.collectAsState().value,
                     isLocked = viewModel.isLockedPassword.collectAsState().value,
@@ -113,12 +109,10 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
                     }
                 )
                 Spacer(modifier = Modifier.height(heightRatio04))
-
                 GenderPicker(viewModel.selectedGender.collectAsState().value) {
                     viewModel.setSelectedGender(it)
                 }
                 Spacer(modifier = Modifier.height(heightRatio04))
-
                 RegisterButton(widthRatio80) {
                     viewModel.register(mContext)
                 }

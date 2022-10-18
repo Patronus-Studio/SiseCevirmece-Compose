@@ -1,6 +1,9 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.annotation.IntegerRes
+import androidx.annotation.RawRes
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -8,7 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.airbnb.lottie.compose.*
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece.R
 
 
@@ -28,4 +34,14 @@ fun LoadingAnimation() {
             )
         }
     }
+}
+
+@Composable
+fun SampleAnimation(@RawRes animationRes:Int) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationRes))
+    LottieAnimation(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier.fillMaxSize(),
+    )
 }

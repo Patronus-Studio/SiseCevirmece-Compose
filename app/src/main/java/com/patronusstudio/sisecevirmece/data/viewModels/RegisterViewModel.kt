@@ -3,11 +3,11 @@ package com.patronusstudio.sisecevirmece.data.viewModels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.GenderEnum
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.model.UserModelRegister
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
-import com.patronusstudio.sisecevirmece.ui.screens.GenderEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,19 +22,19 @@ class RegisterViewModel : ViewModel() {
 
     var emailError = MutableStateFlow(false)
         private set
-    var userEmail = MutableStateFlow("me.iamcodder2@gmail.com")
+    var userEmail = MutableStateFlow("")
         private set
 
-    private val _selectedGender = MutableStateFlow(GenderEnum.MALE)
+    private val _selectedGender = MutableStateFlow(GenderEnum.NONE)
     val selectedGender: StateFlow<GenderEnum> get() = _selectedGender
 
     private val _isLockedPassword = MutableStateFlow(true)
     val isLockedPassword: StateFlow<Boolean> get() = _isLockedPassword
 
-    private val _userPassword = MutableStateFlow("123123")
+    private val _userPassword = MutableStateFlow("")
     val userPassword: StateFlow<String> get() = _userPassword
 
-    private val _username = MutableStateFlow("iamcodder2")
+    private val _username = MutableStateFlow("")
     val username: StateFlow<String> get() = _username
 
     private val _isLoading = MutableStateFlow(false)
