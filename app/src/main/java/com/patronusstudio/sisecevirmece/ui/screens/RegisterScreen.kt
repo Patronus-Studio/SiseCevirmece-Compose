@@ -29,6 +29,7 @@ import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.Mustard
 import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
+import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
 import kotlinx.coroutines.launch
 
@@ -48,10 +49,7 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
 
-    val heightRatio40 = (heightSize * 0.40).dp
     val heightRatio04 = (heightSize * 0.04).dp
-    val heightRatio10 = (heightSize * 0.1).dp
-    val heightRatio02 = (heightSize * 0.02).dp
 
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
@@ -63,7 +61,7 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
     LaunchedEffect(key1 = viewModel.errorMessage.collectAsState().value) {
         if (viewModel.errorMessage.value != null) {
             if (sheetState.isVisible.not()) sheetState.show()
-        }
+        } else sheetState.hide()
     }
     LaunchedEffect(key1 = sheetState.currentValue) {
         if (sheetState.currentValue == ModalBottomSheetValue.Hidden) viewModel.clearErrorMessage()
@@ -78,12 +76,8 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
         sheetState = sheetState,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(300.dp), contentAlignment = Alignment.Center
-            ) {
-                Text(text = viewModel.errorMessage.collectAsState().value.toString())
+            ErrorSheet(message = viewModel.errorMessage.collectAsState().value.toString()) {
+                viewModel.clearErrorMessage()
             }
         },
         content = {
