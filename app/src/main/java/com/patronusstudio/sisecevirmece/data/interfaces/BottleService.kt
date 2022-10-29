@@ -2,10 +2,7 @@ package com.patronusstudio.sisecevirmece.data.interfaces
 
 import com.patronusstudio.sisecevirmece.data.model.*
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface BottleService {
 
@@ -20,4 +17,7 @@ interface BottleService {
 
     @POST("/usernameControl")
     suspend fun checkUsername(@Query("username") username: String): Response<SampleResponse>
+
+    @GET("userGameInfo/getUserGameInfo")
+    suspend fun getUserGameInfo(@Query("username") username: String) : Response<UserInfoModelResponse>
 }

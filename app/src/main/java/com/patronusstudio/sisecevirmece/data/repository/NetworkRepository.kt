@@ -31,4 +31,10 @@ class NetworkRepository {
             RetrofitObjects.service.checkUsername(username)
         }
     }
+
+    suspend fun getUserGameInfo(username: String):Response<UserInfoModelResponse>{
+        return withContext(Dispatchers.IO){
+            RetrofitObjects.service.getUserGameInfo(username)
+        }
+    }
 }
