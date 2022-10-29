@@ -5,36 +5,37 @@ import com.patronusstudio.sisecevirmece.data.objects.RetrofitObjects
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import javax.inject.Inject
 
-class NetworkRepository {
+class NetworkRepository @Inject constructor() {
 
     suspend fun loginWithUsernamePass(loginRequestModel: LoginRequestModel): Response<LoginResponseModel> {
         return withContext(Dispatchers.IO) {
-            RetrofitObjects.service.login(loginRequestModel)
+            RetrofitObjects.getApi().login(loginRequestModel)
         }
     }
 
     suspend fun register(userModelRegister: UserModelRegister): Response<UserModelResponse> {
         return withContext(Dispatchers.IO) {
-            RetrofitObjects.service.register(userModelRegister)
+            RetrofitObjects.getApi().register(userModelRegister)
         }
     }
 
     suspend fun emailControl(email: String): Response<SampleResponse> {
         return withContext(Dispatchers.IO) {
-            RetrofitObjects.service.checkEmail(email)
+            RetrofitObjects.getApi().checkEmail(email)
         }
     }
 
     suspend fun usernameControl(username: String): Response<SampleResponse> {
         return withContext(Dispatchers.IO) {
-            RetrofitObjects.service.checkUsername(username)
+            RetrofitObjects.getApi().checkUsername(username)
         }
     }
 
-    suspend fun getUserGameInfo(username: String):Response<UserInfoModelResponse>{
-        return withContext(Dispatchers.IO){
-            RetrofitObjects.service.getUserGameInfo(username)
+    suspend fun getUserGameInfo(username: String): Response<UserInfoModelResponse> {
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().getUserGameInfo(username)
         }
     }
 }

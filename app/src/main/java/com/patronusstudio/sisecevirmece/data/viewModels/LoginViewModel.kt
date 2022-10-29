@@ -6,6 +6,7 @@ import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.model.LoginRequestModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +14,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class LoginViewModel() : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val networkRepository: NetworkRepository,
+    private val localRepository: LocalRepository) : ViewModel() {
 
-    private val networkRepository by lazy { NetworkRepository() }
-    private val localRepository by lazy { LocalRepository() }
 
     private val _token = MutableStateFlow("")
     val token = _token.asStateFlow()

@@ -8,17 +8,21 @@ import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.model.UserModelRegister
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject  constructor(
+    private val networkRepository:NetworkRepository,
+    private val localRepository:LocalRepository
+): ViewModel() {
 
-    private val networkRepository by lazy { NetworkRepository() }
-    private val localRepository by lazy { LocalRepository() }
 
     var emailError = MutableStateFlow(false)
         private set

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.data.enums.DataFetchStatus
 import com.patronusstudio.sisecevirmece.data.viewModels.SplashScreenViewModel
@@ -20,7 +21,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(isLogged: (Boolean) -> Unit) {
     val context = LocalContext.current
-    val viewModel = viewModel<SplashScreenViewModel>()
+    val viewModel = hiltViewModel<SplashScreenViewModel>()
     val dataFetchStatus by viewModel.dataFetchStatus.collectAsState()
     val userToken by viewModel.userToken.collectAsState()
 

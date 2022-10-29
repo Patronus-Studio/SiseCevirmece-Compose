@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
@@ -39,7 +40,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
-    val viewModel = viewModel<LoginViewModel>()
+    val viewModel = hiltViewModel<LoginViewModel>()
     val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp

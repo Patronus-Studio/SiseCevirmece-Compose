@@ -1,7 +1,7 @@
 buildscript {
     ext {
         //Core Libraries
-        compose_version = '1.4.0-alpha01'
+        compose_version = '1.3.0'
         compose_ui_version = '1.4.0-alpha01'
         compose_ui_tooling_version = '1.4.0-alpha01'
         compose_ui_tooling_preview_version = '1.4.0-alpha01'
@@ -14,7 +14,7 @@ buildscript {
         coroutines_android = '1.6.4'
         coroutines_core = '1.6.4'
         hilt_android = '2.44'
-        hilt_compose = '2.44'
+        hilt_compose = '1.0.0'
         hilt_compiler = '2.44'
 
         //Test Libraries
