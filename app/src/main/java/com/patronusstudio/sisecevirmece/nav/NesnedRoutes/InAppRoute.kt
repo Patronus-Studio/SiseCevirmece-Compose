@@ -1,11 +1,9 @@
 package com.patronusstudio.sisecevirmece.nav.NesnedRoutes
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
-import androidx.navigation.navigation
 import com.patronusstudio.sisecevirmece.NavInAppScreens
+import com.patronusstudio.sisecevirmece.NavSplashScreen
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
 import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
@@ -51,6 +49,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             val token = navBackStackEntry.arguments?.getString(NavInAppScreens.HomeScreen.token)
             HomeScreen(token ?: "") {
                 navController.popBackStack()
+                navController.navigate(NavInAppScreens.LoginScreen.routeName)
             }
         }
 
