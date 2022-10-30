@@ -18,6 +18,6 @@ interface BottleService {
     @POST("/usernameControl")
     suspend fun checkUsername(@Query("username") username: String): Response<SampleResponse>
 
-    @GET("userGameInfo/getUserGameInfo")
-    suspend fun getUserGameInfo(@Query("username") username: String) : Response<UserInfoModelResponse>
+    @POST("userGameInfo/getUserGameInfo")
+    suspend fun getUserGameInfo(@Query("authToken") authToken: String) : Response<UserInfoModelResponse>
 }

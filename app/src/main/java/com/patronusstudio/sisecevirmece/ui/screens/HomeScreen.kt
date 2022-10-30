@@ -10,12 +10,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -31,37 +27,74 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
 import com.patronusstudio.sisecevirmece.data.model.Avatar
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
+import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
+import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(token: String,exists:()->Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BlueViolet)
-    ) {
-        Space(0.02)
-        Title()
-        Space(0.05)
-        UserPicHousting()
-        Space(0.02)
-        Username(token)
-        LevelBar()
-        Space(0.03)
-        HomeCards()
-        Space(0.05)
-        PlayButton(exists)
+fun HomeScreen(token: String, exists: () -> Unit) {
+    val mContext = LocalContext.current
+    val viewModel = hiltViewModel<HomeViewModel>()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getUserGameInfo(token)
     }
+    LaunchedEffect(key1 = viewModel.loginError.collectAsState().value) {
+        if (viewModel.loginError.value.isNotEmpty()) {
+            if (sheetState.isVisible.not()) sheetState.show()
+        } else sheetState.hide()
+    }
+    ModalBottomSheetLayout(sheetState = sheetState,
+        sheetContent = {
+            ErrorSheet(message = viewModel.loginError.collectAsState().value, errorIconClicked = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO){
+                        viewModel.clearAuthToken(mContext)
+                    }
+                    exists()
+                }
+            })
+        },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BlueViolet)
+            ) {
+                Space(0.02)
+                Title()
+                Space(0.05)
+                UserPicHousting()
+                Space(0.02)
+                Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
+                LevelBar()
+                Space(0.03)
+                HomeCards()
+                Space(0.05)
+                PlayButton {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO){
+                            viewModel.clearAuthToken(mContext)
+                        }
+                        exists()
+                    }
+                }
+                AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                    LoadingAnimation()
+                }
+            }
+        })
 }
 
 @Composable
@@ -150,14 +183,14 @@ private fun HomeCards() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun PlayButton(exists:()->Unit) {
+private fun PlayButton(exists: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
     val isExistClicked = remember {
         mutableStateOf(false)
     }
-    LaunchedEffect(key1 = isExistClicked.value){
-        if(isExistClicked.value){
+    LaunchedEffect(key1 = isExistClicked.value) {
+        if (isExistClicked.value) {
             val result = this.async {
                 LocalRepository().removeUserToken(context)
             }

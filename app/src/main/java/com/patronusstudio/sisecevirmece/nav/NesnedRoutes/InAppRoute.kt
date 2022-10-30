@@ -28,7 +28,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavInAppScreens.HomeScreen.routeName + "/{$token}", navOptions {
+                            NavInAppScreens.HomeScreen.routeName + "/$token", navOptions {
                                 popUpTo(0)
                             }
                         )

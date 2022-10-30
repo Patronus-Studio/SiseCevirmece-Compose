@@ -4,9 +4,9 @@ import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 
 data class UserInfoModelResponse(
     val data: UserInfoModel,
-    val status: HttpStatusEnum,
-    val token: Any
-)
+    override val status: HttpStatusEnum,
+    override val message: String?
+): BaseResponse()
 
 data class UserInfoModel(
     val achievement: Any,
