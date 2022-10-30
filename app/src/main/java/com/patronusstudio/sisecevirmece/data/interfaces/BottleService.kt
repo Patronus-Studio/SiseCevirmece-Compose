@@ -20,4 +20,7 @@ interface BottleService {
 
     @POST("userGameInfo/getUserGameInfo")
     suspend fun getUserGameInfo(@Query("authToken") authToken: String) : Response<UserInfoModelResponse>
+
+    @GET("avatar/getAvatars")
+    suspend fun getAvatars(@Query("username") username: String):Response<AvatarResponseModel>
 }

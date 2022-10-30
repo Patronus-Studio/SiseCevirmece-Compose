@@ -30,8 +30,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
-import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
-import com.patronusstudio.sisecevirmece.data.model.Avatar
+import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
@@ -48,23 +47,35 @@ fun HomeScreen(token: String, exists: () -> Unit) {
     val viewModel = hiltViewModel<HomeViewModel>()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     LaunchedEffect(key1 = Unit) {
-        viewModel.getUserGameInfo(token)
+        withContext(Dispatchers.Main) {
+            viewModel.getUserGameInfo(token)
+        }
+        withContext(Dispatchers.IO) {
+            viewModel.getAvatars()
+        }
     }
-    LaunchedEffect(key1 = viewModel.loginError.collectAsState().value) {
+    LaunchedEffect(
+        key1 = viewModel.loginError.collectAsState().value,
+        key2 = viewModel.errorMessage.collectAsState().value
+    ) {
         if (viewModel.loginError.value.isNotEmpty()) {
             if (sheetState.isVisible.not()) sheetState.show()
         } else sheetState.hide()
     }
+
     ModalBottomSheetLayout(sheetState = sheetState,
         sheetContent = {
             ErrorSheet(message = viewModel.loginError.collectAsState().value, errorIconClicked = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO){
+                    withContext(Dispatchers.IO) {
                         viewModel.clearAuthToken(mContext)
                     }
                     exists()
                 }
             })
+            ErrorSheet(message = viewModel.errorMessage.collectAsState().value) {
+
+            }
         },
         content = {
             Column(
@@ -75,7 +86,7 @@ fun HomeScreen(token: String, exists: () -> Unit) {
                 Space(0.02)
                 Title()
                 Space(0.05)
-                UserPicHousting()
+                UserPicHousting(viewModel)
                 Space(0.02)
                 Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
                 LevelBar()
@@ -84,7 +95,7 @@ fun HomeScreen(token: String, exists: () -> Unit) {
                 Space(0.05)
                 PlayButton {
                     CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO){
+                        withContext(Dispatchers.IO) {
                             viewModel.clearAuthToken(mContext)
                         }
                         exists()
@@ -121,17 +132,16 @@ fun Space(ratio: Double) {
 }
 
 @Composable
-private fun UserPicHousting() {
-    val currentImage = remember { mutableStateOf(getSamplePhotoUrl()) }
-    currentImage.value.statu = AvatarStatu.BUYED
+private fun UserPicHousting(viewModel: HomeViewModel) {
+    val currentImage = remember { mutableStateOf(viewModel.getCurrentAvatar()) }
     val isClicked = remember { mutableStateOf(false) }
     if (isClicked.value) {
-        OpenDialog {
+        OpenDialog(viewModel) {
             isClicked.value = false
             if (it != null) currentImage.value = it
         }
     }
-    UserPic(0.4, currentImage.value) {
+    UserPic(0.4, viewModel.getCurrentAvatar() ?: AvatarModel(0, "", 1, AvatarStatu.BUYED)) {
         isClicked.value = true
     }
 }
@@ -224,13 +234,11 @@ private fun PlayButton(exists: () -> Unit) {
 
 //fun OpenDialog(isClicked: MutableState<Boolean>) {
 @Composable
-fun OpenDialog(dismiss: (Avatar?) -> Unit) {
+fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
     //AnimatedVisibility(visible = isClicked.value) {
-    val list = List(11) {
-        getSamplePhotoUrl()
-    }
     val width = (LocalConfiguration.current.screenWidthDp * 0.8).dp
     val height = (LocalConfiguration.current.screenHeightDp * 0.6).dp
+    val avatarList = viewModel.avatar.collectAsState().value!!
     AnimatedVisibility(visible = true) {
         Dialog(
             onDismissRequest = {
@@ -250,14 +258,14 @@ fun OpenDialog(dismiss: (Avatar?) -> Unit) {
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
                     content = {
-                        itemsIndexed(list, itemContent = { position, itemValue ->
+                        itemsIndexed(avatarList, itemContent = { position, itemValue ->
                             Box(
                                 Modifier
                                     .wrapContentSize()
                                     .padding(vertical = 8.dp)
                             ) {
                                 UserPic(ratio = 0.25, avatar = itemValue) {
-                                    if (itemValue.statu == AvatarStatu.BUYED) {
+                                    if (itemValue.buyedStatu == AvatarStatu.BUYED) {
                                         dismiss(itemValue)
                                     }
                                 }

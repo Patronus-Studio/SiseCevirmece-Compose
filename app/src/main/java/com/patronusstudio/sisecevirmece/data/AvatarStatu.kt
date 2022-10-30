@@ -1,6 +1,10 @@
 package com.patronusstudio.sisecevirmece.data
 
-enum class AvatarStatu {
-    BUYED,
-    NON_BUYED,
+import com.google.gson.annotations.SerializedName
+
+enum class AvatarStatu(val buyedStatu:String) {
+    @SerializedName("BUYED")
+    BUYED("BUYED"),
+    @SerializedName("NON_BUYED")
+    NON_BUYED("NON_BUYED"),
 }

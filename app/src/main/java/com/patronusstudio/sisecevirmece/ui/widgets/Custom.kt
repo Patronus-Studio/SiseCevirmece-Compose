@@ -37,8 +37,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
-import com.patronusstudio.sisecevirmece.data.getSamplePhotoUrl
-import com.patronusstudio.sisecevirmece.data.model.Avatar
+import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 
 @Preview
@@ -128,12 +127,11 @@ fun LevelBar(currentStar: Int = 38, nextLevelNeedStar: Int = 40, currentLevel: S
     }
 }
 
-@Preview
 @Composable
 fun UserPic(
     ratio: Double = 0.25,
-    avatar: Avatar = getSamplePhotoUrl(),
-    clickedImage: ((Avatar?) -> Unit)? = null
+    avatar: AvatarModel,
+    clickedImage: ((AvatarModel?) -> Unit)? = null
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val imageSize = (screenWidth * ratio).dp
@@ -149,13 +147,13 @@ fun UserPic(
                     .size(imageSize)
                     .clip(CircleShape)
                     .clickable {
-                        if (avatar.statu == AvatarStatu.BUYED) {
+                        if (avatar.buyedStatu == AvatarStatu.BUYED) {
                             clickedImage!!(avatar)
                         }
                     }
             ) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(avatar.url)
+                    model = ImageRequest.Builder(LocalContext.current).data(avatar.imageUrl)
                         .crossfade(true)
                         .build(), contentDescription = "",
                     contentScale = ContentScale.Crop,
@@ -169,7 +167,7 @@ fun UserPic(
                         isLoading.value = false
                     }
                 )
-                if (avatar.statu == AvatarStatu.NON_BUYED) {
+                if (avatar.buyedStatu == AvatarStatu.NON_BUYED) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()

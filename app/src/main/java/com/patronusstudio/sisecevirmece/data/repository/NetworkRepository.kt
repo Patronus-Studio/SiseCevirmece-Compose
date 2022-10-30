@@ -38,4 +38,10 @@ class NetworkRepository @Inject constructor() {
             RetrofitObjects.getApi().getUserGameInfo(username)
         }
     }
+
+    suspend fun getAvatars(username: String):Response<AvatarResponseModel>{
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().getAvatars(username)
+        }
+    }
 }
