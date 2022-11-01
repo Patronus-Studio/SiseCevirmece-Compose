@@ -68,7 +68,7 @@ class LoginViewModel @Inject constructor(
             val result = networkRepository.loginWithUsernamePass(loginRequestModel)
             if(result.body() != null && result.isSuccessful){
                 if(result.body()!!.status == HttpStatusEnum.OK){
-                    _token.value = result.body()!!.token
+                    _token.value = result.body()!!.message.toString()
                 }
                 else{
                     isThereError.value = Pair(true,result.body()?.message ?: "Bir hatayla karşılaşıldı.")

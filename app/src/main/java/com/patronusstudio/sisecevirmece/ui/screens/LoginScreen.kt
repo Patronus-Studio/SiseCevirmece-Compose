@@ -55,7 +55,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
 
     val state = viewModel.token.collectAsState().value
     LaunchedEffect(key1 = state) {
-        if (state.isNotEmpty()) {
+        if (state.isNullOrEmpty().not()) {
             withContext(Dispatchers.IO) {
                 viewModel.setUserToken(context)
             }
