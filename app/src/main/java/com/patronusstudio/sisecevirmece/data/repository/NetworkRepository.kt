@@ -44,4 +44,10 @@ class NetworkRepository @Inject constructor() {
             RetrofitObjects.getApi().getAvatars(username)
         }
     }
+
+    suspend fun getLevels():Response<LevelResponseModel>{
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().getAllLevel()
+        }
+    }
 }

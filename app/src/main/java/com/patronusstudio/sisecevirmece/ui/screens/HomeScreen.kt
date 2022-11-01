@@ -52,6 +52,7 @@ fun HomeScreen(token: String, exists: () -> Unit) {
         }
         withContext(Dispatchers.IO) {
             viewModel.getAvatars()
+            viewModel.getAllLevel()
         }
     }
     LaunchedEffect(
@@ -89,7 +90,12 @@ fun HomeScreen(token: String, exists: () -> Unit) {
                 UserPicHousting(viewModel)
                 Space(0.02)
                 Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
-                LevelBar()
+                LevelBar(
+                    currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
+                        ?: 0,
+                    currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
+                    nextLevelNeedStar = viewModel.calculateNextLevelStarSize(viewModel.levels.collectAsState().value ?: listOf())
+                )
                 Space(0.03)
                 HomeCards()
                 Space(0.05)

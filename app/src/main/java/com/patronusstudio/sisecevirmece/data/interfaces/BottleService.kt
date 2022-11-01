@@ -23,4 +23,7 @@ interface BottleService {
 
     @GET("avatar/getAvatars")
     suspend fun getAvatars(@Query("username") username: String):Response<AvatarResponseModel>
+
+    @GET("level/getAllLevel")
+    suspend fun getAllLevel():Response<LevelResponseModel>
 }

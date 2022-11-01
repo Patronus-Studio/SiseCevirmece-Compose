@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
+import android.content.res.Resources
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -29,10 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
@@ -40,16 +38,21 @@ import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 
+val Float.toDp get() = this / Resources.getSystem().displayMetrics.density
+
 @Preview
 @Composable
-fun LevelBar(currentStar: Int = 38, nextLevelNeedStar: Int = 40, currentLevel: String = "7") {
+fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: String = "7") {
     val width = LocalConfiguration.current.screenWidthDp
     val contentWidth = (width * 0.5).dp
     val contentHeight = (width * 0.20).dp
     val barWidth = (width * 0.5).dp
     val barHeight = (width * 0.1).dp
     val circleLevelSize = (width * 0.13).dp
-    val maxLevelWidth = barWidth - circleLevelSize
+    val maxLevelWidth = barWidth + 16.dp - circleLevelSize - 4.dp
+
+    val currentLeverBarSize: Dp =
+        (((currentStar * 100 / nextLevelNeedStar) * maxLevelWidth.value) / 100).dp
     val starSize = (width * 0.06).dp
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box(
@@ -69,7 +72,7 @@ fun LevelBar(currentStar: Int = 38, nextLevelNeedStar: Int = 40, currentLevel: S
                 Box(
                     modifier = Modifier
                         // TODO: 10.dp silinecek
-                        .width(maxLevelWidth - 10.dp)
+                        .width(currentLeverBarSize)
                         .height(barHeight)
                         .clip(RoundedCornerShape(16.dp))
                         .background(UnitedNationsBlue)

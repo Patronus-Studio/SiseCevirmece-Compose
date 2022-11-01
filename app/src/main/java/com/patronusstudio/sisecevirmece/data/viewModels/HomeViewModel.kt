@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.model.AvatarResponseModel
+import com.patronusstudio.sisecevirmece.data.model.LevelModel
 import com.patronusstudio.sisecevirmece.data.model.UserInfoModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
@@ -33,6 +34,9 @@ class HomeViewModel @Inject constructor(
 
     private val _avatars = MutableStateFlow<List<AvatarModel>?>(null)
     val avatar : StateFlow<List<AvatarModel>?> = _avatars
+
+    private val _levels = MutableStateFlow<List<LevelModel>?>(null)
+    val levels : StateFlow<List<LevelModel>?> = _levels
 
     suspend fun getUserGameInfo(authToken:String){
         _isLoading.value = true
@@ -66,5 +70,27 @@ class HomeViewModel @Inject constructor(
         }
         _avatars.value = avatarsResponse.body()!!.data
         _isLoading.value = false
+    }
+
+    suspend fun getAllLevel(){
+        _isLoading.value = true
+        val levelResponse = networkRepository.getLevels()
+        if(levelResponse.isSuccessful.not() || levelResponse.body()!!.status != HttpStatusEnum.OK){
+            _errorMessage.value = levelResponse.body()?.message ?: "Avatarlar çekilirken bir hata oluştu."
+            _isLoading.value = false
+            return
+        }
+        _levels.value = levelResponse.body()!!.data
+        _isLoading.value = false
+    }
+
+    fun calculateNextLevelStarSize(list: List<LevelModel>):Int{
+        val findedIndex = list.indexOfFirst {
+            it.level == _userGameInfoModel.value!!.level
+        }
+        return if(findedIndex == -1) 100
+        else{
+            _levels.value!!.get(findedIndex+1).star
+        }
     }
 }
