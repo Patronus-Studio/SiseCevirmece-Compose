@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
@@ -39,7 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
+fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<LoginViewModel>()
     val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
@@ -59,7 +60,8 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
             withContext(Dispatchers.IO) {
                 viewModel.setUserToken(context)
             }
-            goToAnotherScreen(LoginScreenNavEnums.LOGIN, state)
+            MainApplication.authToken = state
+            goToAnotherScreen(LoginScreenNavEnums.LOGIN)
         } else {
             viewModel.userTokenControl(context)
         }
@@ -97,7 +99,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
         }
         Spacer(modifier = Modifier.height(heightRatio02))
         SignInText(widthRatio80, widthRatio10) {
-            goToAnotherScreen(LoginScreenNavEnums.REGISTER, null)
+            goToAnotherScreen(LoginScreenNavEnums.REGISTER)
         }
         Spacer(modifier = Modifier.height(heightRatio04))
         GoogleSignIn()

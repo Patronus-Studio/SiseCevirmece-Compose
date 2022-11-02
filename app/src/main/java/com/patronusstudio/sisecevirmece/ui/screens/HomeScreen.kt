@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
@@ -42,13 +43,13 @@ import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(token: String, exists: () -> Unit) {
+fun HomeScreen(exists: () -> Unit) {
     val mContext = LocalContext.current
     val viewModel = hiltViewModel<HomeViewModel>()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.Main) {
-            viewModel.getUserGameInfo(token)
+            viewModel.getUserGameInfo(MainApplication.authToken)
         }
         withContext(Dispatchers.IO) {
             viewModel.getAvatars()

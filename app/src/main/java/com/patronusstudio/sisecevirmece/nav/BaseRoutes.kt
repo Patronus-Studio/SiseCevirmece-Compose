@@ -23,14 +23,6 @@ sealed class NavInAppScreens(override val routeName: String) : BaseRoutes() {
     object RootNesned: NavInAppScreens("NavAuthScreen")
     object LoginScreen : NavInAppScreens("LoginScreen")
     object RegisterScreen : NavInAppScreens("RegisterScreen")
-    object HomeScreen : NavInAppScreens("HomeScreen") {
-        var token = "token"
-        val screenWithArgs = "${routeName}/{$token}"
-        val arguments = listOf(
-            navArgument(token) {
-                NavType.StringType
-                nullable = true
-            }
-        )
-    }
+    object HomeScreen : NavInAppScreens("HomeScreen")
+    object PackageScreen:NavInAppScreens("PackageScreen")
 }
