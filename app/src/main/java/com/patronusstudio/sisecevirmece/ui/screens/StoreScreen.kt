@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.patronusstudio.sisecevirmece.data.enums.PackageTitlesButonEnum
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 
@@ -46,24 +47,24 @@ fun PackageTitles() {
     }
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Buttonsss(isActive = activeBtn.value, packageTitlesEnum = PackageTitlesEnum.CREATED) {
-                if(it == PackageTitlesEnum.CREATED) activeBtn.value = !activeBtn.value
+            ActivePassiveButton(isActive = activeBtn.value, packageTitlesEnum = PackageTitlesButonEnum.CREATED) {
+                if(it == PackageTitlesButonEnum.CREATED) activeBtn.value = !activeBtn.value
             }
-            Buttonsss(
+            ActivePassiveButton(
                 isActive = activeBtn.value.not(),
-                packageTitlesEnum = PackageTitlesEnum.DOWNLOADED
+                packageTitlesEnum = PackageTitlesButonEnum.DOWNLOADED
             ) {
-                if(it == PackageTitlesEnum.DOWNLOADED) activeBtn.value = !activeBtn.value
+                if(it == PackageTitlesButonEnum.DOWNLOADED) activeBtn.value = !activeBtn.value
             }
         }
     }
 }
 
 @Composable
-fun Buttonsss(
+fun ActivePassiveButton(
     isActive: Boolean,
-    packageTitlesEnum: PackageTitlesEnum,
-    clicked: (PackageTitlesEnum) -> Unit
+    packageTitlesEnum: PackageTitlesButonEnum,
+    clicked: (PackageTitlesButonEnum) -> Unit
 ) {
     Button(
         onClick = { clicked(packageTitlesEnum) },
@@ -81,44 +82,6 @@ fun Buttonsss(
 
 }
 
-enum class PackageTitlesEnum {
-    CREATED {
-        override fun getTitles() = "Oluşturduklarım"
-
-        override fun activeBackgrounColor(): Color =
-            Color(android.graphics.Color.parseColor("#C689C6"))
-
-        override fun activeButonText(): Color =
-            Color(android.graphics.Color.parseColor("#ffffff"))
-
-        override fun passiveBackgrounColor(): Color =
-            Color(android.graphics.Color.parseColor("#ffffff"))
-
-        override fun passiveButtonText(): Color =
-            Color(android.graphics.Color.parseColor("#C689C6"))
-    },
-    DOWNLOADED {
-        override fun getTitles() = "İndirdiklerim"
-
-        override fun activeBackgrounColor(): Color =
-            Color(android.graphics.Color.parseColor("#C689C6"))
-
-        override fun activeButonText(): Color =
-            Color(android.graphics.Color.parseColor("#ffffff"))
-
-        override fun passiveBackgrounColor(): Color =
-            Color(android.graphics.Color.parseColor("#ffffff"))
-
-        override fun passiveButtonText(): Color =
-            Color(android.graphics.Color.parseColor("#C689C6"))
-    };
-
-    abstract fun getTitles(): String
-    abstract fun activeBackgrounColor(): Color
-    abstract fun passiveBackgrounColor(): Color
-    abstract fun activeButonText(): Color
-    abstract fun passiveButtonText(): Color
-}
 
 
 
