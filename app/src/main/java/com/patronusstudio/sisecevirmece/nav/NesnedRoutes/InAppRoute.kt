@@ -3,11 +3,12 @@ package com.patronusstudio.sisecevirmece.nav.NesnedRoutes
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.patronusstudio.sisecevirmece.NavInAppScreens
-import com.patronusstudio.sisecevirmece.NavSplashScreen
+import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
 import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
 import com.patronusstudio.sisecevirmece.ui.screens.RegisterScreen
+import com.patronusstudio.sisecevirmece.ui.screens.StoreScreen
 
 fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
     navigation(
@@ -46,11 +47,23 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
             HomeScreen {
-                navController.popBackStack()
-                navController.navigate(NavInAppScreens.LoginScreen.routeName)
+                when(it){
+                    InAppScreenNavEnums.LOGOUT -> {
+                        navController.popBackStack()
+                        navController.navigate(NavInAppScreens.LoginScreen.routeName)
+                    }
+                    InAppScreenNavEnums.STORES -> {
+                        navController.navigate(NavInAppScreens.StoreScreen.routeName)
+                    }
+                    InAppScreenNavEnums.PLAY_GAME -> {
+
+                    }
+                }
             }
         }
-
+        composable(route = NavInAppScreens.StoreScreen.routeName){
+            StoreScreen()
+        }
     }
 
 }

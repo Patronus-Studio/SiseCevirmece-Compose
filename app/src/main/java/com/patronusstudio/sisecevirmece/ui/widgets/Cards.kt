@@ -43,7 +43,9 @@ fun CardImageWithText(
         modifier = Modifier
             .width(cardSizeWidth)
             .height(cardSizeHeight)
-            .clickable { clicked() },
+            .clickable {
+                clicked()
+                       },
         backgroundColor = backgroundColor,
         shape = RoundedCornerShape(16.dp),
         border = if (borderColor != null) BorderStroke(1.dp, borderColor)

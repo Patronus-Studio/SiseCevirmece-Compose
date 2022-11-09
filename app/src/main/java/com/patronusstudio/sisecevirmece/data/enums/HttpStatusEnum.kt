@@ -5,17 +5,17 @@ import com.google.gson.annotations.SerializedName
 
 enum class HttpStatusEnum(val code: String) {
     @SerializedName("OK")
-    OK("200"),
+    OK("OK"),
     @SerializedName("BadRequest")
-    BadRequest("400"),
+    BadRequest("BadRequest"),
     @SerializedName("Unauthorized")
-    Unauthorized("401"),
+    Unauthorized("Unauthorized"),
     @SerializedName("NotFound")
-    NotFound("404"),
+    NotFound("NotFound"),
     @SerializedName("NOT_ACCEPTABLE")
-    NotAcceptable("406"),
+    NotAcceptable("NOT_ACCEPTABLE"),
     @SerializedName("Unknown")
-    Unknown("0");
+    Unknown("Unknown");
 
 
 }

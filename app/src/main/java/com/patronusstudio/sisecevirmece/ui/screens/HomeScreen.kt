@@ -31,19 +31,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
+import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
-import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(exists: () -> Unit) {
+fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     val mContext = LocalContext.current
     val viewModel = hiltViewModel<HomeViewModel>()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -72,7 +75,7 @@ fun HomeScreen(exists: () -> Unit) {
                     withContext(Dispatchers.IO) {
                         viewModel.clearAuthToken(mContext)
                     }
-                    exists()
+                    route(InAppScreenNavEnums.LOGOUT)
                 }
             })
             ErrorSheet(message = viewModel.errorMessage.collectAsState().value) {
@@ -95,17 +98,27 @@ fun HomeScreen(exists: () -> Unit) {
                     currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
                         ?: 0,
                     currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
-                    nextLevelNeedStar = viewModel.calculateNextLevelStarSize(viewModel.levels.collectAsState().value ?: listOf())
+                    nextLevelNeedStar = viewModel.calculateNextLevelStarSize(
+                        viewModel.levels.collectAsState().value ?: listOf()
+                    )
                 )
                 Space(0.03)
-                HomeCards()
+                HomeCards(route)
                 Space(0.05)
                 PlayButton {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO) {
-                            viewModel.clearAuthToken(mContext)
+                    when (it) {
+                        InAppScreenNavEnums.PLAY_GAME -> {
+                            Toast.makeText(mContext, "Oyna", Toast.LENGTH_SHORT).show()
                         }
-                        exists()
+                        InAppScreenNavEnums.LOGOUT -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                withContext(Dispatchers.IO) {
+                                    viewModel.clearAuthToken(mContext)
+                                }
+                                route(InAppScreenNavEnums.LOGOUT)
+                            }
+                        }
+                        else -> ""
                     }
                 }
                 AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
@@ -161,7 +174,7 @@ private fun Username(username: String) {
 }
 
 @Composable
-private fun HomeCards() {
+private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val cardSizeWidth = (width * 0.25).dp
     val cardSizeHeight = (width * 0.25).dp
@@ -186,7 +199,7 @@ private fun HomeCards() {
             imageSize = imageSize, textColor = SunsetOrange, cardSizeWidth = cardSizeWidth,
             cardSizeHeight = cardSizeHeight
         ) {
-            Toast.makeText(context, "Mağaza", Toast.LENGTH_SHORT).show()
+            route(InAppScreenNavEnums.STORES)
         }
         CardImageWithText(
             R.drawable.profile, stringResource(id = R.string.my_profile),
@@ -200,22 +213,9 @@ private fun HomeCards() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun PlayButton(exists: () -> Unit) {
+private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
-    val isExistClicked = remember {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(key1 = isExistClicked.value) {
-        if (isExistClicked.value) {
-            val result = this.async {
-                LocalRepository().removeUserToken(context)
-            }
-            result.await()
-            exists()
-        }
-    }
-
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier
@@ -226,7 +226,7 @@ private fun PlayButton(exists: () -> Unit) {
                         .makeText(context, "Oyna", Toast.LENGTH_SHORT)
                         .show()
                 }, onLongClick = {
-                    exists()
+                    playGame(InAppScreenNavEnums.LOGOUT)
                 }),
             backgroundColor = Mustard,
             shape = RoundedCornerShape(16.dp)

@@ -26,4 +26,7 @@ interface BottleService {
 
     @GET("level/getAllLevel")
     suspend fun getAllLevel():Response<LevelResponseModel>
+
+    @GET("package/getAllPackageCategories")
+    suspend fun getAllPackageCategories():Response<PackageCategoryResponseModel>
 }
