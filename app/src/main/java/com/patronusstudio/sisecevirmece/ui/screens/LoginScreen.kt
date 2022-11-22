@@ -60,6 +60,18 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
 
+    LaunchedEffect(key1 = sheet.value, block = {
+        if(sheet.value) sheetState.show()
+        else sheetState.hide()
+    })
+
+    val isThereError = viewModel.isThereError.collectAsState().value
+    LaunchedEffect(key1 = isThereError){
+        if(isThereError.first){
+            sheet.value = true
+        }
+    }
+
     val state = viewModel.token.collectAsState().value
     LaunchedEffect(key1 = state) {
         if(isConnected()){
@@ -73,18 +85,16 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 viewModel.userTokenControl(context)
             }
         }
-        else sheet.value = true
+        else {
+            viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
+        }
     }
-
-    LaunchedEffect(key1 = sheet.value, block = {
-        if(sheet.value) sheetState.show()
-        else sheetState.hide()
-    })
 
     ModalBottomSheetLayout(
         sheetContent = {
-            ErrorSheet(message = "İnternet bağlantısı bulunamadı.") {
+            ErrorSheet(message = isThereError.second) {
                 sheet.value = false
+                viewModel.isThereError.value= Pair(false,"")
             }
         }, sheetState = sheetState
     ) {
@@ -116,7 +126,12 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 })
             Spacer(modifier = Modifier.height(heightRatio04))
             LoginButton(widthRatio80) {
-                viewModel.loginWithEmailPass()
+                if(isConnected()){
+                    viewModel.loginWithEmailPass()
+                }
+                else{
+                    viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
+                }
             }
             Spacer(modifier = Modifier.height(heightRatio02))
             SignInText(widthRatio80, widthRatio10) {
