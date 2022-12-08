@@ -18,11 +18,19 @@
         <entry key="../../../../layout/compose-model-1662055522821.xml" value="0.7046296296296296" />
         <entry key="../../../../layout/compose-model-1662058777560.xml" value="1.0" />
         <entry key="../../../../layout/compose-model-1662066852533.xml" value="1.0" />
+        <entry key="../../../../layout/compose-model-1669147609904.xml" value="0.335" />
+        <entry key="../../../../layout/compose-model-1669150269863.xml" value="0.7836363636363637" />
+        <entry key="../../../../layout/compose-model-1669661484509.xml" value="0.46296296296296297" />
+        <entry key="../../../../layout/compose-model-1669670504316.xml" value="0.44907407407407407" />
+        <entry key="../../../../layout/compose-model-1670074628542.xml" value="0.5" />
+        <entry key="../../../../layout/compose-model-1670075522096.xml" value="0.625" />
+        <entry key="../../../../layout/compose-model-1670084271256.xml" value="0.25" />
+        <entry key="../../../../layout/compose-model-1670434906823.xml" value="0.2778716216216216" />
         <entry key="..\:/Users/Legion-Y540/StudioProjects/SiseCevirmece-Compose/app/src/main/res/drawable/ic_undraw_beer_xg5f.xml" value="0.268" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_14" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

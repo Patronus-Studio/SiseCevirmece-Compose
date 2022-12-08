@@ -5,10 +5,7 @@ import androidx.navigation.compose.composable
 import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
-import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
-import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
-import com.patronusstudio.sisecevirmece.ui.screens.RegisterScreen
-import com.patronusstudio.sisecevirmece.ui.screens.StoreScreen
+import com.patronusstudio.sisecevirmece.ui.screens.*
 
 fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
     navigation(
@@ -58,11 +55,17 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                     InAppScreenNavEnums.PLAY_GAME -> {
 
                     }
+                    InAppScreenNavEnums.ADD_CATEGORIES -> {
+                        navController.navigate(NavInAppScreens.AddCategoriesScreen.routeName)
+                    }
                 }
             }
         }
         composable(route = NavInAppScreens.StoreScreen.routeName){
             StoreScreen()
+        }
+        composable(route = NavInAppScreens.AddCategoriesScreen.routeName){
+            AddCategoriesScreen()
         }
     }
 

@@ -191,8 +191,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             borderColor = SeaSerpent, cardSizeWidth, cardSizeHeight,
             imageSize
         ) {
-            Toast.makeText(context, "Kategorini Ekle", Toast.LENGTH_SHORT)
-                .show()
+            route(InAppScreenNavEnums.ADD_CATEGORIES)
         }
         CardImageWithText(
             R.drawable.store, stringResource(id = R.string.store), backgroundColor = Mustard,
