@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -65,7 +66,7 @@ fun CardImageWithText(
 }
 
 @Composable
-fun CardTitle(clickedBackButton: () -> Unit) {
+fun CardTitle(title: String, clickedBackButton: () -> Unit) {
     val cardWidth = (LocalConfiguration.current.screenWidthDp * 0.9)
     val screenHeight = LocalConfiguration.current.screenHeightDp
     Column(
@@ -92,7 +93,7 @@ fun CardTitle(clickedBackButton: () -> Unit) {
                         contentDescription = "Player Man",
                         modifier = Modifier
                             .width((cardWidth * 0.1).dp)
-                            .clip(CircleShape   )
+                            .clip(CircleShape)
                             .clickable {
                                 clickedBackButton()
                             }
@@ -100,8 +101,11 @@ fun CardTitle(clickedBackButton: () -> Unit) {
                     Spacer(modifier = Modifier.width((cardWidth * 0.05).dp))
 
                     Text(
-                        text = "Titlea", modifier = Modifier.width((cardWidth * 0.7).dp),
-                        fontSize = 24.sp, textAlign = TextAlign.Center
+                        text = title,
+                        modifier = Modifier.width((cardWidth * 0.7).dp),
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        fontFamily = FontFamily.SansSerif
                     )
                     Spacer(modifier = Modifier.width((cardWidth * 0.15).dp))
                 }
