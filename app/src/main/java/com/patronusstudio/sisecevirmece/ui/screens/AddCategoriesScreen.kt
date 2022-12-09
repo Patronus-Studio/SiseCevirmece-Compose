@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -70,6 +71,7 @@ fun AddCategoriesScreen() {
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val context = LocalContext.current
 
+    // TODO: hata mesajı doluysa bottom içerisinde hata mesajı basılacak
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,14 +81,17 @@ fun AddCategoriesScreen() {
         CardTitle(stringResource(id = R.string.add_category)) {
             Toast.makeText(context, "Geri Tuşuna basıldı", Toast.LENGTH_SHORT).show()
         }
-        CategoryCard(questionCardMaxWidth)
+        CategoryCard(questionCardMaxWidth, viewModel)
         Spacer(modifier = Modifier.height(16.dp))
-        QuestionListView(questionCardMaxHeight, questionCardMaxWidth, viewModel)
+        QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
+        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+            LoadingAnimation()
+        }
     }
 }
 
 @Composable
-private fun CategoryCard(questionCardMaxWidth: Double) {
+private fun CategoryCard(questionCardMaxWidth: Double, viewModel: AddCategoriesScreenViewModel) {
     val addImageCardSize = (questionCardMaxWidth * 0.3).dp
     Box(
         modifier = Modifier
@@ -102,9 +107,9 @@ private fun CategoryCard(questionCardMaxWidth: Double) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Spacer(modifier = Modifier.width(16.dp))
-            AddImage(addImageCardSize)
+            AddImage(addImageCardSize, viewModel)
             Spacer(modifier = Modifier.width(8.dp))
-            CategoryName()
+            CategoryName(viewModel)
             Spacer(modifier = Modifier.width(16.dp))
         }
     }
@@ -112,7 +117,7 @@ private fun CategoryCard(questionCardMaxWidth: Double) {
 }
 
 @Composable
-private fun QuestionListView(
+private fun QuestionsCard(
     questionCardMaxHeight: Double,
     questionCardMaxWidth: Double,
     viewModel: AddCategoriesScreenViewModel
@@ -132,13 +137,15 @@ private fun QuestionListView(
                 QuestionViewItem(questionModel = item, valueChange = {
                     viewModel.updateQuestionModelText(item, it)
                 }, removeBtnClicked = {
-                    viewModel.removeQuestionModel(item)
-                    if (viewModel.questionList.value.size <= 5) {
-                        btnAddLocationX = 0.dp
-                        btnRemoveLocationX = 0.dp
-                    } else {
-                        btnAddLocationX = (-80).dp
-                        btnRemoveLocationX = 80.dp
+                    if(viewModel.questionList.value.size > 1) {
+                        viewModel.removeQuestionModel(item)
+                        if (viewModel.questionList.value.size <= 5) {
+                            btnAddLocationX = 0.dp
+                            btnRemoveLocationX = 0.dp
+                        } else {
+                            btnAddLocationX = (-80).dp
+                            btnRemoveLocationX = 80.dp
+                        }
                     }
                 })
                 if (item.id == list.last().id) {
@@ -173,7 +180,7 @@ private fun QuestionListView(
                     .offset(x = offsetStateRemoveBtn.value)
             ) {
                 CircleImageButton(id = R.drawable.save) {
-
+                    viewModel.saveQuestions()
                 }
             }
         }
@@ -195,9 +202,8 @@ private fun CircleImageButton(@DrawableRes id: Int, clicked: () -> Unit) {
 
 
 @Composable
-fun AddImage(size: Dp) {
+fun AddImage(size: Dp, viewModel: AddCategoriesScreenViewModel) {
     val context = LocalContext.current
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { result ->
@@ -219,50 +225,43 @@ fun AddImage(size: Dp) {
     ) {
         imageUri?.let {
             if (Build.VERSION.SDK_INT < 28) {
-                bitmap.value = MediaStore.Images
-                    .Media.getBitmap(context.contentResolver, it)
+                viewModel.setBitmap(MediaStore.Images.Media.getBitmap(context.contentResolver, it))
             } else {
-                val source = ImageDecoder
-                    .createSource(context.contentResolver, it)
-                bitmap.value = ImageDecoder.decodeBitmap(source)
+                val source = ImageDecoder.createSource(context.contentResolver, it)
+                viewModel.setBitmap(ImageDecoder.decodeBitmap(source))
             }
-
-            bitmap.value?.let { btm ->
-                Image(
-                    bitmap = btm.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
-                )
-            }
+            Image(
+                bitmap = viewModel.selectedImage.collectAsState().value!!.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
+            )
 
         } ?: kotlin.run {
             Image(
                 painter = painterResource(id = R.drawable.select_image),
                 contentDescription = "", modifier = Modifier.size(80.dp)
             )
-
         }
     }
 }
 
 @Composable
-fun CategoryName() {
-    val packageName = remember { mutableStateOf("") }
-    val cornerShape8 = RoundedCornerShape(8.dp)
+fun CategoryName(viewModel: AddCategoriesScreenViewModel) {
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
         focusedIndicatorColor = Purple200
     )
     TextField(
-        value = packageName.value,
+        value = viewModel.packageName.collectAsState().value,
         singleLine = true,
         onValueChange = {
-            packageName.value = it
+            viewModel.setPackageName(it)
         },
         placeholder = {
             Text(text = stringResource(R.string.enter_package_name))
         },
-        colors = textFieldColors
+        colors = textFieldColors,
+        modifier = Modifier.padding(end = 16.dp, start = 8.dp)
     )
 }
 
@@ -344,6 +343,7 @@ fun GetCardWithConstraint(
                         this.top.linkTo(parent.top)
                         this.centerHorizontallyTo(parent)
                     }
+                    .padding(bottom = 8.dp)
             ) {
                 Box(contentAlignment = Alignment.TopCenter) {
                     questions()
