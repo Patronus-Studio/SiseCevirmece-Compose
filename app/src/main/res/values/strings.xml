@@ -7,4 +7,6 @@
     <string name="level">Level</string>
     <string name="app_name_with_blank">Şişe Çevirmece</string>
     <string name="getting_some_error">Bir hatayla karşılaşıldı.</string>
+    <string name="enter_package_name">Paket ismi girin</string>
+    <string name="enter_question">Sorunuzu girin.</string>
 </resources>

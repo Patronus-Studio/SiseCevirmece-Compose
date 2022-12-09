@@ -1,7 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -24,23 +24,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
-import com.patronusstudio.sisecevirmece.ui.theme.Beaver
-import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
-import com.patronusstudio.sisecevirmece.ui.theme.Purple200
-import kotlinx.coroutines.coroutineScope
+import com.patronusstudio.sisecevirmece.ui.theme.*
+import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import kotlinx.coroutines.launch
 
 data class QuestionModel(
@@ -58,81 +58,109 @@ abstract class BaseModelWithIndex {
 @Preview
 fun AddCategoriesScreen() {
     val width = LocalConfiguration.current.screenWidthDp
-
+    val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.6
+    val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Heliotrope)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        CardTitle{
+            Toast.makeText(context, "Geri Tuşuna basıldı", Toast.LENGTH_SHORT).show()
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Row(
+                Modifier
+                    .width(questionCardMaxWidth.dp)
+                    .background(Color.White, RoundedCornerShape(8.dp))
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AddImage((width * 0.3).dp)
+                CategoryName((width * 0.5).dp, 60.dp)
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        QuestionListView(questionCardMaxHeight, questionCardMaxWidth, viewModel)
+    }
+}
+
+@Composable
+private fun QuestionListView(
+    questionCardMaxHeight: Double,
+    questionCardMaxWidth: Double,
+    viewModel: AddCategoriesScreenViewModel
+) {
     var btnAddLocationX by remember { mutableStateOf(0.dp) }
     val offsetStateAddBtn =
         animateDpAsState(targetValue = btnAddLocationX, animationSpec = tween(1000))
     var btnRemoveLocationX by remember { mutableStateOf(0.dp) }
     val offsetStateRemoveBtn =
         animateDpAsState(targetValue = btnRemoveLocationX, animationSpec = tween(1000))
-
+    val list = viewModel.questionList.collectAsState().value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    val list = viewModel.questionList.collectAsState().value
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BlueViolet)
-    ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            AddImage((width * 0.3).dp)
-            CategoryName((width * 0.5).dp, 60.dp)
-        }
-        GetCardWithConstraint(questions = {
-            LazyColumn(content = {
-                this.items(list) { item ->
-                    QuestionViewItem(questionModel = item, valueChange = {
-                        viewModel.updateQuestionModelText(item, it)
-                    }, removeBtnClicked = {
-                        viewModel.removeQuestionModel(item)
-                        if (viewModel.questionList.value.size <= 5) {
-                            btnAddLocationX = 0.dp
-                            btnRemoveLocationX = 0.dp
-                        } else {
-                            btnAddLocationX = (-80).dp
-                            btnRemoveLocationX = 80.dp
-                        }
-                    })
-                    if(item.id == list.last().id){
-                        Spacer(modifier = Modifier.height(16.dp))
+    GetCardWithConstraint(questionCardMaxHeight, questionCardMaxWidth, questions = {
+        LazyColumn(content = {
+            this.items(list) { item ->
+                QuestionViewItem(questionModel = item, valueChange = {
+                    viewModel.updateQuestionModelText(item, it)
+                }, removeBtnClicked = {
+                    viewModel.removeQuestionModel(item)
+                    if (viewModel.questionList.value.size <= 5) {
+                        btnAddLocationX = 0.dp
+                        btnRemoveLocationX = 0.dp
+                    } else {
+                        btnAddLocationX = (-80).dp
+                        btnRemoveLocationX = 80.dp
                     }
+                })
+                if (item.id == list.last().id) {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            }, state = listState)
-        }, butons = {
+            }
+        }, state = listState)
+    }, butons = {
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .offset(x = offsetStateAddBtn.value)
+        ) {
+            CircleImageButton(id = R.drawable.add) {
+                viewModel.addNewQuestionModel()
+                if (list.size > 5) {
+                    btnAddLocationX = (-80).dp
+                    btnRemoveLocationX = 80.dp
+                } else {
+                    btnAddLocationX = 0.dp
+                    btnRemoveLocationX = 0.dp
+                }
+                coroutineScope.launch {
+                    listState.scrollToItem(list.size)
+                }
+            }
+        }
+        if (list.size > 5) {
             Box(
                 modifier = Modifier
                     .wrapContentSize()
-                    .offset(x = offsetStateAddBtn.value)
+                    .offset(x = offsetStateRemoveBtn.value)
             ) {
-                CircleImageButton(id = R.drawable.add) {
-                    viewModel.addNewQuestionModel()
-                    if (list.size > 5) {
-                        btnAddLocationX = (-80).dp
-                        btnRemoveLocationX = 80.dp
-                    } else {
-                        btnAddLocationX = 0.dp
-                        btnRemoveLocationX = 0.dp
-                    }
-                    coroutineScope.launch {
-                        listState.scrollToItem(list.size)
-                    }
-                }
-            }
-            if (list.size > 5) {
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .offset(x = offsetStateRemoveBtn.value)
-                ) {
-                    CircleImageButton(id = R.drawable.save) {
+                CircleImageButton(id = R.drawable.save) {
 
-                    }
                 }
             }
-        })
-    }
+        }
+    })
 }
 
 @Composable
@@ -140,29 +168,28 @@ private fun CircleImageButton(@DrawableRes id: Int, clicked: () -> Unit) {
     Image(
         painter = painterResource(id = id),
         contentDescription = "", modifier = Modifier
-            .size(32.dp)
+            .size(48.dp)
             .clip(CircleShape)
-            .border(1.dp, Color.White, CircleShape)
             .clickable {
                 clicked()
             }
     )
-
 }
 
 
 @Composable
 fun AddImage(size: Dp) {
+    val gradients = listOf(SeaSerpent, SunsetOrange, Mustard, UnitedNationsBlue)
     val cornerShape16 = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
             .size(size)
             .clip(cornerShape16)
-            .border(2.dp, Purple200, cornerShape16)
+            .border(2.dp, Brush.horizontalGradient(gradients), cornerShape16)
             .background(Color.White), contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.category),
+            painter = painterResource(id = R.drawable.select_image),
             contentDescription = "", modifier = Modifier.size(80.dp)
         )
     }
@@ -170,32 +197,29 @@ fun AddImage(size: Dp) {
 
 @Composable
 fun CategoryName(width: Dp, height: Dp) {
-    val constantName = "Paket İsmi"
-    val packageName = remember { mutableStateOf(constantName) }
+    val packageName = remember { mutableStateOf("") }
     val cornerShape8 = RoundedCornerShape(8.dp)
+    val textFieldColors = TextFieldDefaults.textFieldColors(
+        backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Purple200
+    )
     Box(
         modifier = Modifier
             .width(width)
             .height(height)
             .clip(cornerShape8)
-            .border(2.dp, Color.Green, cornerShape8)
             .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
-        BasicTextField(value = packageName.value,
-            singleLine = true, onValueChange = {
+        TextField(value = packageName.value,
+            singleLine = true,
+            onValueChange = {
                 packageName.value = it
-            }, modifier = Modifier
-                .onFocusEvent {
-                    if (it.isFocused) {
-                        if (packageName.value == constantName)
-                            packageName.value = ""
-                    } else {
-                        if (packageName.value == "")
-                            packageName.value = constantName
-                    }
-                }
-                .padding(8.dp)
+            },
+            placeholder = {
+                Text(text = stringResource(R.string.enter_package_name))
+            },
+            colors = textFieldColors
         )
     }
 }
@@ -228,13 +252,12 @@ fun QuestionViewItem(
                 valueChange(it)
             },
             placeholder = {
-                Text(text = "Sorunuzu girin.")
+                Text(text = stringResource(R.string.enter_question))
             },
             colors = textFieldColors,
             singleLine = true,
             modifier = modifier.fillMaxWidth(0.7f),
-
-            )
+        )
         Box(
             modifier = modifier
                 .fillMaxSize(0.2f)
@@ -245,47 +268,55 @@ fun QuestionViewItem(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Image(painter = painterResource(id = R.drawable.error), contentDescription = "",modifier.fillMaxSize())
+            Image(
+                painter = painterResource(id = R.drawable.error),
+                contentDescription = "",
+                modifier.fillMaxSize()
+            )
         }
     }
 }
 
 @Composable
-fun GetCardWithConstraint(questions: @Composable () -> Unit, butons: @Composable () -> Unit) {
-    val localHeight = LocalConfiguration.current.screenHeightDp * 0.8
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-    ) {
-        val (cardRef, addBtnRef) = createRefs()
-        Box(
+fun GetCardWithConstraint(
+    cardMaxHeightSize: Double,
+    cardMaxWidthSize: Double,
+    questions: @Composable () -> Unit,
+    butons: @Composable () -> Unit
+) {
+    Box(modifier = Modifier.fillMaxWidth(1f), contentAlignment = Alignment.TopCenter) {
+        ConstraintLayout(
             modifier = Modifier
-                .requiredHeightIn(100.dp, localHeight.dp)
-                .fillMaxWidth(0.9f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Beaver, RoundedCornerShape(16.dp))
-                .animateContentSize(tween(500))
-                .constrainAs(cardRef) {
-                    this.top.linkTo(parent.top)
-                    this.centerHorizontallyTo(parent)
-                }
+                .width(cardMaxWidthSize.dp)
+                .wrapContentHeight()
         ) {
+            val (cardRef, addBtnRef) = createRefs()
             Box(
-                contentAlignment = Alignment.TopCenter
+                modifier = Modifier
+                    .requiredHeightIn(100.dp, cardMaxHeightSize.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White, RoundedCornerShape(16.dp))
+                    .animateContentSize(tween(500))
+                    .constrainAs(cardRef) {
+                        this.top.linkTo(parent.top)
+                        this.centerHorizontallyTo(parent)
+                    }
             ) {
-                questions()
-            }
-        }
-        Box(
-            modifier = Modifier
-                .constrainAs(addBtnRef) {
-                    this.top.linkTo(cardRef.bottom)
-                    this.bottom.linkTo(cardRef.bottom)
+                Box(contentAlignment = Alignment.TopCenter) {
+                    questions()
                 }
-                .fillMaxWidth(), contentAlignment = Alignment.Center
-        ) {
-            butons()
+            }
+            Box(
+                modifier = Modifier
+                    .constrainAs(addBtnRef) {
+                        this.top.linkTo(cardRef.bottom)
+                        this.bottom.linkTo(cardRef.bottom)
+                    }
+                    .fillMaxWidth(), contentAlignment = Alignment.Center
+            ) {
+                butons()
+            }
         }
     }
 }
