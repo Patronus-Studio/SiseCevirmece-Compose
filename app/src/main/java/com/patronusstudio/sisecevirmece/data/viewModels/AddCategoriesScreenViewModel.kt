@@ -1,8 +1,10 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
 import com.patronusstudio.sisecevirmece.ui.screens.QuestionModel
 import kotlinx.coroutines.*
@@ -26,6 +28,9 @@ class AddCategoriesScreenViewModel : ViewModel() {
 
     private val _selectedImage = MutableStateFlow<Bitmap?>(null)
     val selectedImage: StateFlow<Bitmap?> get() = _selectedImage
+
+    private val _packageComment = MutableStateFlow("")
+    val packageComment :StateFlow<String> get() = _packageComment
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage : StateFlow<String> get() = _errorMessage
@@ -52,18 +57,26 @@ class AddCategoriesScreenViewModel : ViewModel() {
         _packageName.value = name
     }
 
+    fun setPackageComment(comment: String) {
+        _packageComment.value = comment
+    }
+
     fun setBitmap(bitmap: Bitmap) {
         _selectedImage.value = bitmap
     }
 
-    fun saveQuestions() {
+    fun saveQuestions(context: Context) {
         val listIsEmpty = listEmptyControl()
         if(listIsEmpty) {
-            _errorMessage.value = "Kendi kategorinizi eklemek için 10 taneden fazla soru ekleyin."
+            _errorMessage.value = context.getString(R.string.package_question_emty_error_message)
             return
         }
         if(_packageName.value.isEmpty()){
-            _errorMessage.value = "Lütfen kategori ismi girin."
+            _errorMessage.value = context.getString(R.string.enter_package_name)
+            return
+        }
+        if(_packageComment.value.isEmpty()){
+            _errorMessage.value = context.getString(R.string.enter_package_comment)
             return
         }
         _isLoading.value = true

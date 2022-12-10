@@ -8,5 +8,7 @@
     <string name="app_name_with_blank">Şişe Çevirmece</string>
     <string name="getting_some_error">Bir hatayla karşılaşıldı.</string>
     <string name="enter_package_name">Paket ismi girin</string>
+    <string name="enter_package_comment">Paket açıklaması girin</string>
     <string name="enter_question">Sorunuzu girin.</string>
+    <string name="package_question_emty_error_message">Kendi paketinizi eklemek için 10 taneden fazla soru ekleyin.</string>
 </resources>

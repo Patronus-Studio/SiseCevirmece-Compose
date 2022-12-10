@@ -135,7 +135,20 @@ private fun CategoryCard(questionCardMaxWidth: Double, viewModel: AddCategoriesS
             Spacer(modifier = Modifier.width(16.dp))
             AddImage(addImageCardSize, viewModel)
             Spacer(modifier = Modifier.width(8.dp))
-            CategoryName(viewModel)
+            Column(Modifier.wrapContentSize()) {
+                CategoryTextField(
+                    text = viewModel.packageName.collectAsState().value,
+                    placeText = stringResource(R.string.enter_package_name)
+                ) {
+                    viewModel.setPackageName(it)
+                }
+                CategoryTextField(
+                    text = viewModel.packageComment.collectAsState().value,
+                    placeText = stringResource(R.string.enter_package_comment)
+                ) {
+                    viewModel.setPackageComment(it)
+                }
+            }
             Spacer(modifier = Modifier.width(16.dp))
         }
     }
@@ -148,6 +161,7 @@ private fun QuestionsCard(
     questionCardMaxWidth: Double,
     viewModel: AddCategoriesScreenViewModel
 ) {
+    val localContext = LocalContext.current
     var btnAddLocationX by remember { mutableStateOf(0.dp) }
     val offsetStateAddBtn =
         animateDpAsState(targetValue = btnAddLocationX, animationSpec = tween(1000))
@@ -206,7 +220,7 @@ private fun QuestionsCard(
                     .offset(x = offsetStateRemoveBtn.value)
             ) {
                 CircleImageButton(id = R.drawable.save) {
-                    viewModel.saveQuestions()
+                    viewModel.saveQuestions(localContext)
                 }
             }
         }
@@ -272,19 +286,19 @@ fun AddImage(size: Dp, viewModel: AddCategoriesScreenViewModel) {
 }
 
 @Composable
-fun CategoryName(viewModel: AddCategoriesScreenViewModel) {
+fun CategoryTextField(text: String, placeText: String, valueChange: (String) -> Unit) {
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
         focusedIndicatorColor = Purple200
     )
     TextField(
-        value = viewModel.packageName.collectAsState().value,
+        value = text,
         singleLine = true,
         onValueChange = {
-            viewModel.setPackageName(it)
+            valueChange(it)
         },
         placeholder = {
-            Text(text = stringResource(R.string.enter_package_name))
+            Text(text = placeText)
         },
         colors = textFieldColors,
         modifier = Modifier.padding(end = 16.dp, start = 8.dp)
