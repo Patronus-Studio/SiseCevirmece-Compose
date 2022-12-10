@@ -17,11 +17,7 @@ class AddCategoriesScreenViewModel : ViewModel() {
             QuestionModel(2, "ads"),
             QuestionModel(3, "da"),
             QuestionModel(4, "asdasd"),
-            QuestionModel(5, "ad"),
-            QuestionModel(6, "ad"),
-            QuestionModel(7, "ad"),
-            QuestionModel(8, "ad"),
-            QuestionModel(9, "ad"))
+            QuestionModel(5, "ad"))
     )
     val questionList: StateFlow<List<QuestionModel>> get() = _questionList
 
@@ -81,13 +77,13 @@ class AddCategoriesScreenViewModel : ViewModel() {
     }
 
     private fun listEmptyControl(): Boolean {
-        val notEmptyQuestionSize = _questionList.value.map {
+        val notEmptyQuestionSize = _questionList.value.filter {
             it.question.isNotEmpty() && it.question.isNotBlank()
         }.size
         return notEmptyQuestionSize < 10
     }
 
-    fun savePackage() {
-
+    fun clearErrorMessage(){
+        _errorMessage.value = ""
     }
 }

@@ -1,11 +1,11 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -23,9 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +47,7 @@ import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
+import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import kotlinx.coroutines.launch
 
 data class QuestionModel(
@@ -62,6 +61,7 @@ abstract class BaseModelWithIndex {
     abstract var id: Int
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 @Preview
 fun AddCategoriesScreen() {
@@ -70,24 +70,50 @@ fun AddCategoriesScreen() {
     val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    // TODO: hata mesajı doluysa bottom içerisinde hata mesajı basılacak
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Heliotrope)
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        CardTitle(stringResource(id = R.string.add_category)) {
-            Toast.makeText(context, "Geri Tuşuna basıldı", Toast.LENGTH_SHORT).show()
-        }
-        CategoryCard(questionCardMaxWidth, viewModel)
-        Spacer(modifier = Modifier.height(16.dp))
-        QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
-        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-            LoadingAnimation()
+    BackHandler {
+        if (sheetState.isVisible) {
+            viewModel.clearErrorMessage()
         }
     }
+
+    LaunchedEffect(key1 = viewModel.errorMessage.collectAsState().value) {
+        if (viewModel.errorMessage.value.isNotEmpty()) {
+            sheetState.show()
+        } else {
+            sheetState.hide()
+        }
+    }
+
+    ModalBottomSheetLayout(
+        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
+        sheetContent = {
+            ErrorSheet(message = viewModel.errorMessage.collectAsState().value) {
+                viewModel.clearErrorMessage()
+            }
+        },
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Heliotrope)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            CardTitle(stringResource(id = R.string.add_category)) {
+                Toast.makeText(context, "Geri Tuşuna basıldı", Toast.LENGTH_SHORT).show()
+            }
+            CategoryCard(questionCardMaxWidth, viewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+            QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -137,7 +163,7 @@ private fun QuestionsCard(
                 QuestionViewItem(questionModel = item, valueChange = {
                     viewModel.updateQuestionModelText(item, it)
                 }, removeBtnClicked = {
-                    if(viewModel.questionList.value.size > 1) {
+                    if (viewModel.questionList.value.size > 1) {
                         viewModel.removeQuestionModel(item)
                         if (viewModel.questionList.value.size <= 5) {
                             btnAddLocationX = 0.dp

@@ -78,9 +78,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                     route(InAppScreenNavEnums.LOGOUT)
                 }
             })
-            ErrorSheet(message = viewModel.errorMessage.collectAsState().value) {
-
-            }
+            ErrorSheet(message = viewModel.errorMessage.collectAsState().value)
         },
         content = {
             Column(
