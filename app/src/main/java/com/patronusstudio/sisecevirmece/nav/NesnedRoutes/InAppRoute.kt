@@ -3,11 +3,9 @@ package com.patronusstudio.sisecevirmece.nav.NesnedRoutes
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.patronusstudio.sisecevirmece.NavInAppScreens
-import com.patronusstudio.sisecevirmece.NavSplashScreen
+import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
-import com.patronusstudio.sisecevirmece.ui.screens.HomeScreen
-import com.patronusstudio.sisecevirmece.ui.screens.LoginScreen
-import com.patronusstudio.sisecevirmece.ui.screens.RegisterScreen
+import com.patronusstudio.sisecevirmece.ui.screens.*
 
 fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
     navigation(
@@ -24,11 +22,11 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             }
         }
         composable(route = NavInAppScreens.LoginScreen.routeName) { navBackStackEntry ->
-            LoginScreen { loginEnum, token ->
+            LoginScreen { loginEnum ->
                 when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavInAppScreens.HomeScreen.routeName + "/$token", navOptions {
+                            NavInAppScreens.HomeScreen.routeName , navOptions {
                                 popUpTo(0)
                             }
                         )
@@ -37,22 +35,38 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                         NavInAppScreens.RegisterScreen.routeName
                     )
                     LoginScreenNavEnums.FORGET_PASSWORD -> navController.navigate(
-                        NavInAppScreens.HomeScreen.screenWithArgs
+                        NavInAppScreens.HomeScreen.routeName
                     )
                 }
             }
         }
         composable(
-            route = NavInAppScreens.HomeScreen.screenWithArgs,
-            arguments = NavInAppScreens.HomeScreen.arguments
+            route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
-            val token = navBackStackEntry.arguments?.getString(NavInAppScreens.HomeScreen.token)
-            HomeScreen(token ?: "") {
-                navController.popBackStack()
-                navController.navigate(NavInAppScreens.LoginScreen.routeName)
+            HomeScreen {
+                when(it){
+                    InAppScreenNavEnums.LOGOUT -> {
+                        navController.popBackStack()
+                        navController.navigate(NavInAppScreens.LoginScreen.routeName)
+                    }
+                    InAppScreenNavEnums.STORES -> {
+                        navController.navigate(NavInAppScreens.StoreScreen.routeName)
+                    }
+                    InAppScreenNavEnums.PLAY_GAME -> {
+
+                    }
+                    InAppScreenNavEnums.ADD_CATEGORIES -> {
+                        navController.navigate(NavInAppScreens.AddCategoriesScreen.routeName)
+                    }
+                }
             }
         }
-
+        composable(route = NavInAppScreens.StoreScreen.routeName){
+            StoreScreen()
+        }
+        composable(route = NavInAppScreens.AddCategoriesScreen.routeName){
+            AddCategoriesScreen()
+        }
     }
 
 }

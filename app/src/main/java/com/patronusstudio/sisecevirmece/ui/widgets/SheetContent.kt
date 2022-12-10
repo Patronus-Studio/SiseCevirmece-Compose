@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +17,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece.R
 
 @Composable
-fun ErrorSheet(message:String,errorIconClicked: () -> Unit) {
+fun ErrorSheet(message: String, errorIconClicked: (() -> Unit)? = null) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
     Box(
         modifier = Modifier
@@ -31,7 +30,9 @@ fun ErrorSheet(message:String,errorIconClicked: () -> Unit) {
             modifier = Modifier
                 .size(32.dp)
                 .clickable {
-                    errorIconClicked()
+                    errorIconClicked?.let {
+                        errorIconClicked()
+                    }
                 })
     }
     Column(

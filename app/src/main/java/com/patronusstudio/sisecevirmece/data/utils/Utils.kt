@@ -1,7 +1,9 @@
 package com.patronusstudio.sisecevirmece.data.utils
 
+import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 
 fun String.checkEmailCorrect(): Boolean {
     if (this.isEmpty()) {
@@ -14,4 +16,9 @@ fun String.checkEmailCorrect(): Boolean {
     val p = Pattern.compile(pttn)
     val m: Matcher = p.matcher(droppedLastBackspace)
     return m.matches()
+}
+
+fun isConnected(): Boolean {
+    val command = "ping -c 1 google.com"
+    return Runtime.getRuntime().exec(command).waitFor() == 0
 }

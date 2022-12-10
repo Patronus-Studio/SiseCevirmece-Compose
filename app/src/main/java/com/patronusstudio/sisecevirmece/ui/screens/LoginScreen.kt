@@ -6,8 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,21 +25,30 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
+import com.patronusstudio.sisecevirmece.data.utils.isConnected
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.Mustard
 import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
+import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
+fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<LoginViewModel>()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val sheet = remember {
+        mutableStateOf(false)
+    }
     val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
@@ -52,59 +60,91 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums, String?) -> Unit) {
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
 
+    LaunchedEffect(key1 = sheet.value, block = {
+        if(sheet.value) sheetState.show()
+        else sheetState.hide()
+    })
 
-    val state = viewModel.token.collectAsState().value
-    LaunchedEffect(key1 = state) {
-        if (state.isNullOrEmpty().not()) {
-            withContext(Dispatchers.IO) {
-                viewModel.setUserToken(context)
-            }
-            goToAnotherScreen(LoginScreenNavEnums.LOGIN, state)
-        } else {
-            viewModel.userTokenControl(context)
+    val isThereError = viewModel.isThereError.collectAsState().value
+    LaunchedEffect(key1 = isThereError){
+        if(isThereError.first){
+            sheet.value = true
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BlueViolet),
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        TopImage(widthRatio80, heightRatio40)
-        Spacer(modifier = Modifier.height(heightRatio10))
-        UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
-            viewModel.setUsername(username)
-        }
-        Spacer(modifier = Modifier.height(heightRatio04))
-        Password(
-            viewModel.userPassword.collectAsState().value,
-            viewModel.isPasswordTrailLocked.collectAsState().value,
-            widthRatio80,
-            {
-                viewModel.setUserPassword(it)
-            },
-            {
-                if (viewModel.isPasswordTrailLocked.value) {
-                    viewModel.setTrailIconClicked(false)
-                } else {
-                    viewModel.setTrailIconClicked(true)
+    val state = viewModel.token.collectAsState().value
+    LaunchedEffect(key1 = state) {
+        if(isConnected()){
+            if (state.isEmpty().not()) {
+                withContext(Dispatchers.IO) {
+                    viewModel.setUserToken(context)
                 }
-            })
-        Spacer(modifier = Modifier.height(heightRatio04))
-        LoginButton(widthRatio80) {
-            viewModel.loginWithEmailPass()
+                MainApplication.authToken = state
+                goToAnotherScreen(LoginScreenNavEnums.LOGIN)
+            } else {
+                viewModel.userTokenControl(context)
+            }
         }
-        Spacer(modifier = Modifier.height(heightRatio02))
-        SignInText(widthRatio80, widthRatio10) {
-            goToAnotherScreen(LoginScreenNavEnums.REGISTER, null)
+        else {
+            viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
         }
-        Spacer(modifier = Modifier.height(heightRatio04))
-        GoogleSignIn()
-        Spacer(modifier = Modifier.height(heightRatio04))
-        AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
-            LoadingAnimation()
+    }
+
+    ModalBottomSheetLayout(
+        sheetContent = {
+            ErrorSheet(message = isThereError.second) {
+                sheet.value = false
+                viewModel.isThereError.value= Pair(false,"")
+            }
+        }, sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BlueViolet),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            TopImage(widthRatio80, heightRatio40)
+            Spacer(modifier = Modifier.height(heightRatio10))
+            UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
+                viewModel.setUsername(username)
+            }
+            Spacer(modifier = Modifier.height(heightRatio04))
+            Password(
+                viewModel.userPassword.collectAsState().value,
+                viewModel.isPasswordTrailLocked.collectAsState().value,
+                widthRatio80,
+                {
+                    viewModel.setUserPassword(it)
+                },
+                {
+                    if (viewModel.isPasswordTrailLocked.value) {
+                        viewModel.setTrailIconClicked(false)
+                    } else {
+                        viewModel.setTrailIconClicked(true)
+                    }
+                })
+            Spacer(modifier = Modifier.height(heightRatio04))
+            LoginButton(widthRatio80) {
+                if(isConnected()){
+                    viewModel.loginWithEmailPass()
+                }
+                else{
+                    viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
+                }
+            }
+            Spacer(modifier = Modifier.height(heightRatio02))
+            SignInText(widthRatio80, widthRatio10) {
+                goToAnotherScreen(LoginScreenNavEnums.REGISTER)
+            }
+            Spacer(modifier = Modifier.height(heightRatio04))
+            GoogleSignIn()
+            Spacer(modifier = Modifier.height(heightRatio04))
+            AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
+                LoadingAnimation()
+            }
         }
+
     }
 }
 

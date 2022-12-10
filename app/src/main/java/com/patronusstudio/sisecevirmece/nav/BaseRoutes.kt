@@ -1,9 +1,6 @@
 package com.patronusstudio.sisecevirmece
 
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-
-sealed class  BaseRoutes {
+sealed class BaseRoutes {
     abstract val routeName: String
 }
 
@@ -12,7 +9,7 @@ sealed class NavSplashScreen(override val routeName: String) : BaseRoutes() {
 }
 
 sealed class NavAppLandingScreens(override val routeName: String) : BaseRoutes() {
-    object RootNesned: NavAppLandingScreens("NavAppLandingScreens")
+    object RootNesned : NavAppLandingScreens("NavAppLandingScreens")
     object First : NavAppLandingScreens("First")
     object Second : NavAppLandingScreens("Second")
     object Third : NavAppLandingScreens("Third")
@@ -20,17 +17,10 @@ sealed class NavAppLandingScreens(override val routeName: String) : BaseRoutes()
 }
 
 sealed class NavInAppScreens(override val routeName: String) : BaseRoutes() {
-    object RootNesned: NavInAppScreens("NavAuthScreen")
+    object RootNesned : NavInAppScreens("NavAuthScreen")
     object LoginScreen : NavInAppScreens("LoginScreen")
     object RegisterScreen : NavInAppScreens("RegisterScreen")
-    object HomeScreen : NavInAppScreens("HomeScreen") {
-        var token = "token"
-        val screenWithArgs = "${routeName}/{$token}"
-        val arguments = listOf(
-            navArgument(token) {
-                NavType.StringType
-                nullable = true
-            }
-        )
-    }
+    object HomeScreen : NavInAppScreens("HomeScreen")
+    object StoreScreen : NavInAppScreens("StoreScreen")
+    object AddCategoriesScreen: NavInAppScreens("AddCategoriesScreen")
 }

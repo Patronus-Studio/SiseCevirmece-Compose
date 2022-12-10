@@ -1,7 +1,10 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,18 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patronusstudio.sisecevirmece.R
-import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
-import com.patronusstudio.sisecevirmece.ui.theme.Mustard
-import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
-import com.patronusstudio.sisecevirmece.ui.theme.UnitedNationsBlue
 
 @Composable
 fun CardImageWithText(
@@ -43,7 +41,9 @@ fun CardImageWithText(
         modifier = Modifier
             .width(cardSizeWidth)
             .height(cardSizeHeight)
-            .clickable { clicked() },
+            .clickable {
+                clicked()
+            },
         backgroundColor = backgroundColor,
         shape = RoundedCornerShape(16.dp),
         border = if (borderColor != null) BorderStroke(1.dp, borderColor)
@@ -61,6 +61,55 @@ fun CardImageWithText(
                 modifier = Modifier.size(imageSize)
             )
             Text(text = text, fontSize = 12.sp, style = TextStyle(color = textColor))
+        }
+    }
+}
+
+@Composable
+fun CardTitle(title: String, clickedBackButton: () -> Unit) {
+    val cardWidth = (LocalConfiguration.current.screenWidthDp * 0.9)
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .requiredHeightIn(min = (screenHeight * 0.08).dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(cardWidth.dp)
+                    .background(Color.White, RoundedCornerShape(8.dp))
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.back),
+                        contentDescription = "Player Man",
+                        modifier = Modifier
+                            .width((cardWidth * 0.1).dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                clickedBackButton()
+                            }
+                    )
+                    Spacer(modifier = Modifier.width((cardWidth * 0.05).dp))
+
+                    Text(
+                        text = title,
+                        modifier = Modifier.width((cardWidth * 0.7).dp),
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        fontFamily = FontFamily.SansSerif
+                    )
+                    Spacer(modifier = Modifier.width((cardWidth * 0.15).dp))
+                }
+            }
         }
     }
 }

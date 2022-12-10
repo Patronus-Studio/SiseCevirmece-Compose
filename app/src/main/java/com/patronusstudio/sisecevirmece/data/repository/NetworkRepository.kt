@@ -50,4 +50,10 @@ class NetworkRepository @Inject constructor() {
             RetrofitObjects.getApi().getAllLevel()
         }
     }
+
+    suspend fun getPackageCategories():Response<PackageCategoryResponseModel>{
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().getAllPackageCategories()
+        }
+    }
 }
