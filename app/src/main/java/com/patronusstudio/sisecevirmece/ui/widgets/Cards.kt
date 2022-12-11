@@ -14,7 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -24,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patronusstudio.sisecevirmece.R
+
 
 @Composable
 fun CardImageWithText(
@@ -113,3 +119,119 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun ButtonWithDot(
+    width: Int,
+    height: Int,
+    dotColor: Color,
+    btnColor: Color,
+    text: String,
+    textColor: Color
+) {
+    val cornerShape = RoundedCornerShape(8.dp)
+    Box(
+        modifier = Modifier
+            .width(width.dp)
+            .height(height.dp)
+            .background(Color.Transparent)
+            .graphicsLayer {
+                compositingStrategy = CompositingStrategy.Offscreen
+            }
+            .drawWithCache {
+                val path = Path()
+                onDrawWithContent {
+                    clipPath(path) {
+                        this@onDrawWithContent.drawContent()
+                    }
+                    drawContent()
+                    val circleSize = size.height / 4f
+                    val xLocation = size.width - circleSize
+                    val yLocation = circleSize
+                    drawCircle(
+                        Color.Transparent,
+                        radius = circleSize,
+                        center = Offset(xLocation, yLocation),
+                        blendMode = BlendMode.Clear
+                    )
+                    drawCircle(
+                        dotColor, radius = circleSize * 0.7f,
+                        center = Offset(xLocation, yLocation)
+                    )
+                }
+            }, contentAlignment = Alignment.BottomCenter
+    ) {
+
+        Box(
+            modifier = Modifier
+                .width((width - height * 0.1).dp)
+                .height((height - height * 0.1).dp)
+                .background(btnColor, cornerShape)
+                .clip(cornerShape),
+
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = text, color = textColor)
+        }
+    }
+}
+
+
+@Composable
+fun GraphicsLayerCompositingStrategyExample() {
+    Image(painter = painterResource(id = R.drawable.player_girl),
+        contentDescription = "Dog",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(120.dp)
+            .background(
+                Brush.linearGradient(
+                    listOf(
+                        Color(0xFFC5E1A5),
+                        Color(0xFF80DEEA)
+                    )
+                )
+            )
+            .graphicsLayer {
+                compositingStrategy = CompositingStrategy.Offscreen
+            }
+            .drawWithCache {
+                val path = Path()
+                path.addOval(
+                    Rect(
+                        topLeft = Offset.Zero,
+                        bottomRight = Offset(size.width, size.height)
+                    )
+                )
+                onDrawWithContent {
+                    clipPath(path) {
+                        this@onDrawWithContent.drawContent()
+                    }
+                    val dotSize = size.width / 8f
+                    drawCircle(
+                        Color.Black,
+                        radius = dotSize,
+                        center = Offset(
+                            x = size.width - dotSize,
+                            y = size.height - dotSize
+                        ),
+                        blendMode = BlendMode.Clear
+                    )
+                    drawCircle(
+                        Color(0xFFEF5350), radius = dotSize * 0.8f,
+                        center = Offset(
+                            x = size.width - dotSize,
+                            y = size.height - dotSize
+                        )
+                    )
+                }
+
+            }
+    )
+}
+
+
+
+
+
+
