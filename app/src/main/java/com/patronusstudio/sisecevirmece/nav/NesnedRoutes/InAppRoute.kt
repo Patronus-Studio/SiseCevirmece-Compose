@@ -65,7 +65,9 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             StoreScreen()
         }
         composable(route = NavInAppScreens.AddCategoriesScreen.routeName){
-            AddCategoriesScreen()
+            AddCategoriesScreen(){
+                navController.popBackStack()
+            }
         }
     }
 

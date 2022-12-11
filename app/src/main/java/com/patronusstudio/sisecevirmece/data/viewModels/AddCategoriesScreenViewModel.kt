@@ -5,13 +5,20 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
+import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
 import com.patronusstudio.sisecevirmece.ui.screens.QuestionModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class AddCategoriesScreenViewModel : ViewModel() {
+@HiltViewModel
+class AddCategoriesScreenViewModel  @Inject constructor(
+    private val networkRepository: NetworkRepository,
+    private val localRepository: LocalRepository) : ViewModel() {
 
     private val _questionList = MutableStateFlow(
         mutableStateListOf(
@@ -19,7 +26,8 @@ class AddCategoriesScreenViewModel : ViewModel() {
             QuestionModel(2, "ads"),
             QuestionModel(3, "da"),
             QuestionModel(4, "asdasd"),
-            QuestionModel(5, "ad"))
+            QuestionModel(5, "ad")
+        )
     )
     val questionList: StateFlow<List<QuestionModel>> get() = _questionList
 
@@ -30,13 +38,13 @@ class AddCategoriesScreenViewModel : ViewModel() {
     val selectedImage: StateFlow<Bitmap?> get() = _selectedImage
 
     private val _packageComment = MutableStateFlow("")
-    val packageComment :StateFlow<String> get() = _packageComment
+    val packageComment: StateFlow<String> get() = _packageComment
 
     private val _errorMessage = MutableStateFlow("")
-    val errorMessage : StateFlow<String> get() = _errorMessage
+    val errorMessage: StateFlow<String> get() = _errorMessage
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading :StateFlow<Boolean> get() = _isLoading
+    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     fun updateQuestionModelText(questionModel: QuestionModel, newText: String) {
         questionModel.question = newText
@@ -67,15 +75,15 @@ class AddCategoriesScreenViewModel : ViewModel() {
 
     fun saveQuestions(context: Context) {
         val listIsEmpty = listEmptyControl()
-        if(listIsEmpty) {
+        if (listIsEmpty) {
             _errorMessage.value = context.getString(R.string.package_question_emty_error_message)
             return
         }
-        if(_packageName.value.isEmpty()){
+        if (_packageName.value.isEmpty()) {
             _errorMessage.value = context.getString(R.string.enter_package_name)
             return
         }
-        if(_packageComment.value.isEmpty()){
+        if (_packageComment.value.isEmpty()) {
             _errorMessage.value = context.getString(R.string.enter_package_comment)
             return
         }
@@ -83,7 +91,7 @@ class AddCategoriesScreenViewModel : ViewModel() {
         // TODO: db kaydetme işlemi yapılacak
         CoroutineScope(Dispatchers.Default).launch {
             delay(2000)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 _isLoading.value = false
             }
         }
@@ -96,7 +104,12 @@ class AddCategoriesScreenViewModel : ViewModel() {
         return notEmptyQuestionSize < 10
     }
 
-    fun clearErrorMessage(){
+    fun clearErrorMessage() {
         _errorMessage.value = ""
+    }
+
+    suspend fun getPackageCategories() {
+        val result = networkRepository.getPackageCategories()
+       result.body()
     }
 }

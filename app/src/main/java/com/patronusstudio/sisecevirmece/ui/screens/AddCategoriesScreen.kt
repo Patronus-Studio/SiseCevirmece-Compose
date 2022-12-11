@@ -4,7 +4,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -46,9 +44,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
+import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class QuestionModel(
     override var id: Int,
@@ -63,11 +65,12 @@ abstract class BaseModelWithIndex {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-@Preview
-fun AddCategoriesScreen() {
+fun AddCategoriesScreen(back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.6
     val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
+    val dotButtonWidth = LocalConfiguration.current.screenWidthDp * 0.25
+    val dotButtonHeight = LocalConfiguration.current.screenHeightDp * 0.07
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -76,6 +79,8 @@ fun AddCategoriesScreen() {
     BackHandler {
         if (sheetState.isVisible) {
             viewModel.clearErrorMessage()
+        } else {
+            back()
         }
     }
 
@@ -84,6 +89,13 @@ fun AddCategoriesScreen() {
             sheetState.show()
         } else {
             sheetState.hide()
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        delay(2000)
+        withContext(Dispatchers.IO) {
+            viewModel.getPackageCategories()
         }
     }
 
@@ -103,10 +115,18 @@ fun AddCategoriesScreen() {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             CardTitle(stringResource(id = R.string.add_category)) {
-                Toast.makeText(context, "Geri Tuşuna basıldı", Toast.LENGTH_SHORT).show()
+                back()
             }
             CategoryCard(questionCardMaxWidth, viewModel)
             Spacer(modifier = Modifier.height(16.dp))
+            ButtonWithDot(
+                dotButtonWidth.toInt(),
+                dotButtonHeight.toInt(),
+                Green,
+                UnitedNationsBlue,
+                "Click me!",
+                Color.White
+            )
             QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                 LoadingAnimation()
