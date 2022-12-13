@@ -4,7 +4,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +44,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.QuestionModel
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
@@ -54,17 +54,6 @@ import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-data class QuestionModel(
-    override var id: Int,
-    var question: String
-) : BaseModelWithIndex() {
-    override fun equals(other: Any?): Boolean = false
-}
-
-abstract class BaseModelWithIndex {
-    abstract var id: Int
-}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -196,6 +185,7 @@ private fun CategoryType(
                         textColor = Color(android.graphics.Color.parseColor(item.passiveTextColor))
                     ) {
                         viewModel.setPackageCategory(item)
+
                         userSelectedCategory.value = item.id.toInt()
                     }
                 }
@@ -382,7 +372,7 @@ fun QuestionViewItem(
                 valueChange(it)
             },
             placeholder = {
-                Text(text = stringResource(R.string.enter_question))
+                Text(text = stringResource(id =R.string.enter_question))
             },
             colors = textFieldColors,
             singleLine = true,
