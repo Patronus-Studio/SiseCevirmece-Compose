@@ -122,17 +122,17 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
 
 @Composable
 fun ButtonWithDot(
-    width: Int,
     height: Int,
     dotColor: Color,
     btnColor: Color,
     text: String,
-    textColor: Color
+    textColor: Color,
+    clicked: () -> Unit
 ) {
     val cornerShape = RoundedCornerShape(8.dp)
     Box(
         modifier = Modifier
-            .width(width.dp)
+            .wrapContentWidth()
             .height(height.dp)
             .background(Color.Transparent)
             .graphicsLayer {
@@ -159,16 +159,53 @@ fun ButtonWithDot(
                         center = Offset(xLocation, yLocation)
                     )
                 }
-            }, contentAlignment = Alignment.BottomCenter
+            }
+            .clickable {
+                clicked()
+            }
+            .padding(horizontal = (height / 4).dp),
+        contentAlignment = Alignment.BottomCenter
     ) {
-
         Box(
             modifier = Modifier
-                .width((width - height * 0.1).dp)
+                .wrapContentWidth()
                 .height((height - height * 0.1).dp)
                 .background(btnColor, cornerShape)
-                .clip(cornerShape),
+                .clip(cornerShape)
+                .padding(horizontal = (height / 4).dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = text, color = textColor)
+        }
+    }
+}
 
+@Composable
+fun ButtonWithPassive(
+    height: Int,
+    btnColor: Color,
+    text: String,
+    textColor: Color,
+    clicked: () -> Unit
+) {
+    val cornerShape = RoundedCornerShape(8.dp)
+    Box(
+        modifier = Modifier
+            .wrapContentWidth()
+            .height(height.dp)
+            .padding(horizontal = (height / 4).dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Box(
+            modifier = Modifier
+                .wrapContentHeight()
+                .height((height - height * 0.1).dp)
+                .background(btnColor, cornerShape)
+                .clip(cornerShape)
+                .clickable {
+                    clicked()
+                }
+                .padding(horizontal = (height / 4).dp),
             contentAlignment = Alignment.Center
         ) {
             Text(text = text, color = textColor)

@@ -4,6 +4,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -42,13 +44,14 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
+import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithPassive
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -67,13 +70,11 @@ abstract class BaseModelWithIndex {
 @Composable
 fun AddCategoriesScreen(back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
-    val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.6
+    val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.55
     val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
-    val dotButtonWidth = LocalConfiguration.current.screenWidthDp * 0.25
     val dotButtonHeight = LocalConfiguration.current.screenHeightDp * 0.07
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     BackHandler {
@@ -93,7 +94,6 @@ fun AddCategoriesScreen(back: () -> Unit) {
     }
 
     LaunchedEffect(key1 = Unit) {
-        delay(2000)
         withContext(Dispatchers.IO) {
             viewModel.getPackageCategories()
         }
@@ -110,7 +110,7 @@ fun AddCategoriesScreen(back: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxHeight()
                 .background(Heliotrope)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -118,22 +118,16 @@ fun AddCategoriesScreen(back: () -> Unit) {
                 back()
             }
             CategoryCard(questionCardMaxWidth, viewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-            ButtonWithDot(
-                dotButtonWidth.toInt(),
-                dotButtonHeight.toInt(),
-                Green,
-                UnitedNationsBlue,
-                "Click me!",
-                Color.White
-            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
+            Spacer(modifier = Modifier.height(8.dp))
             QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                 LoadingAnimation()
             }
         }
-    }
 
+    }
 }
 
 @Composable
@@ -171,6 +165,47 @@ private fun CategoryCard(questionCardMaxWidth: Double, viewModel: AddCategoriesS
             }
             Spacer(modifier = Modifier.width(16.dp))
         }
+    }
+}
+
+@Composable
+private fun CategoryType(
+    viewModel: AddCategoriesScreenViewModel,
+    dotButtonHeight: Double
+) {
+    val localContext = LocalContext.current
+    val userSelectedCategory = remember { mutableStateOf(0) }
+    LazyRow {
+        items(items = viewModel.categories.value,
+            itemContent = { item: PackageCategoryModel ->
+                AnimatedVisibility(visible = item.id.toInt() == userSelectedCategory.value) {
+                    ButtonWithDot(
+                        height = dotButtonHeight.toInt(),
+                        dotColor = Green,
+                        btnColor = Color(android.graphics.Color.parseColor(item.activeBtnColor)),
+                        text = item.name,
+                        textColor = Color(android.graphics.Color.parseColor(item.activeTextColor))
+                    ) {
+                        Toast.makeText(
+                            localContext, item.name, Toast.LENGTH_SHORT
+                        ).show()
+                        userSelectedCategory.value = item.id.toInt()
+                    }
+                }
+                AnimatedVisibility(visible = item.id.toInt() != userSelectedCategory.value) {
+                    ButtonWithPassive(
+                        height = dotButtonHeight.toInt(),
+                        btnColor = Color(android.graphics.Color.parseColor(item.passiveBtnColor)),
+                        text = item.name,
+                        textColor = Color(android.graphics.Color.parseColor(item.passiveTextColor))
+                    ) {
+                        Toast.makeText(
+                            localContext, item.name, Toast.LENGTH_SHORT
+                        ).show()
+                        userSelectedCategory.value = item.id.toInt()
+                    }
+                }
+            })
     }
 
 }
@@ -390,6 +425,7 @@ fun GetCardWithConstraint(
             modifier = Modifier
                 .width(cardMaxWidthSize.dp)
                 .wrapContentHeight()
+                .padding(bottom = 16.dp)
         ) {
             val (cardRef, addBtnRef) = createRefs()
             Box(

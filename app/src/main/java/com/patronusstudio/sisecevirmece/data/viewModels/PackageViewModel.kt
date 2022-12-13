@@ -26,7 +26,7 @@ class PackageViewModel @Inject constructor(
     suspend fun getPackageCategories() {
         _isLoading.value = true
         val categories = networkRepository.getPackageCategories()
-        if (categories.isSuccessful.not() || categories.body() == null || categories.body()?.status != HttpStatusEnum.OK.code) {
+        if (categories.isSuccessful.not() || categories.body() == null || categories.body()?.status != HttpStatusEnum.OK) {
             _errorMessage.value = categories.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
         }
         _isLoading.value = false

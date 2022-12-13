@@ -3,8 +3,13 @@ package com.patronusstudio.sisecevirmece.data.viewModels
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
+import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
+import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
@@ -16,9 +21,10 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class AddCategoriesScreenViewModel  @Inject constructor(
+class AddCategoriesScreenViewModel @Inject constructor(
     private val networkRepository: NetworkRepository,
-    private val localRepository: LocalRepository) : ViewModel() {
+    private val localRepository: LocalRepository
+) : ViewModel() {
 
     private val _questionList = MutableStateFlow(
         mutableStateListOf(
@@ -45,6 +51,9 @@ class AddCategoriesScreenViewModel  @Inject constructor(
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    private val _categories = MutableStateFlow<List<PackageCategoryModel>>(listOf())
+    val categories: StateFlow<List<PackageCategoryModel>> get() = _categories
 
     fun updateQuestionModelText(questionModel: QuestionModel, newText: String) {
         questionModel.question = newText
@@ -109,7 +118,17 @@ class AddCategoriesScreenViewModel  @Inject constructor(
     }
 
     suspend fun getPackageCategories() {
+        _isLoading.value = true
         val result = networkRepository.getPackageCategories()
-       result.body()
+        val body = result.body()
+        if(body == null || body.status != HttpStatusEnum.OK){
+            _errorMessage.value = body?.message ?: "Bir hatayla karşılaşıldı"
+            _isLoading.value = false
+            return
+        }
+        _categories.value = body.packageCategoryModel.filter {
+            it.isUserSelectableWhenCreatingPackage == SelectableEnum.YES
+        }
+        _isLoading.value = false
     }
 }
