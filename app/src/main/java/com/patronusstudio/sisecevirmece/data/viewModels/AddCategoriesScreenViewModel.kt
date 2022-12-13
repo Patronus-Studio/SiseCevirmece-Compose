@@ -46,6 +46,9 @@ class AddCategoriesScreenViewModel @Inject constructor(
     private val _packageComment = MutableStateFlow("")
     val packageComment: StateFlow<String> get() = _packageComment
 
+    private val _packageCategoryModel = MutableStateFlow<PackageCategoryModel?>(null)
+    val packageCategoryModel :StateFlow<PackageCategoryModel?> get() = _packageCategoryModel
+
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> get() = _errorMessage
 
@@ -78,6 +81,10 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _packageComment.value = comment
     }
 
+    fun setPackageCategory(packageCategoryModel: PackageCategoryModel){
+        _packageCategoryModel.value = packageCategoryModel
+    }
+
     fun setBitmap(bitmap: Bitmap) {
         _selectedImage.value = bitmap
     }
@@ -94,6 +101,10 @@ class AddCategoriesScreenViewModel @Inject constructor(
         }
         if (_packageComment.value.isEmpty()) {
             _errorMessage.value = context.getString(R.string.enter_package_comment)
+            return
+        }
+        if(_packageCategoryModel.value == null){
+            _errorMessage.value = context.getString(R.string.select_package_category)
             return
         }
         _isLoading.value = true

@@ -173,7 +173,6 @@ private fun CategoryType(
     viewModel: AddCategoriesScreenViewModel,
     dotButtonHeight: Double
 ) {
-    val localContext = LocalContext.current
     val userSelectedCategory = remember { mutableStateOf(0) }
     LazyRow {
         items(items = viewModel.categories.value,
@@ -186,9 +185,6 @@ private fun CategoryType(
                         text = item.name,
                         textColor = Color(android.graphics.Color.parseColor(item.activeTextColor))
                     ) {
-                        Toast.makeText(
-                            localContext, item.name, Toast.LENGTH_SHORT
-                        ).show()
                         userSelectedCategory.value = item.id.toInt()
                     }
                 }
@@ -199,9 +195,7 @@ private fun CategoryType(
                         text = item.name,
                         textColor = Color(android.graphics.Color.parseColor(item.passiveTextColor))
                     ) {
-                        Toast.makeText(
-                            localContext, item.name, Toast.LENGTH_SHORT
-                        ).show()
+                        viewModel.setPackageCategory(item)
                         userSelectedCategory.value = item.id.toInt()
                     }
                 }
