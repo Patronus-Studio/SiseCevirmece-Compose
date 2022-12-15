@@ -24,10 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -118,7 +114,14 @@ class AddCategoriesScreenViewModel @Inject constructor(
             return
         }
         _isLoading.value = true
+        CoroutineScope(Dispatchers.Main).launch {
+            saveDb(context)
+            clearAllContent()
+        }
+        _isLoading.value = false
+    }
 
+    private suspend fun saveDb(context:Context) {
         val packageModel = PackageDbModel(
             primaryId = 0,
             cloudPackageCategoryId = _packageCategoryModel.value?.id?.toInt() ?: -1,
@@ -129,27 +132,31 @@ class AddCategoriesScreenViewModel @Inject constructor(
             createdTime = getCurrentTime(),
             updatedTime = getCurrentTime()
         )
-
-        CoroutineScope(Dispatchers.Main).launch {
-            val packageId= withContext(Dispatchers.IO){
-                BottleRoomDb.getInstance(context).getBottleDao().insertPackage(packageModel)
-            }
-            val tempQuestionList = mutableListOf<QuestionDbModel>()
-            _questionList.value.forEach {
-                tempQuestionList.add(
-                    QuestionDbModel(
-                        localPackageCategoryId = packageId.toInt(),
-                        question = it.question,
-                        isShowed = false
-                    )
-                )
-            }
-            withContext(Dispatchers.IO) {
-                BottleRoomDb.getInstance(context).getBottleDao().insertQuestions(tempQuestionList.toList())
-            }
-
-            _isLoading.value = false
+        val packageId = withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().insertPackage(packageModel)
         }
+        val tempQuestionList = mutableListOf<QuestionDbModel>()
+        _questionList.value.forEach {
+            tempQuestionList.add(
+                QuestionDbModel(
+                    localPackageCategoryId = packageId.toInt(),
+                    question = it.question,
+                    isShowed = false
+                )
+            )
+        }
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao()
+                .insertQuestions(tempQuestionList.toList())
+        }
+    }
+
+    private fun clearAllContent() {
+        _packageComment.value = ""
+        _packageName.value = ""
+        _packageCategoryModel.value = null
+        _selectedImage.value = null
+        _questionList.value = mutableStateListOf(QuestionModel(1, "asdasd"))
     }
 
     private fun listEmptyControl(): Boolean {
@@ -177,4 +184,6 @@ class AddCategoriesScreenViewModel @Inject constructor(
         }
         _isLoading.value = false
     }
+
+
 }

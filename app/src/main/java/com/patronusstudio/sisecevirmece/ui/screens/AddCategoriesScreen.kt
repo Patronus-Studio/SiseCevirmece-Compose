@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -45,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.QuestionModel
+import com.patronusstudio.sisecevirmece.data.utils.compress
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
@@ -200,6 +202,7 @@ private fun QuestionsCard(
     questionCardMaxWidth: Double,
     viewModel: AddCategoriesScreenViewModel
 ) {
+    val localFocus = LocalFocusManager.current
     val localContext = LocalContext.current
     var btnAddLocationX by remember { mutableStateOf(0.dp) }
     val offsetStateAddBtn =
@@ -260,6 +263,7 @@ private fun QuestionsCard(
             ) {
                 CircleImageButton(id = R.drawable.save) {
                     viewModel.saveQuestions(localContext)
+                    localFocus.clearFocus()
                 }
             }
         }
@@ -309,12 +313,18 @@ fun AddImage(size: Dp, viewModel: AddCategoriesScreenViewModel) {
                 val source = ImageDecoder.createSource(context.contentResolver, it)
                 viewModel.setBitmap(ImageDecoder.decodeBitmap(source))
             }
-            Image(
-                bitmap = viewModel.selectedImage.collectAsState().value!!.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
-            )
-
+            if (viewModel.selectedImage.collectAsState().value != null) {
+                Image(
+                    bitmap = viewModel.selectedImage.collectAsState().value!!.compress().asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.select_image),
+                    contentDescription = "", modifier = Modifier.size(80.dp)
+                )
+            }
         } ?: kotlin.run {
             Image(
                 painter = painterResource(id = R.drawable.select_image),
@@ -372,7 +382,7 @@ fun QuestionViewItem(
                 valueChange(it)
             },
             placeholder = {
-                Text(text = stringResource(id =R.string.enter_question))
+                Text(text = stringResource(id = R.string.enter_question))
             },
             colors = textFieldColors,
             singleLine = true,
