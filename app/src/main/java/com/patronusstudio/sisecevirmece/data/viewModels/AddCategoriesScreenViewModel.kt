@@ -3,27 +3,37 @@ package com.patronusstudio.sisecevirmece.data.viewModels
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.res.stringArrayResource
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.abstarcts.BottleRoomDb
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.QuestionModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import com.patronusstudio.sisecevirmece.data.utils.getCurrentTime
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
+import com.patronusstudio.sisecevirmece.data.utils.toByteArrray
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class AddCategoriesScreenViewModel @Inject constructor(
     private val networkRepository: NetworkRepository,
-    private val localRepository: LocalRepository
+    private val localRepository: LocalRepository,
 ) : ViewModel() {
 
     private val _questionList = MutableStateFlow(
@@ -47,7 +57,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
     val packageComment: StateFlow<String> get() = _packageComment
 
     private val _packageCategoryModel = MutableStateFlow<PackageCategoryModel?>(null)
-    val packageCategoryModel :StateFlow<PackageCategoryModel?> get() = _packageCategoryModel
+    val packageCategoryModel: StateFlow<PackageCategoryModel?> get() = _packageCategoryModel
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> get() = _errorMessage
@@ -81,7 +91,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _packageComment.value = comment
     }
 
-    fun setPackageCategory(packageCategoryModel: PackageCategoryModel){
+    fun setPackageCategory(packageCategoryModel: PackageCategoryModel) {
         _packageCategoryModel.value = packageCategoryModel
     }
 
@@ -103,17 +113,42 @@ class AddCategoriesScreenViewModel @Inject constructor(
             _errorMessage.value = context.getString(R.string.enter_package_comment)
             return
         }
-        if(_packageCategoryModel.value == null){
+        if (_packageCategoryModel.value == null) {
             _errorMessage.value = context.getString(R.string.select_package_category)
             return
         }
         _isLoading.value = true
-        // TODO: db kaydetme işlemi yapılacak
-        CoroutineScope(Dispatchers.Default).launch {
-            delay(2000)
-            withContext(Dispatchers.Main) {
-                _isLoading.value = false
+
+        val packageModel = PackageDbModel(
+            primaryId = 0,
+            cloudPackageCategoryId = _packageCategoryModel.value?.id?.toInt() ?: -1,
+            packageImage = selectedImage.value!!.toByteArrray(),
+            version = 1,
+            packageName = _packageName.value,
+            packageComment = _packageComment.value,
+            createdTime = getCurrentTime(),
+            updatedTime = getCurrentTime()
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val packageId= withContext(Dispatchers.IO){
+                BottleRoomDb.getInstance(context).getBottleDao().insertPackage(packageModel)
             }
+            val tempQuestionList = mutableListOf<QuestionDbModel>()
+            _questionList.value.forEach {
+                tempQuestionList.add(
+                    QuestionDbModel(
+                        localPackageCategoryId = packageId.toInt(),
+                        question = it.question,
+                        isShowed = false
+                    )
+                )
+            }
+            withContext(Dispatchers.IO) {
+                BottleRoomDb.getInstance(context).getBottleDao().insertQuestions(tempQuestionList.toList())
+            }
+
+            _isLoading.value = false
         }
     }
 
@@ -132,7 +167,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _isLoading.value = true
         val result = networkRepository.getPackageCategories()
         val body = result.body()
-        if(body == null || body.status != HttpStatusEnum.OK){
+        if (body == null || body.status != HttpStatusEnum.OK) {
             _errorMessage.value = body?.message ?: "Bir hatayla karşılaşıldı"
             _isLoading.value = false
             return

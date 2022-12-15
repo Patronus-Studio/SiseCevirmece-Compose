@@ -86,7 +86,7 @@ class HomeViewModel @Inject constructor(
 
     fun calculateNextLevelStarSize(list: List<LevelModel>):Int{
         val findedIndex = list.indexOfFirst {
-            it.level == _userGameInfoModel.value!!.level
+            it.level == _userGameInfoModel.value?.level
         }
         return if(findedIndex == -1) 100
         else{
