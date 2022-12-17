@@ -46,7 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.QuestionModel
-import com.patronusstudio.sisecevirmece.data.utils.compress
+import com.patronusstudio.sisecevirmece.data.utils.resize
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
@@ -56,13 +56,15 @@ import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddCategoriesScreen(back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.55
-    val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
+    val questionCardMaxWidth = width * 0.9
+    val scaledImageSize = (questionCardMaxWidth * 0.6).roundToInt()
     val dotButtonHeight = LocalConfiguration.current.screenHeightDp * 0.07
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val localContext = LocalContext.current
@@ -74,11 +76,13 @@ fun AddCategoriesScreen(back: () -> Unit) {
                     MediaStore.Images.Media.getBitmap(
                         localContext.contentResolver,
                         result
-                    )
+                    ).resize(scaledImageSize, scaledImageSize)
                 )
             } else {
                 val source = ImageDecoder.createSource(localContext.contentResolver, result!!)
-                viewModel.setBitmap(ImageDecoder.decodeBitmap(source).compress())
+                viewModel.setBitmap(
+                    ImageDecoder.decodeBitmap(source).resize(scaledImageSize, scaledImageSize)
+                )
             }
         }
     BackHandler {
@@ -329,7 +333,8 @@ fun AddImage(size: Dp, bitmap: Bitmap?, selectImageClicked: () -> Unit) {
         } else {
             Image(
                 painter = rememberAsyncImagePainter(model = bitmap),
-                contentDescription = null, contentScale = ContentScale.Crop
+                contentDescription = null, modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
         }
     }
