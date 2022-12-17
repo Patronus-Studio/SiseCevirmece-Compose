@@ -283,7 +283,7 @@ private fun QuestionsCard(
                 }
             }
         }
-        if (list.size > 5) {
+        if (list.size > 9) {
             Box(
                 modifier = Modifier
                     .wrapContentSize()

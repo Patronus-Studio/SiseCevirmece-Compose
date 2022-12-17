@@ -90,7 +90,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
     suspend fun saveQuestions(context: Context) {
         val listIsEmpty = listEmptyControl()
         if (listIsEmpty) {
-            _errorMessage.value = context.getString(R.string.package_question_emty_error_message)
+            _errorMessage.value = context.getString(R.string.package_question_empty_error_message)
             return
         }
         if (_packageName.value.isEmpty()) {
