@@ -18,11 +18,9 @@ import com.patronusstudio.sisecevirmece.data.utils.getCurrentTime
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
 import com.patronusstudio.sisecevirmece.data.utils.toByteArrray
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -33,13 +31,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _questionList = MutableStateFlow(
-        mutableStateListOf(
-            QuestionModel(1, "asdasd"),
-            QuestionModel(2, "ads"),
-            QuestionModel(3, "da"),
-            QuestionModel(4, "asdasd"),
-            QuestionModel(5, "ad")
-        )
+        mutableStateListOf(QuestionModel(1, ""))
     )
     val questionList: StateFlow<List<QuestionModel>> get() = _questionList
 
@@ -95,7 +87,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _selectedImage.value = bitmap
     }
 
-    fun saveQuestions(context: Context) {
+    suspend fun saveQuestions(context: Context) {
         val listIsEmpty = listEmptyControl()
         if (listIsEmpty) {
             _errorMessage.value = context.getString(R.string.package_question_emty_error_message)
@@ -114,14 +106,12 @@ class AddCategoriesScreenViewModel @Inject constructor(
             return
         }
         _isLoading.value = true
-        CoroutineScope(Dispatchers.Main).launch {
-            saveDb(context)
-            clearAllContent()
-        }
+        saveDb(context)
+        clearAllContent()
         _isLoading.value = false
     }
 
-    private suspend fun saveDb(context:Context) {
+    private suspend fun saveDb(context: Context) {
         val packageModel = PackageDbModel(
             primaryId = 0,
             cloudPackageCategoryId = _packageCategoryModel.value?.id?.toInt() ?: -1,

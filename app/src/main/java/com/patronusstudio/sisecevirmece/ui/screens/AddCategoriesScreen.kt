@@ -247,9 +247,9 @@ private fun QuestionsCard(
                 QuestionViewItem(questionModel = item, valueChange = {
                     viewModel.updateQuestionModelText(item, it)
                 }, removeBtnClicked = {
-                    if (viewModel.questionList.value.size > 1) {
+                    if (list.size > 1) {
                         viewModel.removeQuestionModel(item)
-                        if (viewModel.questionList.value.size <= 5) {
+                        if (list.size <= 5) {
                             btnAddLocationX = 0.dp
                             btnRemoveLocationX = 0.dp
                         } else {
@@ -290,7 +290,9 @@ private fun QuestionsCard(
                     .offset(x = offsetStateRemoveBtn.value)
             ) {
                 CircleImageButton(id = R.drawable.save) {
-                    viewModel.saveQuestions(localContext)
+                    coroutineScope.launch {
+                        viewModel.saveQuestions(localContext)
+                    }
                     localFocus.clearFocus()
                 }
             }
