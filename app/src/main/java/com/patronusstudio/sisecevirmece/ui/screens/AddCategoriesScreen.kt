@@ -1,7 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.compose.BackHandler
@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.QuestionModel
@@ -65,9 +65,22 @@ fun AddCategoriesScreen(back: () -> Unit) {
     val questionCardMaxWidth = LocalConfiguration.current.screenWidthDp * 0.9
     val dotButtonHeight = LocalConfiguration.current.screenHeightDp * 0.07
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
-    val context = LocalContext.current
+    val localContext = LocalContext.current
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { result ->
+            if (Build.VERSION.SDK_INT < 28) {
+                viewModel.setBitmap(
+                    MediaStore.Images.Media.getBitmap(
+                        localContext.contentResolver,
+                        result
+                    )
+                )
+            } else {
+                val source = ImageDecoder.createSource(localContext.contentResolver, result!!)
+                viewModel.setBitmap(ImageDecoder.decodeBitmap(source).compress())
+            }
+        }
     BackHandler {
         if (sheetState.isVisible) {
             viewModel.clearErrorMessage()
@@ -75,7 +88,6 @@ fun AddCategoriesScreen(back: () -> Unit) {
             back()
         }
     }
-
     LaunchedEffect(key1 = viewModel.errorMessage.collectAsState().value) {
         if (viewModel.errorMessage.value.isNotEmpty()) {
             sheetState.show()
@@ -108,7 +120,19 @@ fun AddCategoriesScreen(back: () -> Unit) {
             CardTitle(stringResource(id = R.string.add_category)) {
                 back()
             }
-            CategoryCard(questionCardMaxWidth, viewModel)
+            CategoryCard(
+                questionCardMaxWidth,
+                viewModel.packageName.collectAsState().value,
+                viewModel.packageComment.collectAsState().value,
+                viewModel.selectedImage.collectAsState().value,
+                packageNameListener = {
+                    viewModel.setPackageName(it)
+                }, packageCommentListener = {
+                    viewModel.setPackageComment(it)
+                }, selectImageClicked = {
+                    galleryLauncher.launch("image/*")
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
             CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
             Spacer(modifier = Modifier.height(8.dp))
@@ -117,12 +141,16 @@ fun AddCategoriesScreen(back: () -> Unit) {
                 LoadingAnimation()
             }
         }
-
     }
 }
 
 @Composable
-private fun CategoryCard(questionCardMaxWidth: Double, viewModel: AddCategoriesScreenViewModel) {
+private fun CategoryCard(
+    questionCardMaxWidth: Double, packageName: String, packageComment: String,
+    bitmap: Bitmap?, packageNameListener: (String) -> Unit,
+    packageCommentListener: (String) -> Unit,
+    selectImageClicked: () -> Unit
+) {
     val addImageCardSize = (questionCardMaxWidth * 0.3).dp
     Box(
         modifier = Modifier
@@ -138,21 +166,18 @@ private fun CategoryCard(questionCardMaxWidth: Double, viewModel: AddCategoriesS
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Spacer(modifier = Modifier.width(16.dp))
-            AddImage(addImageCardSize, viewModel)
+            AddImage(addImageCardSize, bitmap, selectImageClicked)
             Spacer(modifier = Modifier.width(8.dp))
             Column(Modifier.wrapContentSize()) {
                 CategoryTextField(
-                    text = viewModel.packageName.collectAsState().value,
-                    placeText = stringResource(R.string.enter_package_name)
-                ) {
-                    viewModel.setPackageName(it)
-                }
+                    text = packageName,
+                    placeText = stringResource(R.string.enter_package_name), packageNameListener
+                )
                 CategoryTextField(
-                    text = viewModel.packageComment.collectAsState().value,
-                    placeText = stringResource(R.string.enter_package_comment)
-                ) {
-                    viewModel.setPackageComment(it)
-                }
+                    text = packageComment,
+                    placeText = stringResource(R.string.enter_package_comment),
+                    packageCommentListener
+                )
             }
             Spacer(modifier = Modifier.width(16.dp))
         }
@@ -187,7 +212,6 @@ private fun CategoryType(
                         textColor = Color(android.graphics.Color.parseColor(item.passiveTextColor))
                     ) {
                         viewModel.setPackageCategory(item)
-
                         userSelectedCategory.value = item.id.toInt()
                     }
                 }
@@ -285,14 +309,7 @@ private fun CircleImageButton(@DrawableRes id: Int, clicked: () -> Unit) {
 
 
 @Composable
-fun AddImage(size: Dp, viewModel: AddCategoriesScreenViewModel) {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val galleryLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { result ->
-            imageUri = result
-        }
-
+fun AddImage(size: Dp, bitmap: Bitmap?, selectImageClicked: () -> Unit) {
     val gradients = listOf(SeaSerpent, SunsetOrange, Mustard, UnitedNationsBlue)
     val cornerShape16 = RoundedCornerShape(16.dp)
     Box(
@@ -301,34 +318,18 @@ fun AddImage(size: Dp, viewModel: AddCategoriesScreenViewModel) {
             .clip(cornerShape16)
             .border(2.dp, Brush.horizontalGradient(gradients), cornerShape16)
             .background(Color.White)
-            .clickable {
-                galleryLauncher.launch("image/*")
-            }, contentAlignment = Alignment.Center
-
+            .clickable(onClick = selectImageClicked),
+        contentAlignment = Alignment.Center
     ) {
-        imageUri?.let {
-            if (Build.VERSION.SDK_INT < 28) {
-                viewModel.setBitmap(MediaStore.Images.Media.getBitmap(context.contentResolver, it))
-            } else {
-                val source = ImageDecoder.createSource(context.contentResolver, it)
-                viewModel.setBitmap(ImageDecoder.decodeBitmap(source))
-            }
-            if (viewModel.selectedImage.collectAsState().value != null) {
-                Image(
-                    bitmap = viewModel.selectedImage.collectAsState().value!!.compress().asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.select_image),
-                    contentDescription = "", modifier = Modifier.size(80.dp)
-                )
-            }
-        } ?: kotlin.run {
+        if (bitmap == null) {
             Image(
                 painter = painterResource(id = R.drawable.select_image),
                 contentDescription = "", modifier = Modifier.size(80.dp)
+            )
+        } else {
+            Image(
+                painter = rememberAsyncImagePainter(model = bitmap),
+                contentDescription = null, contentScale = ContentScale.Crop
             )
         }
     }
