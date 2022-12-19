@@ -67,7 +67,6 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             if (sheetState.isVisible.not()) sheetState.show()
         } else sheetState.hide()
     }
-
     ModalBottomSheetLayout(sheetState = sheetState,
         sheetContent = {
             ErrorSheet(message = viewModel.loginError.collectAsState().value, errorIconClicked = {
