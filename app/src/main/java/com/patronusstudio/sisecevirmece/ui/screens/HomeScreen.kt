@@ -242,7 +242,7 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
     //AnimatedVisibility(visible = isClicked.value) {
     val width = (LocalConfiguration.current.screenWidthDp * 0.8).dp
     val height = (LocalConfiguration.current.screenHeightDp * 0.6).dp
-    val avatarList = viewModel.avatar.collectAsState().value!!
+    val avatarList = viewModel.avatar.collectAsState().value
     AnimatedVisibility(visible = true) {
         Dialog(
             onDismissRequest = {
@@ -262,7 +262,7 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
                     content = {
-                        itemsIndexed(avatarList, itemContent = { position, itemValue ->
+                        itemsIndexed(avatarList ?: arrayListOf(), itemContent = { position, itemValue ->
                             Box(
                                 Modifier
                                     .wrapContentSize()

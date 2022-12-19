@@ -17,13 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
-import com.patronusstudio.sisecevirmece.data.model.YESORNO
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import kotlinx.coroutines.CoroutineScope
@@ -70,7 +71,7 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
             ) { item: PackageCategoryModel ->
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(item) {
-                    clicked(item.id - 1)
+                    clicked((item.id - 1).toInt())
                 }
             }
             item {
@@ -84,19 +85,19 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
 fun Button(item: PackageCategoryModel, clicked: () -> Unit) {
     val backgroundColor = Color(
         android.graphics.Color.parseColor(
-            if (item.isSelected == YESORNO.YES) item.activeBtnColor
+            if (item.isSelected == SelectableEnum.YES) item.activeBtnColor
             else item.passiveBtnColor
         )
     )
     val borderColor = Color(
         android.graphics.Color.parseColor(
-            if (item.isSelected == YESORNO.YES) item.passiveBtnColor
+            if (item.isSelected == SelectableEnum.YES) item.passiveBtnColor
             else item.activeBtnColor
         )
     )
     val textColor = Color(
         android.graphics.Color.parseColor(
-            if (item.isSelected == YESORNO.YES) item.activeTextColor
+            if (item.isSelected == SelectableEnum.YES) item.activeTextColor
             else item.passiveTextColor
         )
     )
@@ -117,6 +118,7 @@ fun Button(item: PackageCategoryModel, clicked: () -> Unit) {
 @Preview
 @Composable
 fun PackageCard() {
+    val localContext = LocalContext.current
     Box(
         modifier = Modifier
             .width(200.dp)
@@ -128,8 +130,8 @@ fun PackageCard() {
             Box(modifier = Modifier.size(50.dp)){
                 Image(painter = rememberAsyncImagePainter(
                     model = null,
-                    imageLoader = ImageLoader()
-                ), contentDescription = )
+                    imageLoader = ImageLoader(localContext)
+                ), contentDescription = null)
             }
         }
     }
