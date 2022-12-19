@@ -29,4 +29,9 @@ interface BottleService {
 
     @GET("package/getAllPackageCategories")
     suspend fun getAllPackageCategories():Response<PackageCategoryResponseModel>
+
+    @GET("package/getPackageByCategoryName")
+    suspend fun getPackageByCategoryName(@Query("packageCategory") packageCategory: Int):Response<PackageResponseModel>
+
+
 }

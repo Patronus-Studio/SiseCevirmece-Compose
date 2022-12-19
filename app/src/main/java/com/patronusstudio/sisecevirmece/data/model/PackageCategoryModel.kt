@@ -1,5 +1,7 @@
 package com.patronusstudio.sisecevirmece.data.model
 
+import com.google.gson.annotations.SerializedName
+
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 
 data class PackageCategoryModel(
