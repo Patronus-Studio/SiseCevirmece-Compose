@@ -1,6 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.utils
 
-import com.patronusstudio.sisecevirmece.ui.screens.BaseModelWithIndex
+import com.patronusstudio.sisecevirmece.data.abstarcts.BaseModelWithIndex
 
 fun <T : BaseModelWithIndex> T.removeModelOnList(list: List<T>): List<T> {
     val newList: MutableList<T> = list.toMutableList()
