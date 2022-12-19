@@ -1,6 +1,5 @@
 package com.patronusstudio.sisecevirmece.data.utils
 
-import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
