@@ -23,5 +23,6 @@ data class PackageModel(
     val questions: List<Double>,
     val updatedTime: String,
     val username: String,
-    val version: Double
+    val version: Double,
+    var imageId: Int? = null
 )

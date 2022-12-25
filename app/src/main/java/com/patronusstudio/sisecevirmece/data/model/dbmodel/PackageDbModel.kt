@@ -3,8 +3,9 @@ package com.patronusstudio.sisecevirmece.data.model.dbmodel
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.patronusstudio.sisecevirmece.data.DbTables
 
-@Entity(tableName = "PackageTable")
+@Entity(tableName = DbTables.packageTable)
 data class PackageDbModel(
     @PrimaryKey(autoGenerate = true)
     val primaryId: Int = 0,
@@ -12,8 +13,8 @@ data class PackageDbModel(
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     val packageImage: ByteArray? = null,
     val version: Int,
-    val packageName:String,
-    val packageComment:String,
+    val packageName: String,
+    val packageComment: String,
     val createdTime: String,
     val updatedTime: String
 ) {

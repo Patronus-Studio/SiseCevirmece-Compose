@@ -1,11 +1,13 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
+import android.content.Context
 import android.util.Log
+import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
-import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.network.PackageNetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PackageViewModel @Inject constructor(
-    private val networkRepository: NetworkRepository,
-    private val packageNetworkRepository: PackageNetworkRepository
+    private val packageNetworkRepository: PackageNetworkRepository,
+    private val packageLocalRepository: PackageLocalRepository
 ) : BaseViewModel() {
 
     private val _categories = MutableStateFlow<List<PackageCategoryModel>>(listOf())
@@ -30,10 +32,10 @@ class PackageViewModel @Inject constructor(
 
     suspend fun getPackageCategories() {
         _isLoading.value = true
-        val categories = networkRepository.getPackageCategories()
+        val categories = packageNetworkRepository.getPackageCategories()
         if (categories.isSuccessful.not() || categories.body() == null || categories.body()?.status != HttpStatusEnum.OK) {
             _errorMessage.value =
-                categories.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
+                categories.body()?.message ?: "Bir hatayla karşılaşıldı."
         }
         _categories.value = (categories.body()?.packageCategoryModel
             ?: arrayListOf()) as MutableList<PackageCategoryModel>
@@ -55,14 +57,25 @@ class PackageViewModel @Inject constructor(
         _categories.value = tempList
     }
 
-    suspend fun getPackageFromCategory(clickedItemId: Int) {
+    suspend fun getPackageFromCategory(context: Context, clickedItemId: Int) {
         _isLoading.value = true
-        val packageResponse = packageNetworkRepository.getPackageCategories(clickedItemId)
-        if (packageResponse.isSuccessful.not() || packageResponse.body() == null || packageResponse.body()?.status != HttpStatusEnum.OK) {
+        val networkPackages = packageNetworkRepository.getPackageCategories(clickedItemId)
+        if (networkPackages.isSuccessful.not() || networkPackages.body() == null || networkPackages.body()?.status != HttpStatusEnum.OK) {
             _errorMessage.value =
-                packageResponse.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
+                networkPackages.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
         }
-        _packages.value = packageResponse.body()?.packages ?: listOf()
+        val localPackages = packageLocalRepository.getPackages(context)
+        networkPackages.body()?.packages?.forEach { networkModel ->
+            val findedModel = localPackages.find { localModel ->
+                networkModel.id.toInt() == localModel.cloudPackageCategoryId
+            }
+            if (findedModel != null) {
+                if (findedModel.version < networkModel.version) networkModel.imageId =
+                    R.drawable.update
+                else networkModel.imageId = R.drawable.tick
+            }
+        }
+        _packages.value = networkPackages.body()?.packages ?: listOf()
         _isLoading.value = false
         Log.d("Sülo", _packages.value.toString())
     }
