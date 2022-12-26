@@ -8,27 +8,34 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
+import com.patronusstudio.sisecevirmece.data.model.PackageModel
+import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
+import com.patronusstudio.sisecevirmece.ui.theme.GreyTranspancy20
 
 
 @Composable
@@ -121,154 +128,112 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
 }
 
 @Composable
-fun ButtonWithDot(
-    height: Int,
-    dotColor: Color,
-    btnColor: Color,
-    text: String,
-    textColor: Color,
-    clicked: () -> Unit
+fun PackageDetailCard(
+    packageModel: PackageModel,
+    packageDetailCardBtnEnum: PackageDetailCardBtnEnum
 ) {
-    val cornerShape = RoundedCornerShape(8.dp)
-    Box(
+    val imageSize = 64.dp
+    val buttonHeight = 50.dp
+    Column(
         modifier = Modifier
-            .wrapContentWidth()
-            .height(height.dp)
-            .background(Color.Transparent)
-            .graphicsLayer {
-                compositingStrategy = CompositingStrategy.Offscreen
-            }
-            .drawWithCache {
-                val path = Path()
-                onDrawWithContent {
-                    clipPath(path) {
-                        this@onDrawWithContent.drawContent()
-                    }
-                    drawContent()
-                    val circleSize = size.height / 4f
-                    val xLocation = size.width - circleSize
-                    val yLocation = circleSize
-                    drawCircle(
-                        Color.Transparent,
-                        radius = circleSize,
-                        center = Offset(xLocation, yLocation),
-                        blendMode = BlendMode.Clear
-                    )
-                    drawCircle(
-                        dotColor, radius = circleSize * 0.7f,
-                        center = Offset(xLocation, yLocation)
-                    )
-                }
-            }
-            .clickable {
-                clicked()
-            }
-            .padding(horizontal = (height / 4).dp),
-        contentAlignment = Alignment.BottomCenter
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .wrapContentWidth()
-                .height((height - height * 0.1).dp)
-                .background(btnColor, cornerShape)
-                .clip(cornerShape)
-                .padding(horizontal = (height / 4).dp),
-            contentAlignment = Alignment.Center
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            Text(text = text, color = textColor)
-        }
-    }
-}
-
-@Composable
-fun ButtonWithPassive(
-    height: Int,
-    btnColor: Color,
-    text: String,
-    textColor: Color,
-    clicked: () -> Unit
-) {
-    val cornerShape = RoundedCornerShape(8.dp)
-    Box(
-        modifier = Modifier
-            .wrapContentWidth()
-            .height(height.dp)
-            .padding(horizontal = (height / 4).dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Box(
-            modifier = Modifier
-                .wrapContentHeight()
-                .height((height - height * 0.1).dp)
-                .background(btnColor, cornerShape)
-                .clip(cornerShape)
-                .clickable {
-                    clicked()
-                }
-                .padding(horizontal = (height / 4).dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = text, color = textColor)
-        }
-    }
-}
-
-
-@Composable
-fun GraphicsLayerCompositingStrategyExample() {
-    Image(painter = painterResource(id = R.drawable.player_girl),
-        contentDescription = "Dog",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .size(120.dp)
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        Color(0xFFC5E1A5),
-                        Color(0xFF80DEEA)
-                    )
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(
+                    packageModel.imageUrl
                 )
+                    .crossfade(true)
+                    .build(), contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(imageSize)
+                    .clip(CircleShape)
             )
-            .graphicsLayer {
-                compositingStrategy = CompositingStrategy.Offscreen
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.height(imageSize)
+            ) {
+                SampleText(content = packageModel.name, 1, 16)
+                SampleText(content = packageModel.description, 3)
             }
-            .drawWithCache {
-                val path = Path()
-                path.addOval(
-                    Rect(
-                        topLeft = Offset.Zero,
-                        bottomRight = Offset(size.width, size.height)
-                    )
-                )
-                onDrawWithContent {
-                    clipPath(path) {
-                        this@onDrawWithContent.drawContent()
+        }
+        Spacer(modifier = Modifier.height(48.dp))
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+        ) {
+            val (lineRef, leftRef, rightRef) = createRefs()
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(color = GreyTranspancy20, CircleShape)
+                    .clip(CircleShape)
+                    .constrainAs(lineRef) {
+                        this.centerHorizontallyTo(parent, bias = 0.5f)
                     }
-                    val dotSize = size.width / 8f
-                    drawCircle(
-                        Color.Black,
-                        radius = dotSize,
-                        center = Offset(
-                            x = size.width - dotSize,
-                            y = size.height - dotSize
-                        ),
-                        blendMode = BlendMode.Clear
-                    )
-                    drawCircle(
-                        Color(0xFFEF5350), radius = dotSize * 0.8f,
-                        center = Offset(
-                            x = size.width - dotSize,
-                            y = size.height - dotSize
-                        )
-                    )
-                }
+            )
 
+            Column(
+                modifier = Modifier
+                    .constrainAs(leftRef) {
+                        this.linkTo(start = parent.start, end = lineRef.start, bias = 0.9f)
+                        this.linkTo(top = lineRef.top, bottom = lineRef.bottom)
+                    }
+                    .fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SampleText(content = packageModel.numberOfDownload.toInt().toString())
+                SampleText(content = packageModel.version.toInt().toString())
             }
+
+            Column(
+                modifier = Modifier
+                    .constrainAs(rightRef) {
+                        this.linkTo(start = lineRef.end, end = parent.end)
+                        this.linkTo(top = lineRef.top, bottom = lineRef.bottom)
+                    }
+                    .fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SampleText(content = packageModel.numberOfLike.toInt().toString())
+                SampleText(content = packageModel.updatedTime)
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 32.dp, bottom = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.9f)
+                    .height(buttonHeight),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = packageDetailCardBtnEnum.butonColor())
+            ) {
+                Text(text = stringResource(id = packageDetailCardBtnEnum.butonText()))
+            }
+        }
+    }
+}
+
+@Composable
+fun SampleText(content: String, maxLines: Int = 1, fontSize: Int = 10) {
+    Text(
+        text = content, maxLines = maxLines,
+        fontSize = fontSize.sp,
+        style = TextStyle(color = DavysGrey)
     )
 }
-
-
-
-
 
 

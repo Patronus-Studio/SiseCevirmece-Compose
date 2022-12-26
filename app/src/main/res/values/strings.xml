@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">SiseCevirmece</string>
     <string name="add_category">Kategori Ekle</string>
     <string name="store">Mağaza</string>
@@ -12,4 +12,7 @@
     <string name="enter_question">Sorunuzu girin.</string>
     <string name="package_question_empty_error_message">Kendi paketinizi eklemek için 10 taneden fazla soru ekleyin.</string>
     <string name="select_package_category">Paket kategorisi seçin</string>
+    <string name="download">İndir</string>
+    <string name="update">Güncelle</string>
+    <string name="remove">Sil</string>
 </resources>

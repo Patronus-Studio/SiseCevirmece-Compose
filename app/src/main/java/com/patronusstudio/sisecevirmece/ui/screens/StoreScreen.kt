@@ -9,9 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,15 +22,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
+import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,8 +48,18 @@ fun StoreScreen() {
     val packageCardWidth = (LocalConfiguration.current.screenWidthDp * 0.9).dp
     val packageCardHeight = (LocalConfiguration.current.screenHeightDp * 0.1).dp
     val localContext = LocalContext.current
+    val popupStatu = remember {
+        mutableStateOf(false)
+    }
+    val packageModel = remember {
+        mutableStateOf<PackageModel?>(null)
+    }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
+    }
+    val clickedPackage = { item: PackageModel ->
+        packageModel.value = item
+        popupStatu.value = true
     }
     Box(
         modifier = Modifier
@@ -72,13 +84,44 @@ fun StoreScreen() {
                     PackagesCard(
                         cardWidth = packageCardWidth,
                         cardHeight = packageCardHeight,
-                        packageModel = item
+                        packageModel = item,
+                        clicked = clickedPackage
                     )
                 }
             }
         }
+        if (popupStatu.value) {
+            PackagePopup(packageModel.value!!) {
+                popupStatu.value = popupStatu.value.not()
+            }
+        }
+
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
+        }
+    }
+}
+
+@Composable
+fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit) {
+    // TODO: paket statüsünü filtreleyerek ne olduğunu setle
+    val packageStatu = PackageDetailCardBtnEnum.DOWNLOAD
+    val roundedCornerShape = RoundedCornerShape(16.dp)
+    val popupProperties = PopupProperties(focusable = true)
+    Popup(
+        alignment = Alignment.BottomCenter,
+        properties = popupProperties,
+        onDismissRequest = dismissListener
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp)
+                .background(Color.White, roundedCornerShape)
+                .clip(roundedCornerShape)
+        ) {
+            PackageDetailCard(packageModel, packageDetailCardBtnEnum = packageStatu)
         }
     }
 }
@@ -143,7 +186,8 @@ fun Button(item: PackageCategoryModel, clicked: () -> Unit) {
 fun PackagesCard(
     cardWidth: Dp,
     cardHeight: Dp,
-    packageModel: PackageModel
+    packageModel: PackageModel,
+    clicked: (PackageModel) -> Unit
 ) {
     val cornerShape = RoundedCornerShape(16.dp)
     ConstraintLayout(modifier = Modifier.wrapContentSize()) {
@@ -156,6 +200,9 @@ fun PackagesCard(
                 .clip(cornerShape)
                 .constrainAs(cardReference) {
                     this.bottom.linkTo(parent.bottom)
+                }
+                .clickable {
+                    clicked(packageModel)
                 }, contentAlignment = Alignment.Center
         ) {
             Row(

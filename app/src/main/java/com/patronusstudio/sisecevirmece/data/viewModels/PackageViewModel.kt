@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.content.Context
-import android.util.Log
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
@@ -77,6 +76,5 @@ class PackageViewModel @Inject constructor(
         }
         _packages.value = networkPackages.body()?.packages ?: listOf()
         _isLoading.value = false
-        Log.d("Sülo", _packages.value.toString())
     }
 }
