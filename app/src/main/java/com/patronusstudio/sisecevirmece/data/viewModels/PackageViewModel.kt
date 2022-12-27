@@ -1,14 +1,17 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
+import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.network.PackageNetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -22,12 +25,17 @@ class PackageViewModel @Inject constructor(
     private val _categories = MutableStateFlow<List<PackageCategoryModel>>(listOf())
     val categories: StateFlow<List<PackageCategoryModel>> = _categories
 
-    private val _packages = MutableStateFlow<List<PackageModel>>(listOf())
-    val packages: StateFlow<List<PackageModel>> get() = _packages
+    var packages = mutableStateListOf<PackageModel>()
+
+    private val _currentPackage = MutableStateFlow<PackageModel?>(null)
+    val currentPackage: StateFlow<PackageModel?> get() = _currentPackage
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    fun setPackageModel(packageModel: PackageModel) {
+        _currentPackage.value = packageModel
+    }
 
     suspend fun getPackageCategories() {
         _isLoading.value = true
@@ -72,9 +80,55 @@ class PackageViewModel @Inject constructor(
                 if (findedModel.version < networkModel.version) networkModel.imageId =
                     R.drawable.update
                 else networkModel.imageId = R.drawable.tick
+                networkModel.packagaStatu = when {
+                    findedModel.version == networkModel.version.toInt() -> PackageDetailCardBtnEnum.REMOVE
+                    findedModel.version < networkModel.version.toInt() -> PackageDetailCardBtnEnum.UPDATE
+                    else -> PackageDetailCardBtnEnum.DOWNLOAD
+                }
+            } else {
+                networkModel.packagaStatu = PackageDetailCardBtnEnum.DOWNLOAD
             }
         }
-        _packages.value = networkPackages.body()?.packages ?: listOf()
+        packages.clear()
+        packages.addAll(networkPackages.body()?.packages ?: listOf())
         _isLoading.value = false
+    }
+
+    suspend fun removePackage() {
+        _isLoading.value = true
+        delay(2000L)
+        setPackageStatu(PackageDetailCardBtnEnum.DOWNLOAD)
+        updateModelOnList(PackageDetailCardBtnEnum.DOWNLOAD)
+        _isLoading.value = false
+    }
+
+    suspend fun downloadPackage() {
+        _isLoading.value = true
+        delay(2000L)
+        setPackageStatu(PackageDetailCardBtnEnum.REMOVE)
+        updateModelOnList(PackageDetailCardBtnEnum.REMOVE)
+        _isLoading.value = false
+    }
+
+    suspend fun updatePackage() {
+        _isLoading.value = true
+        delay(2000L)
+        setPackageStatu(PackageDetailCardBtnEnum.REMOVE)
+        updateModelOnList(PackageDetailCardBtnEnum.REMOVE)
+        _isLoading.value = false
+    }
+
+    private fun setPackageStatu(packageStatu: PackageDetailCardBtnEnum) {
+        val newPackage = _currentPackage.value!!.copy(packagaStatu = packageStatu)
+        _currentPackage.value = newPackage
+    }
+
+    private fun updateModelOnList(packageStatu: PackageDetailCardBtnEnum) {
+        val findedIndex = packages.indexOfFirst {
+            it.id == currentPackage.value?.id
+        }
+        if (findedIndex != -1) {
+            packages[findedIndex] = packages[findedIndex].copy(packagaStatu = packageStatu)
+        }
     }
 }

@@ -43,22 +43,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun StoreScreen() {
     val viewModel = hiltViewModel<PackageViewModel>()
+    val coroutineScope = rememberCoroutineScope()
     val titles = viewModel.categories.collectAsState().value
-    val packages = viewModel.packages.collectAsState().value
     val packageCardWidth = (LocalConfiguration.current.screenWidthDp * 0.9).dp
     val packageCardHeight = (LocalConfiguration.current.screenHeightDp * 0.1).dp
     val localContext = LocalContext.current
     val popupStatu = remember {
         mutableStateOf(false)
     }
-    val packageModel = remember {
-        mutableStateOf<PackageModel?>(null)
-    }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
     }
     val clickedPackage = { item: PackageModel ->
-        packageModel.value = item
+        viewModel.setPackageModel(item)
         popupStatu.value = true
     }
     Box(
@@ -80,7 +77,7 @@ fun StoreScreen() {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                items(packages) { item: PackageModel ->
+                items(viewModel.packages) { item: PackageModel ->
                     PackagesCard(
                         cardWidth = packageCardWidth,
                         cardHeight = packageCardHeight,
@@ -91,11 +88,18 @@ fun StoreScreen() {
             }
         }
         if (popupStatu.value) {
-            PackagePopup(packageModel.value!!) {
+            PackagePopup(viewModel.currentPackage.collectAsState().value!!, dismissListener = {
                 popupStatu.value = popupStatu.value.not()
-            }
+            }, clickedBtn = {
+                coroutineScope.launch {
+                    when (viewModel.currentPackage.value!!.packagaStatu) {
+                        PackageDetailCardBtnEnum.DOWNLOAD -> viewModel.downloadPackage()
+                        PackageDetailCardBtnEnum.UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.REMOVE -> viewModel.removePackage()
+                    }
+                }
+            })
         }
-
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
         }
@@ -103,9 +107,7 @@ fun StoreScreen() {
 }
 
 @Composable
-fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit) {
-    // TODO: paket statüsünü filtreleyerek ne olduğunu setle
-    val packageStatu = PackageDetailCardBtnEnum.DOWNLOAD
+fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit, clickedBtn: () -> Unit) {
     val roundedCornerShape = RoundedCornerShape(16.dp)
     val popupProperties = PopupProperties(focusable = true)
     Popup(
@@ -121,7 +123,11 @@ fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit) {
                 .background(Color.White, roundedCornerShape)
                 .clip(roundedCornerShape)
         ) {
-            PackageDetailCard(packageModel, packageDetailCardBtnEnum = packageStatu)
+            PackageDetailCard(
+                packageModel,
+                packageDetailCardBtnEnum = packageModel.packagaStatu,
+                clickedBtn
+            )
         }
     }
 }

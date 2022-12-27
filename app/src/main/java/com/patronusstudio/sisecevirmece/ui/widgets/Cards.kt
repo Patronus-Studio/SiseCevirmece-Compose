@@ -130,7 +130,8 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
 @Composable
 fun PackageDetailCard(
     packageModel: PackageModel,
-    packageDetailCardBtnEnum: PackageDetailCardBtnEnum
+    packageDetailCardBtnEnum: PackageDetailCardBtnEnum,
+    clickedBtn: () -> Unit
 ) {
     val imageSize = 64.dp
     val buttonHeight = 50.dp
@@ -214,7 +215,7 @@ fun PackageDetailCard(
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { },
+                onClick = clickedBtn,
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.9f)
                     .height(buttonHeight),

@@ -2,6 +2,7 @@ package com.patronusstudio.sisecevirmece.data.model
 
 import com.google.gson.annotations.SerializedName
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
+import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 
 data class PackageResponseModel(
     @SerializedName("data")
@@ -24,5 +25,7 @@ data class PackageModel(
     val updatedTime: String,
     val username: String,
     val version: Double,
-    var imageId: Int? = null
+    //for local control
+    var imageId: Int? = null,
+    var packagaStatu: PackageDetailCardBtnEnum = PackageDetailCardBtnEnum.DOWNLOAD
 )
