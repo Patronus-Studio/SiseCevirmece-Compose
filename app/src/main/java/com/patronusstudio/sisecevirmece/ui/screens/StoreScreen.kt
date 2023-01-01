@@ -232,7 +232,7 @@ fun PackagesCard(
                         .padding(horizontal = 8.dp)
                 ) {
                     Text(
-                        text = packageModel.name,
+                        text = packageModel.packageName,
                         fontSize = 16.sp,
                         color = Color.Black,
                         maxLines = 1

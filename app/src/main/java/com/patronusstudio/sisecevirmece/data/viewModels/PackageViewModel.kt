@@ -6,6 +6,7 @@ import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
+import com.patronusstudio.sisecevirmece.data.model.BasePackageModel
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
@@ -72,25 +73,31 @@ class PackageViewModel @Inject constructor(
                 networkPackages.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
         }
         val localPackages = packageLocalRepository.getPackages(context)
-        networkPackages.body()?.packages?.forEach { networkModel ->
-            val findedModel = localPackages.find { localModel ->
-                networkModel.id.toInt() == localModel.cloudPackageCategoryId
-            }
-            if (findedModel != null) {
-                if (findedModel.version < networkModel.version) networkModel.imageId =
-                    R.drawable.update
-                else networkModel.imageId = R.drawable.tick
-                networkModel.packagaStatu = when {
-                    findedModel.version == networkModel.version.toInt() -> PackageDetailCardBtnEnum.REMOVE
-                    findedModel.version < networkModel.version.toInt() -> PackageDetailCardBtnEnum.UPDATE
+        val mutableMap = mutableMapOf<Int, MutableList<BasePackageModel>>()
+        networkPackages.body()?.packages?.forEach {
+            mutableMap[it.id] = mutableListOf(it)
+        }
+        localPackages.forEach { localModel ->
+            if (mutableMap[localModel.cloudPackageCategoryId].isNullOrEmpty().not()) {
+                val networkModel = mutableMap[localModel.cloudPackageCategoryId]!!.first()
+                val newImageId =
+                    if (localModel.version < networkModel.version) R.drawable.update else R.drawable.tick
+                val newPackageStatu = when {
+                    localModel.version == networkModel.version -> PackageDetailCardBtnEnum.REMOVE
+                    localModel.version < networkModel.version -> PackageDetailCardBtnEnum.UPDATE
                     else -> PackageDetailCardBtnEnum.DOWNLOAD
                 }
-            } else {
-                networkModel.packagaStatu = PackageDetailCardBtnEnum.DOWNLOAD
+                val newPackageModel = (networkModel as PackageModel).copy(
+                    imageId = if (newImageId != networkModel.imageId) newImageId else networkModel.imageId,
+                    packagaStatu = if (newPackageStatu != networkModel.packagaStatu) newPackageStatu else networkModel.packagaStatu
+                )
+                mutableMap[localModel.cloudPackageCategoryId] = mutableListOf(newPackageModel)
             }
         }
         packages.clear()
-        packages.addAll(networkPackages.body()?.packages ?: listOf())
+        mutableMap.values.forEach {
+            packages.add(it[0] as PackageModel)
+        }
         _isLoading.value = false
     }
 
@@ -128,7 +135,8 @@ class PackageViewModel @Inject constructor(
             it.id == currentPackage.value?.id
         }
         if (findedIndex != -1) {
-            packages[findedIndex] = packages[findedIndex].copy(packagaStatu = packageStatu)
+            val tempModel = packages[findedIndex].copy(packagaStatu = packageStatu)
+            packages[findedIndex] = tempModel
         }
     }
 }

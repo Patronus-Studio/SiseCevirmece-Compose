@@ -162,8 +162,8 @@ fun PackageDetailCard(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.height(imageSize)
             ) {
-                SampleText(content = packageModel.name, 1, 16)
-                SampleText(content = packageModel.description, 3)
+                SampleText(content = packageModel.packageName, 1, 16)
+                SampleText(content = packageModel.packageComment, 3)
             }
         }
         Spacer(modifier = Modifier.height(48.dp))

@@ -12,20 +12,31 @@ data class PackageResponseModel(
 )
 
 data class PackageModel(
-    val createdTime: String,
-    val description: String,
-    val id: Double,
+    override val createdTime: String,
+    @SerializedName("description")
+    override val packageComment: String,
+    val id: Int,
     val imageUrl: String,
-    val name: String,
+    @SerializedName("name")
+    override val packageName: String,
     val numberOfDownload: Double,
     val numberOfLike: Double,
     val numberOfUnlike: Double,
     val packageCategory: Double,
     val questions: List<Double>,
-    val updatedTime: String,
+    override val updatedTime: String,
     val username: String,
-    val version: Double,
+    override val version: Int,
     //for local control
     var imageId: Int? = null,
-    var packagaStatu: PackageDetailCardBtnEnum = PackageDetailCardBtnEnum.DOWNLOAD
-)
+    val packagaStatu: PackageDetailCardBtnEnum = PackageDetailCardBtnEnum.DOWNLOAD
+) : BasePackageModel()
+
+
+abstract class BasePackageModel {
+    abstract val packageComment: String
+    abstract val packageName: String
+    abstract val createdTime: String
+    abstract val updatedTime: String
+    abstract val version: Int
+}
