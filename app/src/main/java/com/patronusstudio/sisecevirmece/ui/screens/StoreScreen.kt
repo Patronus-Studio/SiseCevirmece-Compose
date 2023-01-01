@@ -77,11 +77,12 @@ fun StoreScreen() {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                items(viewModel.packages) { item: PackageModel ->
+
+                items(viewModel.packages.size) { index ->
                     PackagesCard(
                         cardWidth = packageCardWidth,
                         cardHeight = packageCardHeight,
-                        packageModel = item,
+                        packageModel = viewModel.packages[index],
                         clicked = clickedPackage
                     )
                 }
@@ -93,9 +94,9 @@ fun StoreScreen() {
             }, clickedBtn = {
                 coroutineScope.launch {
                     when (viewModel.currentPackage.value!!.packagaStatu) {
-                        PackageDetailCardBtnEnum.DOWNLOAD -> viewModel.downloadPackage()
-                        PackageDetailCardBtnEnum.UPDATE -> viewModel.updatePackage()
-                        PackageDetailCardBtnEnum.REMOVE -> viewModel.removePackage()
+                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage()
+                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
                     }
                 }
             })

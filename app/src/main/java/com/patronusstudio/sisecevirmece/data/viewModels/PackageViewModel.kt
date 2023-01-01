@@ -83,9 +83,9 @@ class PackageViewModel @Inject constructor(
                 val newImageId =
                     if (localModel.version < networkModel.version) R.drawable.update else R.drawable.tick
                 val newPackageStatu = when {
-                    localModel.version == networkModel.version -> PackageDetailCardBtnEnum.REMOVE
-                    localModel.version < networkModel.version -> PackageDetailCardBtnEnum.UPDATE
-                    else -> PackageDetailCardBtnEnum.DOWNLOAD
+                    localModel.version == networkModel.version -> PackageDetailCardBtnEnum.REMOVABLE
+                    localModel.version < networkModel.version -> PackageDetailCardBtnEnum.NEED_UPDATE
+                    else -> PackageDetailCardBtnEnum.NEED_DOWNLOAD
                 }
                 val newPackageModel = (networkModel as PackageModel).copy(
                     imageId = if (newImageId != networkModel.imageId) newImageId else networkModel.imageId,
@@ -103,40 +103,62 @@ class PackageViewModel @Inject constructor(
 
     suspend fun removePackage() {
         _isLoading.value = true
-        delay(2000L)
-        setPackageStatu(PackageDetailCardBtnEnum.DOWNLOAD)
-        updateModelOnList(PackageDetailCardBtnEnum.DOWNLOAD)
+        delay(1000L)
+        setPackageStatu(PackageControlStatu.REMOVED)
+        updateModelOnList()
         _isLoading.value = false
     }
 
     suspend fun downloadPackage() {
         _isLoading.value = true
-        delay(2000L)
-        setPackageStatu(PackageDetailCardBtnEnum.REMOVE)
-        updateModelOnList(PackageDetailCardBtnEnum.REMOVE)
+        delay(1000L)
+        setPackageStatu(PackageControlStatu.DOWNLOADED)
+        updateModelOnList()
         _isLoading.value = false
     }
 
     suspend fun updatePackage() {
         _isLoading.value = true
-        delay(2000L)
-        setPackageStatu(PackageDetailCardBtnEnum.REMOVE)
-        updateModelOnList(PackageDetailCardBtnEnum.REMOVE)
+        delay(1000L)
+        setPackageStatu(PackageControlStatu.UPDATED)
+        updateModelOnList()
         _isLoading.value = false
     }
 
-    private fun setPackageStatu(packageStatu: PackageDetailCardBtnEnum) {
-        val newPackage = _currentPackage.value!!.copy(packagaStatu = packageStatu)
+    private fun setPackageStatu(packageStatuParam: PackageControlStatu) {
+        var imageId = _currentPackage.value!!.imageId
+        var packageStatu = _currentPackage.value!!.packagaStatu
+        when (packageStatuParam) {
+            PackageControlStatu.DOWNLOADED -> {
+                imageId = R.drawable.tick
+                packageStatu = PackageDetailCardBtnEnum.REMOVABLE
+            }
+            PackageControlStatu.UPDATED -> {
+                imageId = R.drawable.tick
+                packageStatu = PackageDetailCardBtnEnum.REMOVABLE
+            }
+            PackageControlStatu.REMOVED -> {
+                imageId = null
+                packageStatu = PackageDetailCardBtnEnum.NEED_DOWNLOAD
+            }
+        }
+        val newPackage = _currentPackage.value!!.copy(
+            packagaStatu = packageStatu,
+            imageId = if (imageId != _currentPackage.value!!.imageId) imageId else _currentPackage.value!!.imageId
+        )
         _currentPackage.value = newPackage
     }
 
-    private fun updateModelOnList(packageStatu: PackageDetailCardBtnEnum) {
+    private fun updateModelOnList() {
         val findedIndex = packages.indexOfFirst {
             it.id == currentPackage.value?.id
         }
         if (findedIndex != -1) {
-            val tempModel = packages[findedIndex].copy(packagaStatu = packageStatu)
-            packages[findedIndex] = tempModel
+            packages[findedIndex] = _currentPackage.value!!
         }
+    }
+
+    private enum class PackageControlStatu {
+        DOWNLOADED, UPDATED, REMOVED
     }
 }
