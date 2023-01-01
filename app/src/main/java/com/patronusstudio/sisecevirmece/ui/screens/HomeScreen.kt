@@ -69,15 +69,21 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     }
     ModalBottomSheetLayout(sheetState = sheetState,
         sheetContent = {
-            ErrorSheet(message = viewModel.loginError.collectAsState().value, errorIconClicked = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO) {
-                        viewModel.clearAuthToken(mContext)
-                    }
-                    route(InAppScreenNavEnums.LOGOUT)
-                }
-            })
-            ErrorSheet(message = viewModel.errorMessage.collectAsState().value)
+            if (sheetState.isVisible.not()) {
+                ErrorSheet(
+                    message = viewModel.loginError.collectAsState().value,
+                    errorIconClicked = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            withContext(Dispatchers.IO) {
+                                viewModel.clearAuthToken(mContext)
+                            }
+                            route(InAppScreenNavEnums.LOGOUT)
+                        }
+                    })
+            }
+            if (sheetState.isVisible.not()) {
+                ErrorSheet(message = viewModel.errorMessage.collectAsState().value)
+            }
         },
         content = {
             Column(
