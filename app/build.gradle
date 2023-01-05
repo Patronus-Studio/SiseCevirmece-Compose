@@ -75,6 +75,7 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_compose"
     kapt "com.google.dagger:hilt-compiler:$hilt_compiler"
     implementation "androidx.constraintlayout:constraintlayout-compose:$compose_constraint_layout"
+    implementation "com.github.bumptech.glide:glide:$glide"
 
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-ktx:$room"

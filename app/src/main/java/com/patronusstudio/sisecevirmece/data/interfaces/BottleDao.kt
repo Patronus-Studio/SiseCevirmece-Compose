@@ -22,4 +22,16 @@ interface BottleDao {
 
     @Query("Select * from ${DbTables.packageTable}")
     suspend fun getPackages(): List<PackageDbModel>
+
+    @Query("Delete from ${DbTables.packageTable}")
+    suspend fun removePackages()
+
+    @Query("Delete from ${DbTables.packageTable} where cloudPackageCategoryId=:id")
+    suspend fun removePackage(id: Int)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addPackage(model: PackageDbModel): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addQuestions(list: MutableList<QuestionDbModel>)
 }

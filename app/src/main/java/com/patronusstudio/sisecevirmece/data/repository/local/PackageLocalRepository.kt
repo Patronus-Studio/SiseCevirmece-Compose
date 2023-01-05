@@ -20,4 +20,22 @@ class PackageLocalRepository @Inject constructor() {
             }
         }
     }
+
+    suspend fun removePackage(context: Context, packageId: Int) {
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().removePackage(packageId)
+        }
+    }
+
+    suspend fun clearAllData(context: Context) {
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().removePackages()
+        }
+    }
+
+    suspend fun addPackages(context: Context, model: PackageDbModel): Long {
+        return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().addPackage(model)
+        }
+    }
 }

@@ -33,6 +33,7 @@ buildscript {
         retrofit_converter_gson = '2.6.2'
         okhttp = '4.10.0'
         lottie = '5.2.0'
+        glide = '4.14.2'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

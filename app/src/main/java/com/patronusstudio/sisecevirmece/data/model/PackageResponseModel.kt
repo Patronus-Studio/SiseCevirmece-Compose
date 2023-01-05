@@ -23,13 +23,13 @@ data class PackageModel(
     val numberOfLike: Double,
     val numberOfUnlike: Double,
     val packageCategory: Double,
-    val questions: List<Double>,
+    val questions: List<String>,
     override val updatedTime: String,
     val username: String,
     override val version: Int,
     //for local control
     var imageId: Int? = null,
-    val packagaStatu: PackageDetailCardBtnEnum = PackageDetailCardBtnEnum.DOWNLOAD
+    var packageStatu: PackageDetailCardBtnEnum
 ) : BasePackageModel()
 
 

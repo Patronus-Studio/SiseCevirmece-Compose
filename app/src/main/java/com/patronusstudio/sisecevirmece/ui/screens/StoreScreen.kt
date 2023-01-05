@@ -92,11 +92,13 @@ fun StoreScreen() {
             PackagePopup(viewModel.currentPackage.collectAsState().value!!, dismissListener = {
                 popupStatu.value = popupStatu.value.not()
             }, clickedBtn = {
-                coroutineScope.launch {
-                    when (viewModel.currentPackage.value!!.packagaStatu) {
-                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage()
+                coroutineScope.launch(Dispatchers.Main) {
+                    when (viewModel.currentPackage.value!!.packageStatu) {
+                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage(
+                            localContext
+                        )
                         PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
-                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
+                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage(localContext)
                     }
                 }
             })
@@ -126,7 +128,7 @@ fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit, clicke
         ) {
             PackageDetailCard(
                 packageModel,
-                packageDetailCardBtnEnum = packageModel.packagaStatu,
+                packageDetailCardBtnEnum = packageModel.packageStatu,
                 clickedBtn
             )
         }

@@ -9,8 +9,13 @@ import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BasePackageModel
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
+import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.network.PackageNetworkRepository
+import com.patronusstudio.sisecevirmece.data.utils.downloadImage
+import com.patronusstudio.sisecevirmece.data.utils.toByteArrray
+import com.patronusstudio.sisecevirmece.data.utils.toPackageDbModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PackageViewModel @Inject constructor(
     private val packageNetworkRepository: PackageNetworkRepository,
-    private val packageLocalRepository: PackageLocalRepository
+    private val packageLocalRepository: PackageLocalRepository,
+    private val questionLocalRepository: QuestionLocalRepository
 ) : BaseViewModel() {
 
     private val _categories = MutableStateFlow<List<PackageCategoryModel>>(listOf())
@@ -75,6 +81,7 @@ class PackageViewModel @Inject constructor(
         val localPackages = packageLocalRepository.getPackages(context)
         val mutableMap = mutableMapOf<Int, MutableList<BasePackageModel>>()
         networkPackages.body()?.packages?.forEach {
+            it.packageStatu = PackageDetailCardBtnEnum.NEED_DOWNLOAD
             mutableMap[it.id] = mutableListOf(it)
         }
         localPackages.forEach { localModel ->
@@ -89,7 +96,7 @@ class PackageViewModel @Inject constructor(
                 }
                 val newPackageModel = (networkModel as PackageModel).copy(
                     imageId = if (newImageId != networkModel.imageId) newImageId else networkModel.imageId,
-                    packagaStatu = if (newPackageStatu != networkModel.packagaStatu) newPackageStatu else networkModel.packagaStatu
+                    packageStatu = if (newPackageStatu != networkModel.packageStatu) newPackageStatu else networkModel.packageStatu
                 )
                 mutableMap[localModel.cloudPackageCategoryId] = mutableListOf(newPackageModel)
             }
@@ -101,17 +108,35 @@ class PackageViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    suspend fun removePackage() {
+    suspend fun removePackage(context: Context) {
         _isLoading.value = true
-        delay(1000L)
+        packageLocalRepository.removePackage(context, _currentPackage.value!!.id)
+        // TODO:  o paket idsine sahip sorularıda sil
+        delay(500L)
         setPackageStatu(PackageControlStatu.REMOVED)
         updateModelOnList()
+        _currentPackage.value = null
         _isLoading.value = false
     }
 
-    suspend fun downloadPackage() {
+    suspend fun downloadPackage(context: Context) {
         _isLoading.value = true
-        delay(1000L)
+        val bitmap = downloadImage(context, _currentPackage.value!!.imageUrl)
+        val byteArray = bitmap.toByteArrray()
+        val packageDbModel = _currentPackage.value!!.toPackageDbModel(byteArray)
+        val packageId = packageLocalRepository.addPackages(context, packageDbModel)
+        val questions = mutableListOf<QuestionDbModel>().apply {
+            _currentPackage.value!!.questions.forEach {
+                this.add(
+                    QuestionDbModel(
+                        localPackageCategoryId = packageId.toInt(),
+                        question = it,
+                        isShowed = false
+                    )
+                )
+            }
+        }
+        questionLocalRepository.addQuestions(context, questions)
         setPackageStatu(PackageControlStatu.DOWNLOADED)
         updateModelOnList()
         _isLoading.value = false
@@ -127,7 +152,7 @@ class PackageViewModel @Inject constructor(
 
     private fun setPackageStatu(packageStatuParam: PackageControlStatu) {
         var imageId = _currentPackage.value!!.imageId
-        var packageStatu = _currentPackage.value!!.packagaStatu
+        var packageStatu = _currentPackage.value!!.packageStatu
         when (packageStatuParam) {
             PackageControlStatu.DOWNLOADED -> {
                 imageId = R.drawable.tick
@@ -143,7 +168,7 @@ class PackageViewModel @Inject constructor(
             }
         }
         val newPackage = _currentPackage.value!!.copy(
-            packagaStatu = packageStatu,
+            packageStatu = packageStatu,
             imageId = if (imageId != _currentPackage.value!!.imageId) imageId else _currentPackage.value!!.imageId
         )
         _currentPackage.value = newPackage

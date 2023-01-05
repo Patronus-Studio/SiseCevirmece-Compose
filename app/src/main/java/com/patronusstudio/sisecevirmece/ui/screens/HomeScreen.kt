@@ -39,10 +39,7 @@ import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -50,40 +47,36 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     val mContext = LocalContext.current
     val viewModel = hiltViewModel<HomeViewModel>()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coroutine = rememberCoroutineScope()
     LaunchedEffect(key1 = Unit) {
-        withContext(Dispatchers.Main) {
+        this.launch(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)
-        }
-        withContext(Dispatchers.IO) {
             viewModel.getAvatars()
             viewModel.getAllLevel()
         }
     }
     LaunchedEffect(
-        key1 = viewModel.loginError.collectAsState().value,
-        key2 = viewModel.errorMessage.collectAsState().value
+        key1 = viewModel.loginError.collectAsState().value
     ) {
         if (viewModel.loginError.value.isNotEmpty()) {
             if (sheetState.isVisible.not()) sheetState.show()
         } else sheetState.hide()
     }
-    ModalBottomSheetLayout(sheetState = sheetState,
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetContent = {
-            if (sheetState.isVisible.not()) {
-                ErrorSheet(
-                    message = viewModel.loginError.collectAsState().value,
-                    errorIconClicked = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            withContext(Dispatchers.IO) {
-                                viewModel.clearAuthToken(mContext)
-                            }
-                            route(InAppScreenNavEnums.LOGOUT)
+            ErrorSheet(
+                message = viewModel.loginError.collectAsState().value,
+                errorIconClicked = {
+                    coroutine.launch(Dispatchers.Main) {
+                        withContext(Dispatchers.IO) {
+                            viewModel.clearAuthToken(mContext)
                         }
-                    })
-            }
-            if (sheetState.isVisible.not()) {
-                ErrorSheet(message = viewModel.errorMessage.collectAsState().value)
-            }
+                        route(InAppScreenNavEnums.LOGOUT)
+                    }
+                })
+
         },
         content = {
             Column(
@@ -267,19 +260,21 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
                     content = {
-                        itemsIndexed(avatarList ?: arrayListOf(), itemContent = { position, itemValue ->
-                            Box(
-                                Modifier
-                                    .wrapContentSize()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                UserPic(ratio = 0.25, avatar = itemValue) {
-                                    if (itemValue.buyedStatu == AvatarStatu.BUYED) {
-                                        dismiss(itemValue)
+                        itemsIndexed(
+                            avatarList ?: arrayListOf(),
+                            itemContent = { position, itemValue ->
+                                Box(
+                                    Modifier
+                                        .wrapContentSize()
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    UserPic(ratio = 0.25, avatar = itemValue) {
+                                        if (itemValue.buyedStatu == AvatarStatu.BUYED) {
+                                            dismiss(itemValue)
+                                        }
                                     }
                                 }
-                            }
-                        })
+                            })
                     })
             }
         }
