@@ -8,7 +8,7 @@ import com.patronusstudio.sisecevirmece.data.DbTables
 data class QuestionDbModel(
     @PrimaryKey(autoGenerate = true)
     val primaryId: Int = 0,
-    val localPackageCategoryId: Int,
+    val localPackagePrimaryId: Int,
     val question: String,
     var isShowed: Boolean = false
 )

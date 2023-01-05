@@ -110,12 +110,16 @@ class PackageViewModel @Inject constructor(
 
     suspend fun removePackage(context: Context) {
         _isLoading.value = true
-        packageLocalRepository.removePackage(context, _currentPackage.value!!.id)
-        // TODO:  o paket idsine sahip sorularıda sil
+        val dbPackageModel =
+            packageLocalRepository.getPackageOnCloudPackageCategoryId(
+                context,
+                _currentPackage.value!!.id
+            )
+        packageLocalRepository.removePackage(context, dbPackageModel.primaryId)
+        questionLocalRepository.removeQuestions(context, dbPackageModel.primaryId)
         delay(500L)
         setPackageStatu(PackageControlStatu.REMOVED)
         updateModelOnList()
-        _currentPackage.value = null
         _isLoading.value = false
     }
 
@@ -129,7 +133,7 @@ class PackageViewModel @Inject constructor(
             _currentPackage.value!!.questions.forEach {
                 this.add(
                     QuestionDbModel(
-                        localPackageCategoryId = packageId.toInt(),
+                        localPackagePrimaryId = packageId.toInt(),
                         question = it,
                         isShowed = false
                     )

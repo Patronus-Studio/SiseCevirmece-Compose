@@ -131,7 +131,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _questionList.value.forEach {
             tempQuestionList.add(
                 QuestionDbModel(
-                    localPackageCategoryId = packageId.toInt(),
+                    localPackagePrimaryId = packageId.toInt(),
                     question = it.question,
                     isShowed = false
                 )

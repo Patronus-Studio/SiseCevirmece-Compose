@@ -26,7 +26,7 @@ interface BottleDao {
     @Query("Delete from ${DbTables.packageTable}")
     suspend fun removePackages()
 
-    @Query("Delete from ${DbTables.packageTable} where cloudPackageCategoryId=:id")
+    @Query("Delete from ${DbTables.packageTable} where primaryId=:id")
     suspend fun removePackage(id: Int)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -34,4 +34,10 @@ interface BottleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addQuestions(list: MutableList<QuestionDbModel>)
+
+    @Query("Delete from ${DbTables.questionTable} where localPackagePrimaryId = :packageId")
+    suspend fun removeQuestions(packageId: Int)
+
+    @Query("Select * from ${DbTables.packageTable} where cloudPackageCategoryId = :id")
+    suspend fun getPackageWithCloudPackageCategoryId(id: Int): PackageDbModel
 }

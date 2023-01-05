@@ -15,4 +15,10 @@ class QuestionLocalRepository @Inject constructor() {
         }
     }
 
+    suspend fun removeQuestions(context: Context, packageId: Int) {
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().removeQuestions(packageId)
+        }
+    }
+
 }

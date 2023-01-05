@@ -21,6 +21,16 @@ class PackageLocalRepository @Inject constructor() {
         }
     }
 
+    suspend fun getPackageOnCloudPackageCategoryId(
+        context: Context,
+        cloudPackageCategoryId: Int
+    ): PackageDbModel {
+        return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao()
+                .getPackageWithCloudPackageCategoryId(cloudPackageCategoryId)
+        }
+    }
+
     suspend fun removePackage(context: Context, packageId: Int) {
         withContext(Dispatchers.IO) {
             BottleRoomDb.getInstance(context).getBottleDao().removePackage(packageId)
