@@ -104,7 +104,8 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 PlayButton {
                     when (it) {
                         InAppScreenNavEnums.PLAY_GAME -> {
-                            Toast.makeText(mContext, "Oyna", Toast.LENGTH_SHORT).show()
+                            it
+                            route(it)
                         }
                         InAppScreenNavEnums.LOGOUT -> {
                             CoroutineScope(Dispatchers.Main).launch {
@@ -210,16 +211,13 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
 @Composable
 private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
-    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier
                 .width(width = (width * 0.8).dp)
                 .padding(vertical = 16.dp)
                 .combinedClickable(onClick = {
-                    Toast
-                        .makeText(context, "Oyna", Toast.LENGTH_SHORT)
-                        .show()
+                    playGame(InAppScreenNavEnums.PLAY_GAME)
                 }, onLongClick = {
                     playGame(InAppScreenNavEnums.LOGOUT)
                 }),
