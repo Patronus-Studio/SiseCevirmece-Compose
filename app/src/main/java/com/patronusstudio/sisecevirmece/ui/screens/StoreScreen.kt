@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +27,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
@@ -34,14 +35,14 @@ import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
 import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
+import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun StoreScreen() {
+fun StoreScreen(back: () -> Unit) {
     val viewModel = hiltViewModel<PackageViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val titles = viewModel.categories.collectAsState().value
@@ -65,6 +66,10 @@ fun StoreScreen() {
             .background(BlueViolet)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            CardTitle(stringResource(id = R.string.store)) {
+                back()
+            }
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.clickedBtn(it)
