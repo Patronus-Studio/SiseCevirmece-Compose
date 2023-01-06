@@ -140,14 +140,11 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyRow(content = {
             items(
-                items = list,
-                key = {
-                    it.id
-                }
+                items = list
             ) { item: PackageCategoryModel ->
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(item) {
-                    clicked((item.id - 1).toInt())
+                    clicked((item.id).toInt())
                 }
             }
             item {
