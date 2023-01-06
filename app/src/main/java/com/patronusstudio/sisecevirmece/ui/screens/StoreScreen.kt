@@ -53,6 +53,7 @@ fun StoreScreen() {
     }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
+        viewModel.getPackageFromCategory(localContext, 1)
     }
     val clickedPackage = { item: PackageModel ->
         viewModel.setPackageModel(item)
@@ -74,11 +75,9 @@ fun StoreScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
 
                 items(viewModel.packages.size) { index ->
+                    Spacer(modifier = Modifier.height(16.dp))
                     PackagesCard(
                         cardWidth = packageCardWidth,
                         cardHeight = packageCardHeight,
