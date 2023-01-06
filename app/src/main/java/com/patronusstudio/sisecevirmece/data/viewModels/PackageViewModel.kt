@@ -125,15 +125,45 @@ class PackageViewModel @Inject constructor(
 
     suspend fun downloadPackage(context: Context) {
         _isLoading.value = true
-        val bitmap = downloadImage(context, _currentPackage.value!!.imageUrl)
-        val byteArray = bitmap.toByteArrray()
+        val byteArray = downloadImage(context, _currentPackage.value!!.imageUrl).toByteArrray()
         val packageDbModel = _currentPackage.value!!.toPackageDbModel(byteArray)
         val packageId = packageLocalRepository.addPackages(context, packageDbModel)
+        insertQuestions(context, packageId.toInt())
+        setPackageStatu(PackageControlStatu.DOWNLOADED)
+        updateModelOnList()
+        _isLoading.value = false
+    }
+
+    suspend fun updatePackage(context: Context) {
+        _isLoading.value = true
+        val byteArray = downloadImage(context, _currentPackage.value!!.imageUrl).toByteArrray()
+        val dbPackageModel =
+            packageLocalRepository.getPackageOnCloudPackageCategoryId(
+                context,
+                _currentPackage.value!!.id
+            )
+        val copiedDbPackageModel = dbPackageModel.copy(
+            cloudPackageCategoryId = _currentPackage.value!!.id,
+            packageImage = byteArray,
+            version = _currentPackage.value!!.version,
+            packageName = _currentPackage.value!!.packageName,
+            packageComment = _currentPackage.value!!.packageComment,
+            updatedTime = _currentPackage.value!!.updatedTime
+        )
+        packageLocalRepository.updatePackage(context, copiedDbPackageModel)
+        questionLocalRepository.removeQuestions(context, dbPackageModel.primaryId)
+        insertQuestions(context, copiedDbPackageModel.primaryId)
+        setPackageStatu(PackageControlStatu.UPDATED)
+        updateModelOnList()
+        _isLoading.value = false
+    }
+
+    private suspend fun insertQuestions(context: Context, packagePrimaryId: Int) {
         val questions = mutableListOf<QuestionDbModel>().apply {
             _currentPackage.value!!.questions.forEach {
                 this.add(
                     QuestionDbModel(
-                        localPackagePrimaryId = packageId.toInt(),
+                        localPackagePrimaryId = packagePrimaryId,
                         question = it,
                         isShowed = false
                     )
@@ -141,17 +171,6 @@ class PackageViewModel @Inject constructor(
             }
         }
         questionLocalRepository.addQuestions(context, questions)
-        setPackageStatu(PackageControlStatu.DOWNLOADED)
-        updateModelOnList()
-        _isLoading.value = false
-    }
-
-    suspend fun updatePackage() {
-        _isLoading.value = true
-        delay(1000L)
-        setPackageStatu(PackageControlStatu.UPDATED)
-        updateModelOnList()
-        _isLoading.value = false
     }
 
     private fun setPackageStatu(packageStatuParam: PackageControlStatu) {

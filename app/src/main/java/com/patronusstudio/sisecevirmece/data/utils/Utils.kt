@@ -41,8 +41,6 @@ fun PackageModel.toPackageDbModel(packageImage: ByteArray): PackageDbModel {
     )
 }
 
-// TODO: resim indirme yapılması lazım
-// sonrasında bitmape çevirip dbye kaydedecez
 suspend fun downloadImage(context: Context, downloadUrlOfImage: String?): Bitmap {
     return withContext(Dispatchers.IO) {
         Glide.with(context).asBitmap().load(downloadUrlOfImage).submit().get()

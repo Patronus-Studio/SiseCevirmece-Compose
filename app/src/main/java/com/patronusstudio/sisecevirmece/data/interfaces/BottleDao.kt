@@ -40,4 +40,7 @@ interface BottleDao {
 
     @Query("Select * from ${DbTables.packageTable} where cloudPackageCategoryId = :id")
     suspend fun getPackageWithCloudPackageCategoryId(id: Int): PackageDbModel
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updatePackage(model: PackageDbModel)
 }

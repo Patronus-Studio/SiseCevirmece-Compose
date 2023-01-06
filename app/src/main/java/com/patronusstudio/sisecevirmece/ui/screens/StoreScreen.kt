@@ -97,7 +97,7 @@ fun StoreScreen() {
                         PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage(
                             localContext
                         )
-                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage(localContext)
                         PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage(localContext)
                     }
                 }
