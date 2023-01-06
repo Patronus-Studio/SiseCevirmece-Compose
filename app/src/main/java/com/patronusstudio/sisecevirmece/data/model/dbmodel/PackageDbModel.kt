@@ -3,20 +3,22 @@ package com.patronusstudio.sisecevirmece.data.model.dbmodel
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.patronusstudio.sisecevirmece.data.DbTables
+import com.patronusstudio.sisecevirmece.data.model.BasePackageModel
 
-@Entity(tableName = "PackageTable")
+@Entity(tableName = DbTables.packageTable)
 data class PackageDbModel(
     @PrimaryKey(autoGenerate = true)
     val primaryId: Int = 0,
     val cloudPackageCategoryId: Int,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     val packageImage: ByteArray? = null,
-    val version: Int,
-    val packageName:String,
-    val packageComment:String,
-    val createdTime: String,
-    val updatedTime: String
-) {
+    override val version: Int,
+    override val packageName: String,
+    override val packageComment: String,
+    override val createdTime: String,
+    override val updatedTime: String
+) : BasePackageModel() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

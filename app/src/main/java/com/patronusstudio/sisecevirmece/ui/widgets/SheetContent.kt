@@ -23,14 +23,9 @@ fun ErrorSheet(message: String, errorIconClicked: (() -> Unit)? = null) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .clickable {
-                errorIconClicked?.let {
-                    errorIconClicked()
-                }
-            },
-        contentAlignment = Alignment.BottomCenter
+            .wrapContentSize()
+            .background(Color.Transparent),
+        contentAlignment = Alignment.TopCenter
     ) {
         Box(
             modifier = Modifier

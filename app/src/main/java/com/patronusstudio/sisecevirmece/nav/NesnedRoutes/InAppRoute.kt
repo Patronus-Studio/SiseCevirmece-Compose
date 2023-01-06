@@ -1,7 +1,10 @@
 package com.patronusstudio.sisecevirmece.nav.NesnedRoutes
 
-import androidx.navigation.*
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
+import androidx.navigation.navigation
 import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
@@ -61,11 +64,13 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 }
             }
         }
-        composable(route = NavInAppScreens.StoreScreen.routeName){
-            StoreScreen()
+        composable(route = NavInAppScreens.StoreScreen.routeName) {
+            StoreScreen {
+                navController.popBackStack()
+            }
         }
         composable(route = NavInAppScreens.AddCategoriesScreen.routeName){
-            AddCategoriesScreen(){
+            AddCategoriesScreen {
                 navController.popBackStack()
             }
         }

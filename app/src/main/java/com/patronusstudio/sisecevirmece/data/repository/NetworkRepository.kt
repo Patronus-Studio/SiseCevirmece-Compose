@@ -51,9 +51,4 @@ class NetworkRepository @Inject constructor() {
         }
     }
 
-    suspend fun getPackageCategories():Response<PackageCategoryResponseModel>{
-        return withContext(Dispatchers.IO) {
-            RetrofitObjects.getApi().getAllPackageCategories()
-        }
-    }
 }

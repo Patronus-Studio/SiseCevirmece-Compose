@@ -14,6 +14,7 @@ import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import com.patronusstudio.sisecevirmece.data.repository.network.PackageNetworkRepository
 import com.patronusstudio.sisecevirmece.data.utils.getCurrentTime
 import com.patronusstudio.sisecevirmece.data.utils.removeModelOnList
 import com.patronusstudio.sisecevirmece.data.utils.toByteArrray
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddCategoriesScreenViewModel @Inject constructor(
     private val networkRepository: NetworkRepository,
+    private val packageNetworkRepository: PackageNetworkRepository,
     private val localRepository: LocalRepository,
 ) : ViewModel() {
 
@@ -129,7 +131,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _questionList.value.forEach {
             tempQuestionList.add(
                 QuestionDbModel(
-                    localPackageCategoryId = packageId.toInt(),
+                    localPackagePrimaryId = packageId.toInt(),
                     question = it.question,
                     isShowed = false
                 )
@@ -162,7 +164,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
 
     suspend fun getPackageCategories() {
         _isLoading.value = true
-        val result = networkRepository.getPackageCategories()
+        val result = packageNetworkRepository.getPackageCategories()
         val body = result.body()
         if (body == null || body.status != HttpStatusEnum.OK) {
             _errorMessage.value = body?.message ?: "Bir hatayla karşılaşıldı"
