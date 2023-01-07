@@ -15,8 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
-import com.patronusstudio.sisecevirmece.ui.theme.Purple700
-
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 @Composable
 fun CustomTextField(
     widthSize: Dp,
@@ -59,7 +58,7 @@ fun CustomTextField(
 fun getTextFieldColor(): TextFieldColors {
     return TextFieldDefaults.outlinedTextFieldColors(
         backgroundColor = Color.White,
-        focusedBorderColor = Color.Green, unfocusedBorderColor = Purple700,
+        focusedBorderColor = Color.Green, unfocusedBorderColor = AppColor.Purple700,
         errorBorderColor = Color.Red
     )
 }

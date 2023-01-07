@@ -33,8 +33,7 @@ import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
-import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
-import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
@@ -63,7 +62,7 @@ fun StoreScreen(back: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlueViolet)
+            .background(AppColor.BlueViolet)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -245,7 +244,7 @@ fun PackagesCard(
                         text = packageModel.username,
                         fontSize = 10.sp,
                         maxLines = 1,
-                        style = TextStyle(color = DavysGrey)
+                        style = TextStyle(color = AppColor.DavysGrey)
                     )
                 }
             }

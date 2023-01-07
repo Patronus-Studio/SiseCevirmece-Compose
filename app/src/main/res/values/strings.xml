@@ -15,4 +15,8 @@
     <string name="download">İndir</string>
     <string name="update">Güncelle</string>
     <string name="remove">Sil</string>
+    <string name="play_normal_title">Klasik MOD</string>
+    <string name="play_normal_content">Bildiğiniz Şişe Çevirmece keyfi, klasik oynanışı ile sizlerle!</string>
+    <string name="play_special_title">Özel MOD</string>
+    <string name="play_special_content">Bildiğiniz Şişe Çevirmece keyfi, farklı kategoriler ve farklı cezalar ile artık çok daha eğlenceli!</string>
 </resources>

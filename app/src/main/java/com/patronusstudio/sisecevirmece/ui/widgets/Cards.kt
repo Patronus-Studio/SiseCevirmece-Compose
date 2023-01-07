@@ -34,9 +34,7 @@ import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
-import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
-import com.patronusstudio.sisecevirmece.ui.theme.GreyTranspancy20
-
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 @Composable
 fun CardImageWithText(
@@ -177,7 +175,7 @@ fun PackageDetailCard(
                 modifier = Modifier
                     .width(1.dp)
                     .fillMaxHeight()
-                    .background(color = GreyTranspancy20, CircleShape)
+                    .background(color = AppColor.GreyTranspancy20, CircleShape)
                     .clip(CircleShape)
                     .constrainAs(lineRef) {
                         this.centerHorizontallyTo(parent, bias = 0.5f)
@@ -233,7 +231,7 @@ fun SampleText(content: String, maxLines: Int = 1, fontSize: Int = 10) {
     Text(
         text = content, maxLines = maxLines,
         fontSize = fontSize.sp,
-        style = TextStyle(color = DavysGrey)
+        style = TextStyle(color = AppColor.DavysGrey)
     )
 }
 
