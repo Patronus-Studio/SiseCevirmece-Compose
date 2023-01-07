@@ -118,7 +118,7 @@ fun AddCategoriesScreen(back: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .background(Heliotrope)
+                .background(AppColor.Heliotrope)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             CardTitle(stringResource(id = R.string.add_category)) {
@@ -200,7 +200,7 @@ private fun CategoryType(
                 AnimatedVisibility(visible = item.id.toInt() == userSelectedCategory.value) {
                     ButtonWithDot(
                         height = dotButtonHeight.toInt(),
-                        dotColor = Green,
+                        dotColor = AppColor.Green,
                         btnColor = Color(android.graphics.Color.parseColor(item.activeBtnColor)),
                         text = item.name,
                         textColor = Color(android.graphics.Color.parseColor(item.activeTextColor))
@@ -316,7 +316,12 @@ private fun CircleImageButton(@DrawableRes id: Int, clicked: () -> Unit) {
 
 @Composable
 fun AddImage(size: Dp, bitmap: Bitmap?, selectImageClicked: () -> Unit) {
-    val gradients = listOf(SeaSerpent, SunsetOrange, Mustard, UnitedNationsBlue)
+    val gradients = listOf(
+        AppColor.SeaSerpent,
+        AppColor.SunsetOrange,
+        AppColor.Mustard,
+        AppColor.UnitedNationsBlue
+    )
     val cornerShape16 = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
@@ -346,7 +351,7 @@ fun AddImage(size: Dp, bitmap: Bitmap?, selectImageClicked: () -> Unit) {
 fun CategoryTextField(text: String, placeText: String, valueChange: (String) -> Unit) {
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = Purple200
+        focusedIndicatorColor = AppColor.Purple200
     )
     TextField(
         value = text,
@@ -371,7 +376,7 @@ fun QuestionViewItem(
     val widthSize = (deviceWithSize * 0.9).dp
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = Purple200
+        focusedIndicatorColor = AppColor.Purple200
     )
     Row(
         modifier = modifier
