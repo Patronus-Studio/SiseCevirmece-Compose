@@ -29,7 +29,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavInAppScreens.HomeScreen.routeName , navOptions {
+                            NavInAppScreens.HomeScreen.routeName, navOptions {
                                 popUpTo(0)
                             }
                         )
@@ -47,7 +47,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
             HomeScreen {
-                when(it){
+                when (it) {
                     InAppScreenNavEnums.LOGOUT -> {
                         navController.popBackStack()
                         navController.navigate(NavInAppScreens.LoginScreen.routeName)
@@ -75,9 +75,9 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             }
         }
         composable(route = NavInAppScreens.GameTypeSelection.routeName) {
-            GameTypeSelection {
-                navController.popBackStack()
-            }
+            GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
+
+            })
         }
     }
 
