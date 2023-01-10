@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import com.patronusstudio.sisecevirmece.NavInAppScreens
+import com.patronusstudio.sisecevirmece.data.enums.GameMode
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.ui.screens.*
@@ -76,8 +77,13 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
         }
         composable(route = NavInAppScreens.GameTypeSelection.routeName) {
             GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
-
+                if (it == GameMode.NORMAL_MODE) navController.navigate(NavInAppScreens.NormalGameScreen.routeName)
             })
+        }
+        composable(route = NavInAppScreens.NormalGameScreen.routeName) {
+            NormalGameScreen {
+                navController.popBackStack()
+            }
         }
     }
 
