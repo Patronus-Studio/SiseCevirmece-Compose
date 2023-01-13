@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
+import kotlin.random.Random
 
 @Composable
 fun NormalGameScreen(backClicked: () -> Unit) {
@@ -36,19 +37,14 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     val touchStatus = remember {
         mutableStateOf(TouchListener.INIT)
     }
-    val calculatedDegree = remember {
-        mutableStateOf(0f)
-    }
-
     val animFinished = {
-        degree.value = calculatedDegree.value % 360
+        degree.value = degree.value % 360
         touchStatus.value = TouchListener.ANIM_ENDED
     }
     val infiniteAnim = rememberUpdatedState(newValue = animateFloatAsState(
-        targetValue = calculatedDegree.value,
+        targetValue = degree.value,
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,9 +80,11 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                                 val canceled =
                                     event.changes.any { it.isConsumed && it.positionChanged() }
                             } while (!canceled && event.changes.any { it.pressed })
-                            spinTimer = 0
-                            calculatedDegree.value = (degree.value % 100 * 27 + 100)
                             touchStatus.value = TouchListener.ANIM_STARTED
+                            val result = degree.value % 100
+                            degree.value = if (result < 50)
+                                (result * (Random.nextInt(50, 75)) + spinTimer)
+                            else (result * (Random.nextInt(20, 35)) + spinTimer)
                         }
                     }
             )
