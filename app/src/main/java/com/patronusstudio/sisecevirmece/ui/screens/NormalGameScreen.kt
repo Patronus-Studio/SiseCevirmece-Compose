@@ -1,6 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -8,9 +9,9 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -32,10 +33,21 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     }
     val bottleRotationValue = 10f
     var spinTimer = 0
-    val isFinished = remember {
-        mutableStateOf(false)
+    val touchStatus = remember {
+        mutableStateOf(TouchListener.INIT)
     }
-    val infiniteAnim = rememberInfiniteTransition()
+    val calculatedDegree = remember {
+        mutableStateOf(0f)
+    }
+
+    val animFinished = {
+        degree.value = calculatedDegree.value % 360
+        touchStatus.value = TouchListener.ANIM_ENDED
+    }
+    val infiniteAnim = rememberUpdatedState(newValue = animateFloatAsState(
+        targetValue = calculatedDegree.value,
+        animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
+    ))
 
     Column(
         modifier = Modifier
@@ -46,16 +58,14 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         CardTitle(title = "Normal MOD", backClicked)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
-                painter = painterResource(id = R.drawable.bottle_sample),
-                contentDescription = "",
+                painter = painterResource(id = R.drawable.bottle_sample), contentDescription = "",
                 modifier = Modifier
                     .size(bottleSize)
                     .rotate(
-                        if (isFinished.value.not()) degree.value else
-                            infiniteAnim.getAnim(
-                                initialValue = degree.value,
-                                targetValue = (degree.value.toInt() * 10 + 100).toFloat(), 5000
-                            ).value
+                        when (touchStatus.value) {
+                            TouchListener.ANIM_STARTED -> infiniteAnim.value.value
+                            else -> degree.value
+                        }
                     )
                     .pointerInput(Unit) {
                         this.detectTransformGestures { centroid, pan, zoom, rotation ->
@@ -67,7 +77,6 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                         }
                     }
                     .pointerInput(Unit) {
-                        isFinished.value = false
                         awaitEachGesture {
                             awaitFirstDown(requireUnconsumed = false)
                             do {
@@ -76,7 +85,8 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                                     event.changes.any { it.isConsumed && it.positionChanged() }
                             } while (!canceled && event.changes.any { it.pressed })
                             spinTimer = 0
-                            isFinished.value = true
+                            calculatedDegree.value = (degree.value % 100 * 27 + 100)
+                            touchStatus.value = TouchListener.ANIM_STARTED
                         }
                     }
             )
@@ -84,17 +94,8 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     }
 }
 
-@Composable
-private fun InfiniteTransition.getAnim(
-    initialValue: Float,
-    targetValue: Float,
-    durationMillis: Int
-): State<Float> {
-    return this.animateFloat(
-        initialValue = initialValue, targetValue = targetValue, animationSpec =
-        infiniteRepeatable(
-            tween(durationMillis, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
+private enum class TouchListener {
+    INIT,
+    ANIM_STARTED,
+    ANIM_ENDED
 }
