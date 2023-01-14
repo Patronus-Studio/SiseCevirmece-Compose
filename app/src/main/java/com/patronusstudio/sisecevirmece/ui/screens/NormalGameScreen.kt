@@ -1,11 +1,9 @@
 package com.patronusstudio.sisecevirmece.ui.screens
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -15,8 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
@@ -28,7 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
@@ -38,7 +39,8 @@ import kotlin.random.Random
 private enum class TouchListener {
     INIT,
     ANIM_STARTED,
-    ANIM_ENDED
+    ANIM_ENDED,
+    TRUH_DARE_POPUP_CLOSED
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -51,26 +53,20 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     var spinTimer = 0
     val touchStatus = remember { mutableStateOf(TouchListener.INIT) }
     val isSpinning = remember { mutableStateOf(false) }
-    val blurSize = remember {
-        mutableStateOf(0.dp)
-    }
     val animFinished = {
         degree.value = degree.value % 360
         touchStatus.value = TouchListener.ANIM_ENDED
         isSpinning.value = false
-        blurSize.value = 8.dp
     }
     val infiniteAnim = rememberUpdatedState(newValue = animateFloatAsState(
         targetValue = degree.value,
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColor.BlueViolet)
-            .blur(blurSize.value)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         CardTitle(title = "Normal MOD", backClicked)
@@ -116,7 +112,6 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                         }
                     }
                     .combinedClickable(onDoubleClick = {
-                        blurSize.value = 8.dp
                         touchStatus.value = TouchListener.ANIM_ENDED
                     }, onClick = {
 
@@ -125,41 +120,47 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         }
     }
     if (touchStatus.value == TouchListener.ANIM_ENDED) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    blurSize.value = 0.dp
-                    touchStatus.value = TouchListener.INIT
-                }, verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            TruthDareSelectPopup()
+        TruthDareSelectDialog {
+            touchStatus.value = it
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun TruthDareSelectPopup() {
-    val screenWidth = LocalConfiguration.current.screenWidthDp
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    val context = LocalContext.current
-    val cardWidth = (screenWidth * 0.44).dp
-    val cardHeight = (screenHeight * 0.3).dp
-
-    val isVisible = remember {
-        mutableStateOf(false)
+private fun TruthDareSelectDialog(setTouchStatus: (TouchListener) -> Unit) {
+    val localContext = LocalContext.current
+    val cardWidth = (LocalConfiguration.current.screenWidthDp * 0.44).dp
+    val cardHeight = (LocalConfiguration.current.screenHeightDp * 0.3).dp
+    val clicked = { truthDareEnum: TruthDareEnum ->
+        Toast.makeText(localContext, truthDareEnum.getText(localContext), Toast.LENGTH_SHORT).show()
     }
+    val isVisible = remember { mutableStateOf(false) }
     LaunchedEffect(key1 = Unit, block = {
-        delay(250L)
+        delay(100L)
         isVisible.value = true
     })
-    val clicked = { truthDareEnum: TruthDareEnum ->
-        Toast.makeText(context, truthDareEnum.getText(context), Toast.LENGTH_SHORT).show()
+    LaunchedEffect(key1 = isVisible.value, block = {
+        if (isVisible.value.not()) {
+            delay(AnimMillis.SHORT.millis.toLong())
+            setTouchStatus(TouchListener.TRUH_DARE_POPUP_CLOSED)
+        }
+    })
+    Dialog(
+        onDismissRequest = {
+            isVisible.value = isVisible.value.not()
+        }, properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            AnimatedCard(isVisible.value, cardWidth, cardHeight, true, TruthDareEnum.TRUTH, clicked)
+            AnimatedCard(isVisible.value, cardWidth, cardHeight, false, TruthDareEnum.DARE, clicked)
+        }
     }
-
-
-    AnimatedCard(isVisible.value, cardWidth, cardHeight, true, TruthDareEnum.TRUTH, clicked)
-    AnimatedCard(isVisible.value, cardWidth, cardHeight, false, TruthDareEnum.DARE, clicked)
 }
 
 @Composable
@@ -169,9 +170,9 @@ private fun AnimatedCard(
     cardHeight: Dp,
     isLeftToRight: Boolean,
     truthDareEnum: TruthDareEnum,
-    clicked: (TruthDareEnum) -> Unit,
-    animDurationMillis: Int = 1250,
+    clicked: (TruthDareEnum) -> Unit
 ) {
+    val animDurationMillis = if (isVisible) AnimMillis.LONG.millis else AnimMillis.SHORT.millis
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInHorizontally(
@@ -183,13 +184,21 @@ private fun AnimatedCard(
             animationSpec = tween(
                 durationMillis = animDurationMillis, 0
             )
+        ), exit = slideOutHorizontally(
+            targetOffsetX = { if (isLeftToRight.not()) it else -it },
+            animationSpec = tween(
+                durationMillis = animDurationMillis
+            )
+        ) + fadeOut(
+            animationSpec = tween(
+                durationMillis = animDurationMillis, 0
+            )
         )
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TDCard(cardWidth = cardWidth, cardHeight = cardHeight, truthDareEnum, clicked)
         }
     }
-
 }
 
 @Composable
