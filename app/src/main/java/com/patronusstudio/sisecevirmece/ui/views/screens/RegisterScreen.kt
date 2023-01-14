@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -26,6 +26,8 @@ import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.GenderEnum
 import com.patronusstudio.sisecevirmece.data.utils.checkEmailCorrect
 import com.patronusstudio.sisecevirmece.data.viewModels.RegisterViewModel
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
+import com.patronusstudio.sisecevirmece.ui.screens.SampleAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet

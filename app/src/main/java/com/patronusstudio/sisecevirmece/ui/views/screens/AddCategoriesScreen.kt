@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -48,6 +48,7 @@ import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.QuestionModel
 import com.patronusstudio.sisecevirmece.data.utils.resize
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
 import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithPassive
