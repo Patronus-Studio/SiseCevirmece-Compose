@@ -19,4 +19,6 @@
     <string name="play_normal_content">Bildiğiniz Şişe Çevirmece keyfi, klasik oynanışı ile sizlerle!</string>
     <string name="play_special_title">Özel MOD</string>
     <string name="play_special_content">Bildiğiniz Şişe Çevirmece keyfi, farklı kategoriler ve farklı cezalar ile artık çok daha eğlenceli!</string>
+    <string name="truth">Doğruluk</string>
+    <string name="dare">Cesaret</string>
 </resources>
