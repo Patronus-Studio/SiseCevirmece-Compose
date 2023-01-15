@@ -9,7 +9,7 @@ import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.data.enums.GameMode
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
-import com.patronusstudio.sisecevirmece.ui.screens.*
+import com.patronusstudio.sisecevirmece.ui.views.screens.*
 
 fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
     navigation(

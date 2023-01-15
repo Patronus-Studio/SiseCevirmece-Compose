@@ -21,4 +21,10 @@
     <string name="play_special_content">Bildiğiniz Şişe Çevirmece keyfi, farklı kategoriler ve farklı cezalar ile artık çok daha eğlenceli!</string>
     <string name="truth">Doğruluk</string>
     <string name="dare">Cesaret</string>
+    <string name="lorem_ipsum_multi_line">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industr\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</string>
+    <string name="lorem_ipsum_single_line">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</string>
+    <string name="replied">Cevaplandı</string>
+    <string name="change_question">Soru değiştir</string>
+    <string name="i_wil_ask_question">Soruyu Ben Soracağım</string>
+    <string name="not_selected">Seçilmedi</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
@@ -33,6 +33,7 @@ import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard

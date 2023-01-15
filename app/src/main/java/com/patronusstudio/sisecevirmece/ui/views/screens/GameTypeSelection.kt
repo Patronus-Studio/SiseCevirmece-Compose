@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

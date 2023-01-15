@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -34,6 +34,7 @@ import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
