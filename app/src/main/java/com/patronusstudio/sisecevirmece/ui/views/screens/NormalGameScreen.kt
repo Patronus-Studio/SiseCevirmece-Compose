@@ -119,7 +119,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         }
     }
     if (touchStatus.value == TouchListener.ANIM_ENDED) {
-        TruthDareSelectDialog(popUpStatus = {
+        TruthDareSelectDialog(dissmissed = {
             touchStatus.value = TouchListener.INIT
         }, truthDareSelected = {
             truthDareSelectedValue.value = it
@@ -129,15 +129,15 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     if (touchStatus.value == TouchListener.TRUTH_DARE_SELECTED) {
         Dialog(
             onDismissRequest = {
-
-            }, properties = DialogProperties(
-                usePlatformDefaultWidth = false,
-                dismissOnClickOutside = false
-            )
+                touchStatus.value = TouchListener.INIT
+            }, properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
-            TruthDareQuestionDialog()
+            TruthDareQuestionDialog {
+                touchStatus.value = TouchListener.INIT
+            }
         }
     }
+
 }
 
 

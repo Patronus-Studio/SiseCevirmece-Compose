@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.ui.views.dialogs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -12,7 +13,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,9 +20,8 @@ import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.AutoTextSize
 
-@Preview
 @Composable
-fun TruthDareQuestionDialog() {
+fun TruthDareQuestionDialog(closeClicked: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
@@ -46,11 +45,27 @@ fun TruthDareQuestionDialog() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    GeneralCard(width = (width * 0.4).dp, smallCardHeight, text = "Cevaplandı")
-                    GeneralCard(width = (width * 0.4).dp, smallCardHeight, text = "Soru değiştir")
+                    GeneralCard(
+                        width = (width * 0.4).dp,
+                        smallCardHeight,
+                        text = stringResource(R.string.replied),
+                        clicked = closeClicked
+                    )
+                    GeneralCard(
+                        width = (width * 0.4).dp,
+                        smallCardHeight,
+                        text = stringResource(R.string.change_question),
+                        clicked = {
+
+                        })
                 }
                 Spacer(modifier = Modifier.height(smallPaddingHeight))
-                GeneralCard((width * 0.9).dp, smallCardHeight, text = "Soruyu Ben Soracağım")
+                GeneralCard(
+                    (width * 0.9).dp,
+                    smallCardHeight,
+                    text = stringResource(R.string.i_wil_ask_question),
+                    clicked = closeClicked
+                )
             }
         }
     }
@@ -82,12 +97,19 @@ private fun GeneralCard(
     width: Dp,
     height: Dp,
     text: String,
+    clicked: (() -> Unit)? = null,
     cardPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+    val modifier = if (clicked == null) Modifier
+        .width(width)
+        .height(height)
+    else Modifier
+        .width(width)
+        .height(height)
+        .clickable(onClick = clicked)
     Card(
-        modifier = Modifier
-            .width(width)
-            .height(height), backgroundColor = AppColor.Mustard,
+        modifier = modifier,
+        backgroundColor = AppColor.Mustard,
         shape = RoundedCornerShape(16.dp), elevation = 4.dp
     ) {
         Box(

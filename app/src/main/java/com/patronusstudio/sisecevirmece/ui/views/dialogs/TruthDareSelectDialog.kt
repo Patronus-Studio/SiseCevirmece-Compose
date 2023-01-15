@@ -34,12 +34,13 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TruthDareSelectDialog(
-    popUpStatus: () -> Unit,
+    dissmissed: () -> Unit,
     truthDareSelected: (TruthDareEnum) -> Unit
 ) {
     val cardWidth = (LocalConfiguration.current.screenWidthDp * 0.44).dp
     val cardHeight = (LocalConfiguration.current.screenHeightDp * 0.3).dp
     val isVisible = remember { mutableStateOf(false) }
+    val selectedTruthDareEnum = remember { mutableStateOf(TruthDareEnum.NOT_SELECTED) }
     LaunchedEffect(key1 = Unit, block = {
         delay(100L)
         isVisible.value = true
@@ -47,7 +48,9 @@ fun TruthDareSelectDialog(
     LaunchedEffect(key1 = isVisible.value, block = {
         if (isVisible.value.not()) {
             delay(AnimMillis.SHORT.millis.toLong())
-            popUpStatus()
+            if (selectedTruthDareEnum.value != TruthDareEnum.NOT_SELECTED) {
+                truthDareSelected(selectedTruthDareEnum.value)
+            } else dissmissed()
         }
     })
     Dialog(
@@ -62,21 +65,17 @@ fun TruthDareSelectDialog(
             modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceEvenly
         ) {
             AnimatedCard(
-                isVisible.value,
-                cardWidth,
-                cardHeight,
-                true,
-                TruthDareEnum.TRUTH,
-                truthDareSelected
-            )
+                isVisible.value, cardWidth, cardHeight, true, TruthDareEnum.TRUTH
+            ) {
+                selectedTruthDareEnum.value = it
+                isVisible.value = false
+            }
             AnimatedCard(
-                isVisible.value,
-                cardWidth,
-                cardHeight,
-                false,
-                TruthDareEnum.DARE,
-                truthDareSelected
-            )
+                isVisible.value, cardWidth, cardHeight, false, TruthDareEnum.DARE
+            ) {
+                selectedTruthDareEnum.value = it
+                isVisible.value = false
+            }
         }
     }
 }

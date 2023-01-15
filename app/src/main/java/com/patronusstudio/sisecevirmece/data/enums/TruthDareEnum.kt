@@ -12,6 +12,10 @@ enum class TruthDareEnum {
     DARE {
         override fun getText(context: Context): String = context.getString(R.string.dare)
         override fun getImageId(): Int = R.drawable.dare
+    },
+    NOT_SELECTED {
+        override fun getText(context: Context): String = context.getString(R.string.not_selected)
+        override fun getImageId(): Int = R.drawable.bottle_sample
     };
 
     abstract fun getText(context: Context): String
