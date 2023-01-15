@@ -17,16 +17,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.AutoTextSize
 
 @Composable
-fun TruthDareQuestionDialog(closeClicked: () -> Unit) {
+fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScreenViewModel) {
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
     val smallPaddingHeight = (height * 0.03).dp
-
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(8.dp))
         TitleCard((width * 0.9).dp)

@@ -10,10 +10,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,42 +23,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
+import com.patronusstudio.sisecevirmece.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.views.dialogs.TruthDareQuestionDialog
 import com.patronusstudio.sisecevirmece.ui.views.dialogs.TruthDareSelectDialog
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import kotlin.random.Random
 
-private enum class TouchListener {
-    INIT,
-    ANIM_STARTED,
-    ANIM_ENDED,
-    TRUTH_DARE_SELECTED
-}
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NormalGameScreen(backClicked: () -> Unit) {
+    val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val bottleSize = (screenWidth * 0.9).dp
-    val degree = remember { mutableStateOf(0f) }
     val bottleRotationValue = 10f
     var spinTimer = 0
-    val touchStatus = remember { mutableStateOf(TouchListener.INIT) }
+    val degree = remember { mutableStateOf(0f) }
     val isSpinning = remember { mutableStateOf(false) }
     val animFinished = {
         degree.value = degree.value % 360
-        touchStatus.value = TouchListener.ANIM_ENDED
+        viewModel.setBottleTouchListener(BottleTouchListener.ANIM_ENDED)
         isSpinning.value = false
     }
-    val infiniteAnim = rememberUpdatedState(newValue = animateFloatAsState(
+    val bottleFlipAnim = rememberUpdatedState(newValue = animateFloatAsState(
         targetValue = degree.value,
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
-    val truthDareSelectedValue = remember { mutableStateOf<TruthDareEnum?>(null) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,8 +66,8 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                 modifier = Modifier
                     .size(bottleSize)
                     .rotate(
-                        when (touchStatus.value) {
-                            TouchListener.ANIM_STARTED -> infiniteAnim.value.value
+                        when (viewModel.bottleTouchListener.collectAsState().value) {
+                            BottleTouchListener.ANIM_STARTED -> bottleFlipAnim.value.value
                             else -> degree.value
                         }
                     )
@@ -100,7 +91,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                                     event.changes.any { it.isConsumed && it.positionChanged() }
                             } while (!canceled && event.changes.any { it.pressed })
                             if (isSpinning.value.not()) {
-                                touchStatus.value = TouchListener.ANIM_STARTED
+                                viewModel.setBottleTouchListener(BottleTouchListener.ANIM_STARTED)
                                 val result = degree.value % 100
                                 degree.value = if (result < 50)
                                     (result * (Random.nextInt(50, 75)) + spinTimer)
@@ -111,42 +102,37 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                         }
                     }
                     .combinedClickable(onDoubleClick = {
-                        touchStatus.value = TouchListener.ANIM_ENDED
+                        viewModel.setBottleTouchListener(BottleTouchListener.ANIM_ENDED)
                     }, onClick = {
 
                     })
             )
         }
     }
-    if (touchStatus.value == TouchListener.ANIM_ENDED) {
+    if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_ENDED) {
         TruthDareSelectDialog(dissmissed = {
-            touchStatus.value = TouchListener.INIT
+            viewModel.setBottleTouchListener(BottleTouchListener.INIT)
         }, truthDareSelected = {
-            truthDareSelectedValue.value = it
-            touchStatus.value = TouchListener.TRUTH_DARE_SELECTED
+            viewModel.setTruthDareSelected(it)
+            viewModel.setBottleTouchListener(BottleTouchListener.TRUTH_DARE_SELECTED)
         })
     }
-    if (touchStatus.value == TouchListener.TRUTH_DARE_SELECTED) {
+    if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.TRUTH_DARE_SELECTED) {
         Dialog(
             onDismissRequest = {
-                touchStatus.value = TouchListener.INIT
+                viewModel.setBottleTouchListener(BottleTouchListener.INIT)
             }, properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
-            TruthDareQuestionDialog {
-                touchStatus.value = TouchListener.INIT
+            if (viewModel.truthDareSelected.collectAsState().value == TruthDareEnum.NOT_SELECTED) {
+                viewModel.setBottleTouchListener(BottleTouchListener.INIT)
+            } else {
+                TruthDareQuestionDialog(
+                    closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
+                    viewModel
+                )
             }
         }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
 
