@@ -106,6 +106,7 @@ class HomeViewModel @Inject constructor(
     }
 
     suspend fun truthDareControl(context: Context) {
+        _isLoading.value = true
         val truthPackage =
             packageLocalRepository.getPackageByName(
                 context, TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
@@ -128,6 +129,7 @@ class HomeViewModel @Inject constructor(
                 questionListToDbModel(context, TruthDareDefaultPackageEnum.DARE, packageId.toInt())
             questionLocalRepository.addQuestions(context, questionList)
         }
+        _isLoading.value = false
     }
 
     private fun getDbModel(
