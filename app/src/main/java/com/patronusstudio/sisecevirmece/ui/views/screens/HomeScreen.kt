@@ -54,6 +54,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             viewModel.getUserGameInfo(MainApplication.authToken)
             viewModel.getAvatars()
             viewModel.getAllLevel()
+            viewModel.truthDareControl(mContext)
         }
     }
     LaunchedEffect(
@@ -105,7 +106,6 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 PlayButton {
                     when (it) {
                         InAppScreenNavEnums.PLAY_GAME -> {
-                            it
                             route(it)
                         }
                         InAppScreenNavEnums.LOGOUT -> {
