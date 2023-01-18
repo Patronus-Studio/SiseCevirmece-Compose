@@ -15,6 +15,15 @@ class QuestionLocalRepository @Inject constructor() {
         }
     }
 
+    suspend fun getQuestionsWithPackageId(
+        context: Context,
+        localPackageId: Int
+    ): List<QuestionDbModel> {
+        return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().getQuestionsList(localPackageId)
+        }
+    }
+
     suspend fun removeQuestions(context: Context, packageId: Int) {
         withContext(Dispatchers.IO) {
             BottleRoomDb.getInstance(context).getBottleDao().removeQuestions(packageId)

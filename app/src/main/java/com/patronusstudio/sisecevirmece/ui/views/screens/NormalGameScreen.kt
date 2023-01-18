@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import kotlin.random.Random
 fun NormalGameScreen(backClicked: () -> Unit) {
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
+    val context = LocalContext.current
     val bottleSize = (screenWidth * 0.9).dp
     val bottleRotationValue = 10f
     var spinTimer = 0
@@ -53,6 +55,9 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         targetValue = degree.value,
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.getTruthQuestion(context)
+    })
     Column(
         modifier = Modifier
             .fillMaxSize()

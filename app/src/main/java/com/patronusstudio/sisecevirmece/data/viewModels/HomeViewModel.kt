@@ -112,21 +112,21 @@ class HomeViewModel @Inject constructor(
                 context, TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
             )
         if (truthPackage == null) {
-            val packageId = packageLocalRepository.addPackages(
+            packageLocalRepository.addPackages(
                 context, getDbModel(context, TruthDareDefaultPackageEnum.TRUTH)
             )
             val questionList =
-                questionListToDbModel(context, TruthDareDefaultPackageEnum.TRUTH, packageId.toInt())
+                questionListToDbModel(context, TruthDareDefaultPackageEnum.TRUTH)
             questionLocalRepository.addQuestions(context, questionList)
         }
         val darePackage =
             packageLocalRepository.getPackageByName(context, context.getString(R.string.dare))
         if (darePackage == null) {
-            val packageId = packageLocalRepository.addPackages(
+            packageLocalRepository.addPackages(
                 context, getDbModel(context, TruthDareDefaultPackageEnum.DARE)
             )
             val questionList =
-                questionListToDbModel(context, TruthDareDefaultPackageEnum.DARE, packageId.toInt())
+                questionListToDbModel(context, TruthDareDefaultPackageEnum.DARE)
             questionLocalRepository.addQuestions(context, questionList)
         }
         _isLoading.value = false
@@ -136,7 +136,7 @@ class HomeViewModel @Inject constructor(
         context: Context, truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): PackageDbModel {
         return PackageDbModel(
-            cloudPackageCategoryId = truthDareDefaultPackageEnum.cloudPackageCategoryId(),
+            cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
             packageImage = truthDareDefaultPackageEnum.getPackageName(context)
                 .toByteArray(),
             version = truthDareDefaultPackageEnum.getVersion(),
@@ -149,14 +149,15 @@ class HomeViewModel @Inject constructor(
 
     private fun questionListToDbModel(
         context: Context,
-        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum,
-        packageId: Int
+        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): MutableList<QuestionDbModel> {
         val questions = mutableListOf<QuestionDbModel>()
         truthDareDefaultPackageEnum.getQuestions(context).forEach {
             questions.add(
                 QuestionDbModel(
-                    localPackagePrimaryId = packageId, question = it, isShowed = false
+                    localPackagePrimaryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+                    question = it,
+                    isShowed = false
                 )
             )
         }

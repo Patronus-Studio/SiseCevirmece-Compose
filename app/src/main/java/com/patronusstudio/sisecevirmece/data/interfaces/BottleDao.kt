@@ -46,4 +46,7 @@ interface BottleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updatePackage(model: PackageDbModel)
+
+    @Query("Select * from ${DbTables.questionTable} where localPackagePrimaryId = :packagePrimaryId")
+    suspend fun getQuestionsList(packagePrimaryId: Int): MutableList<QuestionDbModel>
 }
