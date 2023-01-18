@@ -23,6 +23,9 @@ interface BottleDao {
     @Query("Select * from ${DbTables.packageTable}")
     suspend fun getPackages(): List<PackageDbModel>
 
+    @Query("Select * from ${DbTables.packageTable} where packageName = :packageName")
+    suspend fun getPackageByName(packageName: String): PackageDbModel?
+
     @Query("Delete from ${DbTables.packageTable}")
     suspend fun removePackages()
 

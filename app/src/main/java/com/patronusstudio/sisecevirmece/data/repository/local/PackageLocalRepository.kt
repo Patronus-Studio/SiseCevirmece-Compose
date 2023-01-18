@@ -54,4 +54,10 @@ class PackageLocalRepository @Inject constructor() {
             BottleRoomDb.getInstance(context).getBottleDao().updatePackage(model)
         }
     }
+
+    suspend fun getPackageByName(context: Context, packageName: String): PackageDbModel? {
+        return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao().getPackageByName(packageName)
+        }
+    }
 }
