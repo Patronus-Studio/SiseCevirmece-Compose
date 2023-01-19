@@ -54,7 +54,7 @@ fun StoreScreen(back: () -> Unit) {
     }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
-        viewModel.getPackageFromCategory(localContext, 1)
+        viewModel.getPackageFromCategory( 1)
     }
     val clickedPackage = { item: PackageModel ->
         viewModel.setPackageModel(item)
@@ -73,7 +73,7 @@ fun StoreScreen(back: () -> Unit) {
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.clickedBtn(it)
-                    viewModel.getPackageFromCategory(localContext, it)
+                    viewModel.getPackageFromCategory(it)
                 }
             }
             LazyColumn(
@@ -98,11 +98,9 @@ fun StoreScreen(back: () -> Unit) {
             }, clickedBtn = {
                 coroutineScope.launch(Dispatchers.Main) {
                     when (viewModel.currentPackage.value!!.packageStatu) {
-                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage(
-                            localContext
-                        )
-                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage(localContext)
-                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage(localContext)
+                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage()
+                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
                     }
                 }
             })

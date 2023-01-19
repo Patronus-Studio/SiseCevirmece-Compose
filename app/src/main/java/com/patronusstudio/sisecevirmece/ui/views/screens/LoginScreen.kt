@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
+import com.patronusstudio.sisecevirmece.data.utils.hasInternet
 import com.patronusstudio.sisecevirmece.data.utils.isConnected
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
@@ -71,7 +72,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
 
     val state = viewModel.token.collectAsState().value
     LaunchedEffect(key1 = state) {
-        if (isConnected()) {
+        if (hasInternet(context) == true) {
             if (state.isEmpty().not()) {
                 withContext(Dispatchers.IO) {
                     viewModel.setUserToken(context)
@@ -122,7 +123,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 })
             Spacer(modifier = Modifier.height(heightRatio04))
             LoginButton(widthRatio80) {
-                if (isConnected()) {
+                if (hasInternet(context) == true) {
                     viewModel.loginWithEmailPass()
                 } else {
                     viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")

@@ -46,4 +46,13 @@ interface BottleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updatePackage(model: PackageDbModel)
+
+    @Query("Select * from ${DbTables.questionTable} where localPackagePrimaryId = :packagePrimaryId")
+    suspend fun getQuestionsList(packagePrimaryId: Int): MutableList<QuestionDbModel>
+
+    @Query("Update ${DbTables.questionTable} set isShowed= :isShowed where localPackagePrimaryId= :packagePrimaryId")
+    suspend fun updateAllQuestionsShowStatus(isShowed: Boolean, packagePrimaryId: Int)
+
+    @Query("Update ${DbTables.questionTable} set isShowed= :isShowed where primaryId= :questionPrimaryId")
+    suspend fun updateSingleQuestionShowStatus(isShowed: Boolean, questionPrimaryId: Int)
 }

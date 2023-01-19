@@ -2,6 +2,7 @@ package com.patronusstudio.sisecevirmece.ui.widgets
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.width
@@ -84,7 +85,7 @@ fun AutoTextSize(
 ) {
     var textSize by remember { mutableStateOf(targetTextSizeHeight) }
     Text(
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
         text = text,
         color = color,
         textAlign = textAlign,

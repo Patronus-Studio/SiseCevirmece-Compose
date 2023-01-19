@@ -26,6 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
+import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
@@ -34,7 +35,7 @@ import com.patronusstudio.sisecevirmece.ui.views.dialogs.TruthDareSelectDialog
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import kotlin.random.Random
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NormalGameScreen(backClicked: () -> Unit) {
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
@@ -45,14 +46,21 @@ fun NormalGameScreen(backClicked: () -> Unit) {
     val degree = remember { mutableStateOf(0f) }
     val isSpinning = remember { mutableStateOf(false) }
     val animFinished = {
-        degree.value = degree.value % 360
         viewModel.setBottleTouchListener(BottleTouchListener.ANIM_ENDED)
         isSpinning.value = false
     }
-    val bottleFlipAnim = rememberUpdatedState(newValue = animateFloatAsState(
+    val bottleFlipAnim = animateFloatAsState(
         targetValue = degree.value,
-        animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
-    ))
+        animationSpec = tween(durationMillis = 5000), finishedListener = {
+            animFinished()
+        }
+    )
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.setTruthDareSelected(TruthDareEnum.TRUTH)
+        viewModel.getTruthDareQuestions()
+        viewModel.setTruthDareSelected(TruthDareEnum.DARE)
+        viewModel.getTruthDareQuestions()
+    })
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,7 +75,9 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                     .size(bottleSize)
                     .rotate(
                         when (viewModel.bottleTouchListener.collectAsState().value) {
-                            BottleTouchListener.ANIM_STARTED -> bottleFlipAnim.value.value
+                            BottleTouchListener.ANIM_STARTED -> {
+                                bottleFlipAnim.value
+                            }
                             else -> degree.value
                         }
                     )
@@ -101,11 +111,6 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                             }
                         }
                     }
-                    .combinedClickable(onDoubleClick = {
-                        viewModel.setBottleTouchListener(BottleTouchListener.ANIM_ENDED)
-                    }, onClick = {
-
-                    })
             )
         }
     }
@@ -123,16 +128,11 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                 viewModel.setBottleTouchListener(BottleTouchListener.INIT)
             }, properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
-            if (viewModel.truthDareSelected.collectAsState().value == TruthDareEnum.NOT_SELECTED) {
-                viewModel.setBottleTouchListener(BottleTouchListener.INIT)
-            } else {
-                TruthDareQuestionDialog(
-                    closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
-                    viewModel
-                )
-            }
+            TruthDareQuestionDialog(
+                closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
+                viewModel
+            )
         }
     }
-
 }
 

@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
@@ -22,6 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val application: Application,
     private val networkRepository: NetworkRepository,
     private val localRepository: LocalRepository,
     private val packageLocalRepository: PackageLocalRepository,
@@ -109,54 +111,54 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = true
         val truthPackage =
             packageLocalRepository.getPackageByName(
-                context, TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
+                 TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
             )
         if (truthPackage == null) {
-            val packageId = packageLocalRepository.addPackages(
-                context, getDbModel(context, TruthDareDefaultPackageEnum.TRUTH)
+            packageLocalRepository.addPackages(
+                 getDbModel(TruthDareDefaultPackageEnum.TRUTH)
             )
             val questionList =
-                questionListToDbModel(context, TruthDareDefaultPackageEnum.TRUTH, packageId.toInt())
-            questionLocalRepository.addQuestions(context, questionList)
+                questionListToDbModel(TruthDareDefaultPackageEnum.TRUTH)
+            questionLocalRepository.addQuestions( questionList)
         }
         val darePackage =
-            packageLocalRepository.getPackageByName(context, context.getString(R.string.dare))
+            packageLocalRepository.getPackageByName( context.getString(R.string.dare))
         if (darePackage == null) {
-            val packageId = packageLocalRepository.addPackages(
-                context, getDbModel(context, TruthDareDefaultPackageEnum.DARE)
+            packageLocalRepository.addPackages(
+                 getDbModel(TruthDareDefaultPackageEnum.DARE)
             )
             val questionList =
-                questionListToDbModel(context, TruthDareDefaultPackageEnum.DARE, packageId.toInt())
-            questionLocalRepository.addQuestions(context, questionList)
+                questionListToDbModel(TruthDareDefaultPackageEnum.DARE)
+            questionLocalRepository.addQuestions( questionList)
         }
         _isLoading.value = false
     }
 
     private fun getDbModel(
-        context: Context, truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
+        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): PackageDbModel {
         return PackageDbModel(
-            cloudPackageCategoryId = truthDareDefaultPackageEnum.cloudPackageCategoryId(),
-            packageImage = truthDareDefaultPackageEnum.getPackageName(context)
+            cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+            packageImage = truthDareDefaultPackageEnum.getPackageName(application.applicationContext)
                 .toByteArray(),
             version = truthDareDefaultPackageEnum.getVersion(),
-            packageName = truthDareDefaultPackageEnum.getPackageName(context),
-            packageComment = truthDareDefaultPackageEnum.getPackageComment(context),
+            packageName = truthDareDefaultPackageEnum.getPackageName(application.applicationContext),
+            packageComment = truthDareDefaultPackageEnum.getPackageComment(application.applicationContext),
             createdTime = Calendar.getInstance().time.toString(),
             updatedTime = Calendar.getInstance().time.toString(),
         )
     }
 
     private fun questionListToDbModel(
-        context: Context,
-        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum,
-        packageId: Int
+        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): MutableList<QuestionDbModel> {
         val questions = mutableListOf<QuestionDbModel>()
-        truthDareDefaultPackageEnum.getQuestions(context).forEach {
+        truthDareDefaultPackageEnum.getQuestions(application.applicationContext).forEach {
             questions.add(
                 QuestionDbModel(
-                    localPackagePrimaryId = packageId, question = it, isShowed = false
+                    localPackagePrimaryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+                    question = it,
+                    isShowed = false
                 )
             )
         }
