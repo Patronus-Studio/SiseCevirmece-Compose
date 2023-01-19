@@ -35,7 +35,7 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
     val changeQuestionStatus = remember { mutableStateOf(false) }
     val currentQuestion = remember { mutableStateOf<QuestionDbModel?>(null) }
     val isClickable = remember {mutableStateOf(true)}
-
+    val localContext = LocalContext.current
     LaunchedEffect(key1 = Unit, block = {
         val question= withContext(Dispatchers.IO){
             viewModel.getRandomQuestion()
@@ -78,7 +78,7 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(8.dp))
-        TitleCard((width * 0.9).dp)
+        TitleCard((width * 0.9).dp,viewModel.truthDareSelected.collectAsState().value.getText(localContext))
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
@@ -95,13 +95,13 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     GeneralCard(
-                        width = (width * 0.4).dp,
+                        width = (width * 0.45).dp,
                         smallCardHeight,
                         text = stringResource(R.string.replied),
                         clicked = closeClicked
                     )
                     GeneralCard(
-                        width = (width * 0.4).dp,
+                        width = (width * 0.45).dp,
                         smallCardHeight,
                         text = stringResource(R.string.change_question),
                         clicked = {
@@ -123,7 +123,7 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
 }
 
 @Composable
-private fun TitleCard(width: Dp) {
+private fun TitleCard(width: Dp,title:String) {
     Card(
         modifier = Modifier
             .width(width)
@@ -131,7 +131,7 @@ private fun TitleCard(width: Dp) {
         shape = RoundedCornerShape(16.dp), elevation = 4.dp
     ) {
         Text(
-            text = "Doğruluk",
+            text = title,
             style = TextStyle.Default.copy(
                 color = AppColor.SunsetOrange,
                 fontSize = 24.sp,
