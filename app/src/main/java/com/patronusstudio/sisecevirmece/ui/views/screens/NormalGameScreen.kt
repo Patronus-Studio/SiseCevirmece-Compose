@@ -55,8 +55,10 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.getTruthDareQuestions(TruthDareDefaultPackageEnum.TRUTH)
-        viewModel.getTruthDareQuestions(TruthDareDefaultPackageEnum.DARE)
+        viewModel.setTruthDareSelected(TruthDareEnum.TRUTH)
+        viewModel.getTruthDareQuestions()
+        viewModel.setTruthDareSelected(TruthDareEnum.DARE)
+        viewModel.getTruthDareQuestions()
     })
     Column(
         modifier = Modifier

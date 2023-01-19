@@ -34,10 +34,8 @@ class QuestionLocalRepository @Inject constructor(private val application: Appli
         localPackageId: Int,
         isShowed: Boolean
     ) {
-        withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
-                .updateAllQuestionsShowStatus(isShowed, localPackageId)
-        }
+        BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+            .updateAllQuestionsShowStatus(isShowed, localPackageId)
     }
 
     suspend fun updateQuestionShowStatu(showStatu: Boolean,questionId:Int) {
