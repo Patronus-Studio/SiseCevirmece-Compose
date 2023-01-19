@@ -111,25 +111,25 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = true
         val truthPackage =
             packageLocalRepository.getPackageByName(
-                context, TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
+                 TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
             )
         if (truthPackage == null) {
             packageLocalRepository.addPackages(
-                context, getDbModel(TruthDareDefaultPackageEnum.TRUTH)
+                 getDbModel(TruthDareDefaultPackageEnum.TRUTH)
             )
             val questionList =
                 questionListToDbModel(TruthDareDefaultPackageEnum.TRUTH)
-            questionLocalRepository.addQuestions(context, questionList)
+            questionLocalRepository.addQuestions( questionList)
         }
         val darePackage =
-            packageLocalRepository.getPackageByName(context, context.getString(R.string.dare))
+            packageLocalRepository.getPackageByName( context.getString(R.string.dare))
         if (darePackage == null) {
             packageLocalRepository.addPackages(
-                context, getDbModel(TruthDareDefaultPackageEnum.DARE)
+                 getDbModel(TruthDareDefaultPackageEnum.DARE)
             )
             val questionList =
                 questionListToDbModel(TruthDareDefaultPackageEnum.DARE)
-            questionLocalRepository.addQuestions(context, questionList)
+            questionLocalRepository.addQuestions( questionList)
         }
         _isLoading.value = false
     }

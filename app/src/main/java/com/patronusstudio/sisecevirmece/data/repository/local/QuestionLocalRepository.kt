@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.repository.local
 
+import android.app.Application
 import android.content.Context
 import com.patronusstudio.sisecevirmece.data.abstarcts.BottleRoomDb
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
@@ -7,38 +8,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class QuestionLocalRepository @Inject constructor() {
+class QuestionLocalRepository @Inject constructor(private val application: Application) {
 
-    suspend fun addQuestions(context: Context, list: MutableList<QuestionDbModel>) {
+    suspend fun addQuestions(list: MutableList<QuestionDbModel>) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().addQuestions(list)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().addQuestions(list)
         }
     }
 
     suspend fun getQuestionsWithPackageId(
-        context: Context,
         localPackageId: Int
     ): List<QuestionDbModel> {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().getQuestionsList(localPackageId)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().getQuestionsList(localPackageId)
         }
     }
 
-    suspend fun removeQuestions(context: Context, packageId: Int) {
+    suspend fun removeQuestions(packageId: Int) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().removeQuestions(packageId)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().removeQuestions(packageId)
         }
     }
 
     suspend fun updateAllQuestionsShowStatus(
-        context: Context,
         localPackageId: Int,
         isShowed: Boolean
     ) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao()
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
                 .updateAllQuestionsShowStatus(isShowed, localPackageId)
         }
+    }
+
+    suspend fun updateQuestionShowStatu(showStatu: Boolean,questionId:Int) {
+        BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+            .updateSingleQuestionShowStatus(showStatu, questionId)
     }
 
 }

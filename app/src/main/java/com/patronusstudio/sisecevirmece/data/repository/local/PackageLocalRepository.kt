@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.repository.local
 
+import android.app.Application
 import android.content.Context
 import com.patronusstudio.sisecevirmece.data.abstarcts.BottleRoomDb
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
@@ -7,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class PackageLocalRepository @Inject constructor() {
+class PackageLocalRepository @Inject constructor(private val application: Application) {
 
     private lateinit var tempPackages: List<PackageDbModel>
 
@@ -22,42 +23,45 @@ class PackageLocalRepository @Inject constructor() {
     }
 
     suspend fun getPackageOnCloudPackageCategoryId(
-        context: Context,
         cloudPackageCategoryId: Int
     ): PackageDbModel {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao()
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
                 .getPackageWithCloudPackageCategoryId(cloudPackageCategoryId)
         }
     }
 
-    suspend fun removePackage(context: Context, packageId: Int) {
+    suspend fun removePackage(packageId: Int) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().removePackage(packageId)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                .removePackage(packageId)
         }
     }
 
-    suspend fun clearAllData(context: Context) {
+    suspend fun clearAllData() {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().removePackages()
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().removePackages()
         }
     }
 
-    suspend fun addPackages(context: Context, model: PackageDbModel): Long {
+    suspend fun addPackages(model: PackageDbModel): Long {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().addPackage(model)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                .addPackage(model)
         }
     }
 
-    suspend fun updatePackage(context: Context, model: PackageDbModel) {
+    suspend fun updatePackage(model: PackageDbModel) {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().updatePackage(model)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                .updatePackage(model)
         }
     }
 
-    suspend fun getPackageByName(context: Context, packageName: String): PackageDbModel? {
+    suspend fun getPackageByName(packageName: String): PackageDbModel? {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().getPackageByName(packageName)
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                .getPackageByName(packageName)
         }
     }
 }
