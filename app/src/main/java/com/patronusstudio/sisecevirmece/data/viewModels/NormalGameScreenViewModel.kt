@@ -17,7 +17,7 @@ import javax.inject.Inject
 class NormalGameScreenViewModel @Inject constructor(
     private val packageLocalRepository: PackageLocalRepository,
     private val questionLocalRepository: QuestionLocalRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _truthDareSelected = MutableStateFlow(TruthDareEnum.NOT_SELECTED)
     val truthDareSelected: StateFlow<TruthDareEnum> get() = _truthDareSelected
@@ -40,6 +40,7 @@ class NormalGameScreenViewModel @Inject constructor(
         context: Context,
         truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ) {
+        _isLoading.value = true
         //loading status basılacak
         val truthQuestions = questionLocalRepository.getQuestionsWithPackageId(
             context, truthDareDefaultPackageEnum.getPackageCategoryId()
