@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
+import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import com.patronusstudio.sisecevirmece.R
@@ -24,6 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PackageViewModel @Inject constructor(
+    private val application: Application,
     private val packageNetworkRepository: PackageNetworkRepository,
     private val packageLocalRepository: PackageLocalRepository,
     private val questionLocalRepository: QuestionLocalRepository
@@ -71,14 +73,14 @@ class PackageViewModel @Inject constructor(
         _categories.value = tempList
     }
 
-    suspend fun getPackageFromCategory(context: Context, clickedItemId: Int) {
+    suspend fun getPackageFromCategory(clickedItemId: Int) {
         _isLoading.value = true
         val networkPackages = packageNetworkRepository.getPackageCategories(clickedItemId)
         if (networkPackages.isSuccessful.not() || networkPackages.body() == null || networkPackages.body()?.status != HttpStatusEnum.OK) {
             _errorMessage.value =
                 networkPackages.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
         }
-        val localPackages = packageLocalRepository.getPackages(context)
+        val localPackages = packageLocalRepository.getPackages(application.applicationContext)
         val mutableMap = mutableMapOf<Int, MutableList<BasePackageModel>>()
         networkPackages.body()?.packages?.forEach {
             it.packageStatu = PackageDetailCardBtnEnum.NEED_DOWNLOAD
@@ -108,38 +110,40 @@ class PackageViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    suspend fun removePackage(context: Context) {
+    suspend fun removePackage() {
         _isLoading.value = true
         val dbPackageModel =
             packageLocalRepository.getPackageOnCloudPackageCategoryId(
-                context,
                 _currentPackage.value!!.id
             )
-        packageLocalRepository.removePackage(context, dbPackageModel.primaryId)
-        questionLocalRepository.removeQuestions(context, dbPackageModel.primaryId)
+        packageLocalRepository.removePackage(dbPackageModel.primaryId)
+        questionLocalRepository.removeQuestions(dbPackageModel.primaryId)
         delay(500L)
         setPackageStatu(PackageControlStatu.REMOVED)
         updateModelOnList()
         _isLoading.value = false
     }
 
-    suspend fun downloadPackage(context: Context) {
+    suspend fun downloadPackage() {
         _isLoading.value = true
-        val byteArray = downloadImage(context, _currentPackage.value!!.imageUrl).toByteArrray()
+        val byteArray = downloadImage(
+            application.applicationContext,
+            _currentPackage.value!!.imageUrl
+        ).toByteArrray()
         val packageDbModel = _currentPackage.value!!.toPackageDbModel(byteArray)
-        val packageId = packageLocalRepository.addPackages(context, packageDbModel)
-        insertQuestions(context, packageId.toInt())
+        val packageId = packageLocalRepository.addPackages(packageDbModel)
+        insertQuestions(packageId.toInt())
         setPackageStatu(PackageControlStatu.DOWNLOADED)
         updateModelOnList()
         _isLoading.value = false
     }
 
-    suspend fun updatePackage(context: Context) {
+    suspend fun updatePackage() {
         _isLoading.value = true
-        val byteArray = downloadImage(context, _currentPackage.value!!.imageUrl).toByteArrray()
+        val byteArray = downloadImage(application.applicationContext,_currentPackage.value!!.imageUrl).toByteArrray()
         val dbPackageModel =
             packageLocalRepository.getPackageOnCloudPackageCategoryId(
-                context,
+
                 _currentPackage.value!!.id
             )
         val copiedDbPackageModel = dbPackageModel.copy(
@@ -150,15 +154,15 @@ class PackageViewModel @Inject constructor(
             packageComment = _currentPackage.value!!.packageComment,
             updatedTime = _currentPackage.value!!.updatedTime
         )
-        packageLocalRepository.updatePackage(context, copiedDbPackageModel)
-        questionLocalRepository.removeQuestions(context, dbPackageModel.primaryId)
-        insertQuestions(context, copiedDbPackageModel.primaryId)
+        packageLocalRepository.updatePackage(copiedDbPackageModel)
+        questionLocalRepository.removeQuestions(dbPackageModel.primaryId)
+        insertQuestions(copiedDbPackageModel.primaryId)
         setPackageStatu(PackageControlStatu.UPDATED)
         updateModelOnList()
         _isLoading.value = false
     }
 
-    private suspend fun insertQuestions(context: Context, packagePrimaryId: Int) {
+    private suspend fun insertQuestions(packagePrimaryId: Int) {
         val questions = mutableListOf<QuestionDbModel>().apply {
             _currentPackage.value!!.questions.forEach {
                 this.add(
@@ -170,7 +174,7 @@ class PackageViewModel @Inject constructor(
                 )
             }
         }
-        questionLocalRepository.addQuestions(context, questions)
+        questionLocalRepository.addQuestions(questions)
     }
 
     private fun setPackageStatu(packageStatuParam: PackageControlStatu) {

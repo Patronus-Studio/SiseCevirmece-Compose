@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -34,6 +34,7 @@ import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.*
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
@@ -53,6 +54,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             viewModel.getUserGameInfo(MainApplication.authToken)
             viewModel.getAvatars()
             viewModel.getAllLevel()
+            viewModel.truthDareControl(mContext)
         }
     }
     LaunchedEffect(
@@ -82,7 +84,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(BlueViolet)
+                    .background(AppColor.BlueViolet)
             ) {
                 Space(0.02)
                 Title()
@@ -104,7 +106,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 PlayButton {
                     when (it) {
                         InAppScreenNavEnums.PLAY_GAME -> {
-                            Toast.makeText(mContext, "Oyna", Toast.LENGTH_SHORT).show()
+                            route(it)
                         }
                         InAppScreenNavEnums.LOGOUT -> {
                             CoroutineScope(Dispatchers.Main).launch {
@@ -132,7 +134,7 @@ private fun Title() {
             style = TextStyle(
                 color = Color.White,
                 shadow = Shadow(
-                    DavysGrey, offset = Offset(0f, 0f), blurRadius = 16f
+                    AppColor.DavysGrey, offset = Offset(0f, 0f), blurRadius = 16f
                 )
             ),
             fontSize = 24.sp, fontWeight = FontWeight.Bold
@@ -165,7 +167,7 @@ private fun UserPicHousting(viewModel: HomeViewModel) {
 @Composable
 private fun Username(username: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Text(text = username, fontSize = 16.sp, style = TextStyle(color = Mustard))
+        Text(text = username, fontSize = 16.sp, style = TextStyle(color = AppColor.Mustard))
     }
 }
 
@@ -183,23 +185,32 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
     ) {
         CardImageWithText(
             R.drawable.category, stringResource(id = R.string.add_category),
-            backgroundColor = Color.White, textColor = Heliotrope,
-            borderColor = SeaSerpent, cardSizeWidth, cardSizeHeight,
+            backgroundColor = Color.White, textColor = AppColor.Heliotrope,
+            borderColor = AppColor.SeaSerpent, cardSizeWidth, cardSizeHeight,
             imageSize
         ) {
             route(InAppScreenNavEnums.ADD_CATEGORIES)
         }
         CardImageWithText(
-            R.drawable.store, stringResource(id = R.string.store), backgroundColor = Mustard,
-            imageSize = imageSize, textColor = SunsetOrange, cardSizeWidth = cardSizeWidth,
+            R.drawable.store,
+            stringResource(id = R.string.store),
+            backgroundColor = AppColor.Mustard,
+            imageSize = imageSize,
+            textColor = AppColor.SunsetOrange,
+            cardSizeWidth = cardSizeWidth,
             cardSizeHeight = cardSizeHeight
         ) {
             route(InAppScreenNavEnums.STORES)
         }
         CardImageWithText(
-            R.drawable.profile, stringResource(id = R.string.my_profile),
-            backgroundColor = Color.White, textColor = SunsetOrange, borderColor = SeaSerpent,
-            cardSizeWidth, cardSizeHeight, imageSize
+            R.drawable.profile,
+            stringResource(id = R.string.my_profile),
+            backgroundColor = Color.White,
+            textColor = AppColor.SunsetOrange,
+            borderColor = AppColor.SeaSerpent,
+            cardSizeWidth,
+            cardSizeHeight,
+            imageSize
         ) {
             Toast.makeText(context, "Profilim", Toast.LENGTH_SHORT).show()
         }
@@ -210,25 +221,22 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
 @Composable
 private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
-    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier
                 .width(width = (width * 0.8).dp)
                 .padding(vertical = 16.dp)
                 .combinedClickable(onClick = {
-                    Toast
-                        .makeText(context, "Oyna", Toast.LENGTH_SHORT)
-                        .show()
+                    playGame(InAppScreenNavEnums.PLAY_GAME)
                 }, onLongClick = {
                     playGame(InAppScreenNavEnums.LOGOUT)
                 }),
-            backgroundColor = Mustard,
+            backgroundColor = AppColor.Mustard,
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.play), fontSize = 64.sp,
-                style = TextStyle(color = SunsetOrange), textAlign = TextAlign.Center
+                style = TextStyle(color = AppColor.SunsetOrange), textAlign = TextAlign.Center
             )
         }
     }

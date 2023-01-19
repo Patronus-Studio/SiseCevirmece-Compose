@@ -9,7 +9,7 @@ import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.NavSplashScreen
 import com.patronusstudio.sisecevirmece.nav.NesnedRoutes.passToAppLandingRoute
 import com.patronusstudio.sisecevirmece.nav.NesnedRoutes.passToInAppRoute
-import com.patronusstudio.sisecevirmece.ui.screens.SplashScreen
+import com.patronusstudio.sisecevirmece.ui.views.screens.SplashScreen
 
 @Composable
 fun ScreenHost(navController: NavHostController) {

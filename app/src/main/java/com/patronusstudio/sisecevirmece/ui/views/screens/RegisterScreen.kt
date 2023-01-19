@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -22,14 +22,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.GenderEnum
 import com.patronusstudio.sisecevirmece.data.utils.checkEmailCorrect
 import com.patronusstudio.sisecevirmece.data.viewModels.RegisterViewModel
-import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
-import com.patronusstudio.sisecevirmece.ui.theme.Mustard
-import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
+import com.patronusstudio.sisecevirmece.ui.screens.SampleAnimation
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
@@ -79,9 +78,11 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(BlueViolet)
+                    .background(AppColor.BlueViolet)
             ) {
-                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp), contentAlignment = Alignment.Center) {
                     SampleAnimation(R.raw.register)
                 }
                 EmailView(viewModel.emailError.collectAsState().value,
@@ -234,7 +235,7 @@ fun GenderPicker(selectedGender: GenderEnum, clicked: (GenderEnum) -> Unit) {
 @Composable
 fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Card(backgroundColor = Mustard, modifier = Modifier
+        Card(backgroundColor = AppColor.Mustard, modifier = Modifier
             .width(widthSize)
             .clickable {
                 clicked()
@@ -243,7 +244,7 @@ fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
                 text = "Kayıt Ol", style = TextStyle(
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
-                ), color = SunsetOrange,
+                ), color = AppColor.SunsetOrange,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
         }
