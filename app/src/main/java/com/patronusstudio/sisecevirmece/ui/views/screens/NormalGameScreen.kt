@@ -27,6 +27,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
+import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
@@ -56,7 +57,8 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         animationSpec = tween(durationMillis = 5000), finishedListener = { animFinished() }
     ))
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.getTruthQuestion(context)
+        viewModel.getTruthDareQuestions(context, TruthDareDefaultPackageEnum.TRUTH)
+        viewModel.getTruthDareQuestions(context, TruthDareDefaultPackageEnum.DARE)
     })
     Column(
         modifier = Modifier

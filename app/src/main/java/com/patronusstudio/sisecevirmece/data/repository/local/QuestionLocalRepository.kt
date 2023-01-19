@@ -30,4 +30,15 @@ class QuestionLocalRepository @Inject constructor() {
         }
     }
 
+    suspend fun updateAllQuestionsShowStatus(
+        context: Context,
+        localPackageId: Int,
+        isShowed: Boolean
+    ) {
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(context).getBottleDao()
+                .updateAllQuestionsShowStatus(isShowed, localPackageId)
+        }
+    }
+
 }

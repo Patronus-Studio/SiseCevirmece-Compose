@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,9 @@ class NormalGameScreenViewModel @Inject constructor(
     private val _bottleTouchListener = MutableStateFlow(BottleTouchListener.INIT)
     val bottleTouchListener: StateFlow<BottleTouchListener> get() = _bottleTouchListener
 
+    private val _truthQuestions = MutableStateFlow(listOf<QuestionDbModel>())
+    val truthQuestions: StateFlow<List<QuestionDbModel>> get() = _truthQuestions
+
     fun setTruthDareSelected(truthDareEnum: TruthDareEnum) {
         _truthDareSelected.value = truthDareEnum
     }
@@ -32,21 +36,35 @@ class NormalGameScreenViewModel @Inject constructor(
         _bottleTouchListener.value = bottleTouchListener
     }
 
-    // TODO: sorular çekildi, mutablestate ile tutulacak
-    suspend fun getTruthQuestion(context: Context) {
-        val truthQuestions =
-            questionLocalRepository.getQuestionsWithPackageId(
-                context, TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId()
-            )
-        truthQuestions
-    }
+    suspend fun getTruthDareQuestions(
+        context: Context,
+        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
+    ) {
+        //loading status basılacak
+        val truthQuestions = questionLocalRepository.getQuestionsWithPackageId(
+            context, truthDareDefaultPackageEnum.getPackageCategoryId()
+        )
+        //SORULARIN GOSTERİLME DURUMUNA GÖRE FİLTRELEME YAPTIM
+        if (truthQuestions.isNotEmpty()) {
+            val notShowedQuestions = truthQuestions.filter {
+                !it.isShowed
+            }
+            if (notShowedQuestions.isEmpty()) {
+                questionLocalRepository.updateAllQuestionsShowStatus(
+                    context, truthDareDefaultPackageEnum.getPackageCategoryId(),
+                    false
+                )
+                truthQuestions.forEach {
+                    it.isShowed = false
+                }
+                _truthQuestions.value = truthQuestions.shuffled()
+            } else {
+                _truthQuestions.value = notShowedQuestions.shuffled()
+            }
+        }
+        //soru hiç yoksa baştan ekleme yap doğruluk cesaret sorularını
+        else {
 
-    suspend fun getDareQuestion(context: Context) {
-        val dareQuestions =
-            questionLocalRepository.getQuestionsWithPackageId(
-                context, TruthDareDefaultPackageEnum.DARE.getPackageCategoryId()
-            )
-        dareQuestions
+        }
     }
-
 }
