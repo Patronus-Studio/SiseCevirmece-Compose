@@ -36,7 +36,7 @@ import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
-import com.patronusstudio.sisecevirmece.ui.theme.*
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 val Float.toDp get() = this / Resources.getSystem().displayMetrics.density
 
@@ -66,8 +66,8 @@ fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: S
                     .width(barWidth)
                     .height(barHeight)
                     .clip(CircleShape)
-                    .background(DavysGrey)
-                    .border(BorderStroke(2.dp, Mustard), CircleShape)
+                    .background(AppColor.DavysGrey)
+                    .border(BorderStroke(2.dp, AppColor.Mustard), CircleShape)
             ) {
                 Box(
                     modifier = Modifier
@@ -75,7 +75,7 @@ fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: S
                         .width(currentLeverBarSize)
                         .height(barHeight)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(UnitedNationsBlue)
+                        .background(AppColor.UnitedNationsBlue)
                 )
                 Row(
                     modifier = Modifier
@@ -103,8 +103,8 @@ fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: S
                     modifier = Modifier
                         .size(circleLevelSize + 3.dp)
                         .clip(CircleShape)
-                        .border(BorderStroke(2.dp, Mustard), shape = CircleShape)
-                        .background(SunsetOrange)
+                        .border(BorderStroke(2.dp, AppColor.Mustard), shape = CircleShape)
+                        .background(AppColor.SunsetOrange)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -174,7 +174,7 @@ fun UserPic(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(GreyTranspancy20)
+                            .background(AppColor.GreyTranspancy20)
                     )
                     Canvas(modifier = Modifier
                         .fillMaxSize(), onDraw = {

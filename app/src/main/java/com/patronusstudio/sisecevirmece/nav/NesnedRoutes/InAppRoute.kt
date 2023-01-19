@@ -6,9 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import com.patronusstudio.sisecevirmece.NavInAppScreens
+import com.patronusstudio.sisecevirmece.data.enums.GameMode
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
-import com.patronusstudio.sisecevirmece.ui.screens.*
+import com.patronusstudio.sisecevirmece.ui.views.screens.*
 
 fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
     navigation(
@@ -29,7 +30,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 when (loginEnum) {
                     LoginScreenNavEnums.LOGIN -> {
                         navController.navigate(
-                            NavInAppScreens.HomeScreen.routeName , navOptions {
+                            NavInAppScreens.HomeScreen.routeName, navOptions {
                                 popUpTo(0)
                             }
                         )
@@ -47,7 +48,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
             HomeScreen {
-                when(it){
+                when (it) {
                     InAppScreenNavEnums.LOGOUT -> {
                         navController.popBackStack()
                         navController.navigate(NavInAppScreens.LoginScreen.routeName)
@@ -56,7 +57,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                         navController.navigate(NavInAppScreens.StoreScreen.routeName)
                     }
                     InAppScreenNavEnums.PLAY_GAME -> {
-
+                        navController.navigate(NavInAppScreens.GameTypeSelection.routeName)
                     }
                     InAppScreenNavEnums.ADD_CATEGORIES -> {
                         navController.navigate(NavInAppScreens.AddCategoriesScreen.routeName)
@@ -69,8 +70,18 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 navController.popBackStack()
             }
         }
-        composable(route = NavInAppScreens.AddCategoriesScreen.routeName){
+        composable(route = NavInAppScreens.AddCategoriesScreen.routeName) {
             AddCategoriesScreen {
+                navController.popBackStack()
+            }
+        }
+        composable(route = NavInAppScreens.GameTypeSelection.routeName) {
+            GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
+                if (it == GameMode.NORMAL_MODE) navController.navigate(NavInAppScreens.NormalGameScreen.routeName)
+            })
+        }
+        composable(route = NavInAppScreens.NormalGameScreen.routeName) {
+            NormalGameScreen {
                 navController.popBackStack()
             }
         }

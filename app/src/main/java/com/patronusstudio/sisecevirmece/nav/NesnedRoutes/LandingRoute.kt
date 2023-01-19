@@ -6,10 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.patronusstudio.sisecevirmece.NavAppLandingScreens
 import com.patronusstudio.sisecevirmece.NavInAppScreens
-import com.patronusstudio.sisecevirmece.ui.screens.LandingFirstScreen
-import com.patronusstudio.sisecevirmece.ui.screens.LandingLastScreen
-import com.patronusstudio.sisecevirmece.ui.screens.LandingSecondScreen
-import com.patronusstudio.sisecevirmece.ui.screens.LandingThirdScreen
+import com.patronusstudio.sisecevirmece.ui.views.screens.LandingFirstScreen
+import com.patronusstudio.sisecevirmece.ui.views.screens.LandingLastScreen
+import com.patronusstudio.sisecevirmece.ui.views.screens.LandingSecondScreen
+import com.patronusstudio.sisecevirmece.ui.views.screens.LandingThirdScreen
 
 fun NavGraphBuilder.passToAppLandingRoute(navController: NavHostController) {
     navigation(

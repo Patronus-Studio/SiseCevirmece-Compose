@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
@@ -33,8 +33,8 @@ import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
-import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
-import com.patronusstudio.sisecevirmece.ui.theme.DavysGrey
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
@@ -54,7 +54,7 @@ fun StoreScreen(back: () -> Unit) {
     }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
-        viewModel.getPackageFromCategory(localContext, 1)
+        viewModel.getPackageFromCategory( 1)
     }
     val clickedPackage = { item: PackageModel ->
         viewModel.setPackageModel(item)
@@ -63,7 +63,7 @@ fun StoreScreen(back: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlueViolet)
+            .background(AppColor.BlueViolet)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -73,7 +73,7 @@ fun StoreScreen(back: () -> Unit) {
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.clickedBtn(it)
-                    viewModel.getPackageFromCategory(localContext, it)
+                    viewModel.getPackageFromCategory(it)
                 }
             }
             LazyColumn(
@@ -98,11 +98,9 @@ fun StoreScreen(back: () -> Unit) {
             }, clickedBtn = {
                 coroutineScope.launch(Dispatchers.Main) {
                     when (viewModel.currentPackage.value!!.packageStatu) {
-                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage(
-                            localContext
-                        )
-                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage(localContext)
-                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage(localContext)
+                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage()
+                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
                     }
                 }
             })
@@ -245,7 +243,7 @@ fun PackagesCard(
                         text = packageModel.username,
                         fontSize = 10.sp,
                         maxLines = 1,
-                        style = TextStyle(color = DavysGrey)
+                        style = TextStyle(color = AppColor.DavysGrey)
                     )
                 }
             }

@@ -1,4 +1,4 @@
-package com.patronusstudio.sisecevirmece.ui.screens
+package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -28,17 +28,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
+import com.patronusstudio.sisecevirmece.data.utils.hasInternet
 import com.patronusstudio.sisecevirmece.data.utils.isConnected
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
-import com.patronusstudio.sisecevirmece.ui.theme.BlueViolet
-import com.patronusstudio.sisecevirmece.ui.theme.Mustard
-import com.patronusstudio.sisecevirmece.ui.theme.SunsetOrange
+import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CustomTextField
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.getTextFieldColor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -61,20 +59,20 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val heightRatio02 = (heightSize * 0.02).dp
 
     LaunchedEffect(key1 = sheet.value, block = {
-        if(sheet.value) sheetState.show()
+        if (sheet.value) sheetState.show()
         else sheetState.hide()
     })
 
     val isThereError = viewModel.isThereError.collectAsState().value
-    LaunchedEffect(key1 = isThereError){
-        if(isThereError.first){
+    LaunchedEffect(key1 = isThereError) {
+        if (isThereError.first) {
             sheet.value = true
         }
     }
 
     val state = viewModel.token.collectAsState().value
     LaunchedEffect(key1 = state) {
-        if(isConnected()){
+        if (hasInternet(context) == true) {
             if (state.isEmpty().not()) {
                 withContext(Dispatchers.IO) {
                     viewModel.setUserToken(context)
@@ -84,9 +82,8 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
             } else {
                 viewModel.userTokenControl(context)
             }
-        }
-        else {
-            viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
+        } else {
+            viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
         }
     }
 
@@ -94,14 +91,14 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
         sheetContent = {
             ErrorSheet(message = isThereError.second) {
                 sheet.value = false
-                viewModel.isThereError.value= Pair(false,"")
+                viewModel.isThereError.value = Pair(false, "")
             }
         }, sheetState = sheetState
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BlueViolet),
+                .background(AppColor.BlueViolet),
             verticalArrangement = Arrangement.Bottom
         ) {
             TopImage(widthRatio80, heightRatio40)
@@ -126,11 +123,10 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 })
             Spacer(modifier = Modifier.height(heightRatio04))
             LoginButton(widthRatio80) {
-                if(isConnected()){
+                if (hasInternet(context) == true) {
                     viewModel.loginWithEmailPass()
-                }
-                else{
-                    viewModel.isThereError.value = Pair(true,"İnternet bağlantısı mevcut değil.")
+                } else {
+                    viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
                 }
             }
             Spacer(modifier = Modifier.height(heightRatio02))
@@ -216,7 +212,7 @@ fun Password(
 @Composable
 fun LoginButton(widthSize: Dp, clicked: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Card(backgroundColor = Mustard, modifier = Modifier
+        Card(backgroundColor = AppColor.Mustard, modifier = Modifier
             .width(widthSize)
             .clickable {
                 clicked()
@@ -225,7 +221,7 @@ fun LoginButton(widthSize: Dp, clicked: () -> Unit) {
                 text = "Giriş Yap", style = TextStyle(
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
-                ), color = SunsetOrange,
+                ), color = AppColor.SunsetOrange,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
         }
@@ -240,7 +236,7 @@ fun SignInText(widthSize: Dp, spaceSize: Dp, clicked: () -> Unit) {
             Text(text = "Yeni misin? Aramıza katıl.", style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal
-            ), color = Mustard,
+            ), color = AppColor.Mustard,
                 modifier = Modifier.clickable { clicked() })
         }
         Spacer(modifier = Modifier.width(spaceSize))
