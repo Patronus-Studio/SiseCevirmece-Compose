@@ -1,14 +1,16 @@
 package com.patronusstudio.sisecevirmece.data.model.dbmodel
 
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.patronusstudio.sisecevirmece.data.DbTables
 import com.patronusstudio.sisecevirmece.data.model.BasePackageModel
 
 @Entity(tableName = DbTables.packageTable)
 data class PackageDbModel(
-    @PrimaryKey(autoGenerate = true)
+    @NonNull @PrimaryKey(autoGenerate = true)
     val primaryId: Int = 0,
     val cloudPackageCategoryId: Int,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
@@ -18,8 +20,30 @@ data class PackageDbModel(
     override val packageComment: String,
     override val createdTime: String,
     override val updatedTime: String,
-    var isSelected: Boolean = false
+    @Ignore
+    var isSelected: Boolean
 ) : BasePackageModel() {
+    constructor(
+        primaryId: Int = 0,
+        cloudPackageCategoryId: Int,
+        packageImage: ByteArray? = null,
+        version: Int,
+        packageName: String,
+        packageComment: String,
+        createdTime: String,
+        updatedTime: String
+    ) : this(
+        primaryId,
+        cloudPackageCategoryId,
+        packageImage,
+        version,
+        packageName,
+        packageComment,
+        createdTime,
+        updatedTime,
+        false
+    )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -37,6 +61,7 @@ data class PackageDbModel(
         if (packageComment != other.packageComment) return false
         if (createdTime != other.createdTime) return false
         if (updatedTime != other.updatedTime) return false
+        if (isSelected != other.isSelected) return false
 
         return true
     }
@@ -50,8 +75,7 @@ data class PackageDbModel(
         result = 31 * result + packageComment.hashCode()
         result = 31 * result + createdTime.hashCode()
         result = 31 * result + updatedTime.hashCode()
+        result = 31 * result + isSelected.hashCode()
         return result
     }
-
-
 }
