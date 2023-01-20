@@ -50,10 +50,7 @@ import com.patronusstudio.sisecevirmece.data.utils.resize
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.*
-import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
-import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithPassive
-import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
-import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
+import com.patronusstudio.sisecevirmece.ui.widgets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,15 +113,7 @@ fun AddCategoriesScreen(back: () -> Unit) {
         },
         sheetState = sheetState
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .background(AppColor.Heliotrope)
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            CardTitle(stringResource(id = R.string.add_category)) {
-                back()
-            }
+        BaseBackground(titleId = R.string.add_category, backClicked = { back() }) {
             CategoryCard(
                 questionCardMaxWidth,
                 viewModel.packageName.collectAsState().value,

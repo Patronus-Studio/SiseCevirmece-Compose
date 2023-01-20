@@ -38,7 +38,7 @@ import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 @Composable
 fun CardImageWithText(
-    image: Int,
+    image: Any,
     text: String,
     backgroundColor: Color,
     textColor: Color,
@@ -65,14 +65,18 @@ fun CardImageWithText(
             .clickable { clicked() })
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             AsyncImage(
                 model = image,
                 contentDescription = null,
-                modifier = Modifier.size(imageSize)
+                modifier = Modifier.size(imageSize).clip(RoundedCornerShape(4.dp))
             )
-            Text(text = text, fontSize = 12.sp, style = TextStyle(color = textColor))
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                style = TextStyle(color = textColor, textAlign = TextAlign.Center)
+            )
         }
     }
 }

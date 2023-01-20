@@ -27,6 +27,7 @@
     <string name="change_question">Soru değiştir</string>
     <string name="i_wil_ask_question">Soruyu Ben Soracağım</string>
     <string name="not_selected">Seçilmedi</string>
+    <string name="select_game_category">Oynamak İstediğiniz Kategorileri Seçin</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>

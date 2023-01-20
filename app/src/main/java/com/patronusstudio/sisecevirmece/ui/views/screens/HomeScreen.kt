@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -184,7 +185,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CardImageWithText(
-            R.drawable.category, stringResource(id = R.string.add_category),
+            context.resources.getDrawable(R.drawable.category,null), stringResource(id = R.string.add_category),
             backgroundColor = Color.White, textColor = AppColor.Heliotrope,
             borderColor = AppColor.SeaSerpent, cardSizeWidth, cardSizeHeight,
             imageSize
@@ -192,7 +193,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             route(InAppScreenNavEnums.ADD_CATEGORIES)
         }
         CardImageWithText(
-            R.drawable.store,
+            context.resources.getDrawable(R.drawable.store),
             stringResource(id = R.string.store),
             backgroundColor = AppColor.Mustard,
             imageSize = imageSize,
@@ -203,7 +204,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             route(InAppScreenNavEnums.STORES)
         }
         CardImageWithText(
-            R.drawable.profile,
+            context.resources.getDrawable(R.drawable.profile),
             stringResource(id = R.string.my_profile),
             backgroundColor = Color.White,
             textColor = AppColor.SunsetOrange,

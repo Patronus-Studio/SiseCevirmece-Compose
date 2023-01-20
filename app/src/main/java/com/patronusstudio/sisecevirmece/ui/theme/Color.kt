@@ -19,5 +19,6 @@ object AppColor {
     val Beaver = Color(0xFFA18276)
     val Green = Color(0xFFa7c957)
     val GreenMalachite = Color(0xFF00c853)
+    val White = Color(0xFFFFFFFF)
 }
 

@@ -80,7 +80,7 @@ class PackageViewModel @Inject constructor(
             _errorMessage.value =
                 networkPackages.body()?.message?.toString() ?: "Bir hatayla karşılaşıldı."
         }
-        val localPackages = packageLocalRepository.getPackages(application.applicationContext)
+        val localPackages = packageLocalRepository.getPackages()
         val mutableMap = mutableMapOf<Int, MutableList<BasePackageModel>>()
         networkPackages.body()?.packages?.forEach {
             it.packageStatu = PackageDetailCardBtnEnum.NEED_DOWNLOAD
