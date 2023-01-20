@@ -17,7 +17,8 @@ data class PackageDbModel(
     override val packageName: String,
     override val packageComment: String,
     override val createdTime: String,
-    override val updatedTime: String
+    override val updatedTime: String,
+    var isSelected: Boolean = false
 ) : BasePackageModel() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

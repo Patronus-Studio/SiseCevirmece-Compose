@@ -243,7 +243,6 @@ private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
     }
 }
 
-//fun OpenDialog(isClicked: MutableState<Boolean>) {
 @Composable
 fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
     //AnimatedVisibility(visible = isClicked.value) {
