@@ -35,6 +35,7 @@ import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
@@ -60,16 +61,8 @@ fun StoreScreen(back: () -> Unit) {
         viewModel.setPackageModel(item)
         popupStatu.value = true
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppColor.BlueViolet)
-    ) {
+    BaseBackground(titleId = R.string.store, backClicked = { back() }) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            CardTitle(stringResource(id = R.string.store)) {
-                back()
-            }
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.clickedBtn(it)
@@ -80,7 +73,6 @@ fun StoreScreen(back: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 items(viewModel.packages.size) { index ->
                     Spacer(modifier = Modifier.height(16.dp))
                     PackagesCard(
