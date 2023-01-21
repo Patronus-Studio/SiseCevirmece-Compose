@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -41,8 +39,12 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
     val spaceSizeCards = ((LocalConfiguration.current.screenWidthDp.dp) - (cardWidth * 2)) / 3
     val emptyPackageImageSize = (LocalConfiguration.current.screenWidthDp * 0.75).dp
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.package_empty))
+    val isFirstInit = remember {
+        mutableStateOf(true)
+    }
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getAllPackages()
+        isFirstInit.value = false
     })
     BaseBackground(titleId = R.string.select_game_category, backClicked = backClicked) {
         LazyColumn(content = {
@@ -80,9 +82,10 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
                 }
             }
         })
-        if (viewModel.packages.size == 0) {
+        if (viewModel.packages.size == 0 && !isFirstInit.value) {
             Dialog(
                 onDismissRequest = {
+                    isFirstInit.value = true
                     backClicked()
                 },
                 properties = DialogProperties(usePlatformDefaultWidth = false)
