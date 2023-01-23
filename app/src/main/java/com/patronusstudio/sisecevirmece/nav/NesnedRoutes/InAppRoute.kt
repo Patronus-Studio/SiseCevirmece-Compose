@@ -91,11 +91,17 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 backClicked = {
                     navController.popBackStack()
                 }, passGameScreen = {
+                    navController.currentBackStackEntry?.savedStateHandle.apply {
+                        this?.set("selectedPackages", it)
+                    }
                     navController.navigate(NavInAppScreens.SpecialGameScreen.routeName)
                 })
         }
         composable(route = NavInAppScreens.SpecialGameScreen.routeName) {
-            SpecialGameScreen {
+            val list =
+                navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedPackages")
+            navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedPackages")
+            SpecialGameScreen(list ?: "") {
                 navController.popBackStack()
             }
         }

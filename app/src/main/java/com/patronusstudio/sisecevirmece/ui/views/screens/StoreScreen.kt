@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,7 +35,6 @@ import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
-import com.patronusstudio.sisecevirmece.ui.widgets.CardTitle
 import com.patronusstudio.sisecevirmece.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -137,7 +135,7 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
                 items = list
             ) { item: PackageCategoryModel ->
                 Spacer(modifier = Modifier.width(16.dp))
-                Button(item) {
+                PackageSelectButton(item) {
                     clicked((item.id).toInt())
                 }
             }
@@ -149,7 +147,7 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
 }
 
 @Composable
-fun Button(item: PackageCategoryModel, clicked: () -> Unit) {
+private fun PackageSelectButton(item: PackageCategoryModel, clicked: () -> Unit) {
     val backgroundColor = Color(
         android.graphics.Color.parseColor(
             if (item.isSelected == SelectableEnum.YES) item.activeBtnColor

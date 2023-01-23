@@ -39,7 +39,7 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SpecialGameScreen(backClicked: () -> Unit) {
+fun SpecialGameScreen(selectedPackages:String,backClicked: () -> Unit) {
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val bottleSize = (screenWidth * 0.9).dp

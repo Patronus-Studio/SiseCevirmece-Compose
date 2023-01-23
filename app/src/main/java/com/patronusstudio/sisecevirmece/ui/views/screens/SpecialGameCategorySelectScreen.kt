@@ -1,8 +1,11 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,7 +13,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,21 +33,20 @@ import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 
-//hiç oynanacak paketi yoksa uyarı bas ekranda
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () -> Unit) {
+fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: (String) -> Unit) {
     val viewModel = hiltViewModel<SpecialGameCategorySelectViewModel>()
     val cardWidth = (LocalConfiguration.current.screenWidthDp * 0.3).dp
     val cardHeight = (LocalConfiguration.current.screenHeightDp * 0.20).dp
     val imageSize = (LocalConfiguration.current.screenHeightDp * 0.12).dp
     val spaceSizeCards = ((LocalConfiguration.current.screenWidthDp.dp) - (cardWidth * 2)) / 3
     val emptyPackageImageSize = (LocalConfiguration.current.screenWidthDp * 0.75).dp
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.package_empty))
+    val playButtonWidth = (LocalConfiguration.current.screenWidthDp * 0.9).dp
     val isFirstInit = remember {
         mutableStateOf(true)
     }
     LaunchedEffect(key1 = Unit, block = {
+        viewModel.clearData()
         viewModel.getAllPackages()
         isFirstInit.value = false
     })
@@ -56,13 +60,16 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
                             secondModel = viewModel.packages[index + 1],
                             firstClicked = {
                                 viewModel.setShowStatu(model)
+                                viewModel.setSelectedPackages()
                             }, secondClicked = {
                                 viewModel.setShowStatu(viewModel.packages[index + 1])
+                                viewModel.setSelectedPackages()
                             }, cardWidth, cardHeight, imageSize
                         )
                     } else {
                         SingeCard(model = model, clicked = {
                             viewModel.setShowStatu(model)
+                            viewModel.setSelectedPackages()
                         }, cardWidth, cardHeight, imageSize, spaceSizeCards)
                     }
                 } else if (index + 2 <= viewModel.packages.size - 1) {
@@ -71,46 +78,36 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
                         secondModel = viewModel.packages[index + 2],
                         firstClicked = {
                             viewModel.setShowStatu(viewModel.packages[index + 1])
+                            viewModel.setSelectedPackages()
                         }, secondClicked = {
                             viewModel.setShowStatu(viewModel.packages[index + 2])
+                            viewModel.setSelectedPackages()
                         }, cardWidth, cardHeight, imageSize
                     )
                 } else if (index + 1 <= viewModel.packages.size - 1) {
                     SingeCard(model = viewModel.packages[index + 1], clicked = {
                         viewModel.setShowStatu(viewModel.packages[index + 1])
+                        viewModel.setSelectedPackages()
                     }, cardWidth, cardHeight, imageSize, spaceSizeCards)
                 }
             }
-        })
-        if (viewModel.packages.size <= 5 && !isFirstInit.value) {
-            Dialog(
-                onDismissRequest = {
-                    isFirstInit.value = true
-                    backClicked()
-                },
-                properties = DialogProperties(usePlatformDefaultWidth = false)
-            ) {
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        composition = composition,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.size(emptyPackageImageSize),
-                    )
-                    Text(
-                        text = stringResource(
-                            if (viewModel.packages.size == 0) R.string.paket_doesnt_find_to_play
-                            else R.string.at_least_5_package_add_to_play
-                        ),
-                        color = AppColor.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Normal,
-                    )
-                }
+            item {
+
             }
+        })
+        PlayButton(
+            selectedPackageSize = viewModel.selectedPackage.size,
+            playButtonWidth = playButtonWidth
+        ) {
+            passGameScreen(viewModel.getSelectedPackageJSON())
+        }
+        AnimationDialog(
+            packageSize = viewModel.packages.size,
+            isFirstInit.value,
+            emptyPackageImageSize
+        ) {
+            isFirstInit.value = true
+            backClicked()
         }
     }
 }
@@ -174,4 +171,70 @@ private fun DoubleCard(
         )
 
     }
+}
+
+@Composable
+private fun PlayButton(selectedPackageSize: Int, playButtonWidth: Dp, clicked: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp), contentAlignment = Alignment.BottomCenter
+    ) {
+        AnimatedVisibility(
+            visible = selectedPackageSize > 0,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+        ) {
+            Button(
+                onClick = clicked,
+                colors = ButtonDefaults.buttonColors(backgroundColor = AppColor.SunsetOrange),
+                modifier = Modifier.width(playButtonWidth)
+            ) {
+                Text(
+                    text = "OYNA", textAlign = TextAlign.Center, style = TextStyle(
+                        color = AppColor.White, fontSize = 24.sp, fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun AnimationDialog(
+    packageSize: Int,
+    isFirstInit: Boolean,
+    emptyPackageImageSize: Dp,
+    dissmisRequest: () -> Unit
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.package_empty))
+    if (packageSize <= 0 && !isFirstInit) {
+        Dialog(
+            onDismissRequest = dissmisRequest,
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LottieAnimation(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier.size(emptyPackageImageSize),
+                )
+                Text(
+                    text = stringResource(
+                        if (packageSize == 0) R.string.paket_doesnt_find_to_play
+                        else R.string.at_least_5_package_add_to_play
+                    ),
+                    color = AppColor.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Normal,
+                )
+            }
+        }
+    }
+
 }
