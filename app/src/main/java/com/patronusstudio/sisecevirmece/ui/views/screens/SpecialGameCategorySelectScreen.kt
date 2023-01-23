@@ -82,7 +82,7 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
                 }
             }
         })
-        if (viewModel.packages.size == 0 && !isFirstInit.value) {
+        if (viewModel.packages.size <= 5 && !isFirstInit.value) {
             Dialog(
                 onDismissRequest = {
                     isFirstInit.value = true
@@ -101,7 +101,10 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: () 
                         modifier = Modifier.size(emptyPackageImageSize),
                     )
                     Text(
-                        text = stringResource(R.string.paket_doesnt_find_to_play),
+                        text = stringResource(
+                            if (viewModel.packages.size == 0) R.string.paket_doesnt_find_to_play
+                            else R.string.at_least_5_package_add_to_play
+                        ),
                         color = AppColor.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Normal,
