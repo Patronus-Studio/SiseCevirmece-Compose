@@ -78,6 +78,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
         composable(route = NavInAppScreens.GameTypeSelection.routeName) {
             GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
                 if (it == GameMode.NORMAL_MODE) navController.navigate(NavInAppScreens.NormalGameScreen.routeName)
+                if (it == GameMode.SPECIAL_MODE) navController.navigate(NavInAppScreens.SpecialGameCategorySelectScreen.routeName)
             })
         }
         composable(route = NavInAppScreens.NormalGameScreen.routeName) {
@@ -85,6 +86,26 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 navController.popBackStack()
             }
         }
+        composable(route = NavInAppScreens.SpecialGameCategorySelectScreen.routeName) {
+            SpecialGameCategorySelectScreen(
+                backClicked = {
+                    navController.popBackStack()
+                }, passGameScreen = {
+                    navController.currentBackStackEntry?.savedStateHandle.apply {
+                        this?.set("selectedPackages", it)
+                    }
+                    navController.navigate(NavInAppScreens.SpecialGameScreen.routeName)
+                })
+        }
+        composable(route = NavInAppScreens.SpecialGameScreen.routeName) {
+            val list =
+                navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedPackages")
+            navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedPackages")
+            SpecialGameScreen(list ?: "") {
+                navController.popBackStack()
+            }
+        }
+
     }
 
 }

@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.repository.local
 
 import android.app.Application
-import android.content.Context
 import com.patronusstudio.sisecevirmece.data.abstarcts.BottleRoomDb
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import kotlinx.coroutines.Dispatchers
@@ -12,11 +11,13 @@ class PackageLocalRepository @Inject constructor(private val application: Applic
 
     private lateinit var tempPackages: List<PackageDbModel>
 
-    suspend fun getPackages(context: Context): List<PackageDbModel> {
+    suspend fun getPackages(): List<PackageDbModel> {
         return if (this::tempPackages.isInitialized) tempPackages
         else {
             withContext(Dispatchers.IO) {
-                tempPackages = BottleRoomDb.getInstance(context).getBottleDao().getPackages()
+                tempPackages =
+                    BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                        .getPackages()
                 tempPackages
             }
         }

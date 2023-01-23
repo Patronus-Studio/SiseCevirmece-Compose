@@ -1,6 +1,6 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
-import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,7 +38,7 @@ import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 @Composable
 fun CardImageWithText(
-    @DrawableRes image: Int,
+    image: Any,
     text: String,
     backgroundColor: Color,
     textColor: Color,
@@ -65,13 +65,18 @@ fun CardImageWithText(
             .clickable { clicked() })
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Image(
-                painter = painterResource(id = image), contentDescription = "",
-                modifier = Modifier.size(imageSize)
+            AsyncImage(
+                model = image,
+                contentDescription = null,
+                modifier = Modifier.size(imageSize).clip(RoundedCornerShape(4.dp))
             )
-            Text(text = text, fontSize = 12.sp, style = TextStyle(color = textColor))
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                style = TextStyle(color = textColor, textAlign = TextAlign.Center)
+            )
         }
     }
 }
@@ -235,4 +240,22 @@ fun SampleText(content: String, maxLines: Int = 1, fontSize: Int = 10) {
     )
 }
 
+@Composable
+fun BaseBackground(
+    modifier: Modifier = Modifier,
+    @StringRes titleId: Int,
+    backClicked: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(AppColor.BlueViolet)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        CardTitle(title = stringResource(id = titleId), backClicked)
+        Spacer(modifier = Modifier.height(16.dp))
+        content()
+    }
+}
 
