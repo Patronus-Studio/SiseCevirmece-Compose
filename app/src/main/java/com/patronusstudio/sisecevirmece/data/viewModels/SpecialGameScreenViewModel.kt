@@ -51,8 +51,6 @@ class SpecialGameScreenViewModel @Inject constructor(
             packages.forEach {
                 getQuestions(it)
             }
-        }
-        withContext(Dispatchers.IO) {
             getRandomPackage()
             getRandomQuestion()
         }

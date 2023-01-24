@@ -1,12 +1,15 @@
 package com.patronusstudio.sisecevirmece.data.utils
 
+import android.content.Context
 import android.graphics.Bitmap
+import androidx.annotation.DrawableRes
+import com.bumptech.glide.Glide
 import java.io.ByteArrayOutputStream
 
 
-fun Bitmap.toByteArrray(): ByteArray {
+fun Bitmap.toByteArrray(compressFormat: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG): ByteArray {
     val stream = ByteArrayOutputStream()
-    this.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+    this.compress(compressFormat, 50, stream)
     return stream.toByteArray()
 }
 
@@ -31,4 +34,9 @@ fun Bitmap.resize(maxWidth: Int, maxHeight: Int): Bitmap {
         }
         Bitmap.createScaledBitmap(this, finalWidth, finalHeight, true)
     } else this
+}
+
+fun  Int.toBitmapArray(context:Context): ByteArray{
+    val bitmapImage = Glide.with(context).asBitmap().load(this).centerInside().submit().get()
+    return bitmapImage.toByteArrray(Bitmap.CompressFormat.PNG)
 }
