@@ -15,6 +15,7 @@ import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
+import com.patronusstudio.sisecevirmece.data.utils.toBitmapArray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -139,8 +140,7 @@ class HomeViewModel @Inject constructor(
     ): PackageDbModel {
         return PackageDbModel(
             cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
-            packageImage = truthDareDefaultPackageEnum.getPackageName(application.applicationContext)
-                .toByteArray(),
+            packageImage = truthDareDefaultPackageEnum.getImageId().toBitmapArray(application.applicationContext),
             version = truthDareDefaultPackageEnum.getVersion(),
             packageName = truthDareDefaultPackageEnum.getPackageName(application.applicationContext),
             packageComment = truthDareDefaultPackageEnum.getPackageComment(application.applicationContext),
