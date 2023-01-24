@@ -73,16 +73,8 @@ class SpecialGameScreenViewModel @Inject constructor(
 
 
     private suspend fun getQuestions(packageDbModel: PackageDbModel) {
-        val packageId = when (packageDbModel.cloudPackageCategoryId) {
-            TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId() -> {
-                TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId()
-            }
-            TruthDareDefaultPackageEnum.DARE.getPackageCategoryId() -> {
-                TruthDareDefaultPackageEnum.DARE.getPackageCategoryId()
-            }
-            else -> packageDbModel.primaryId
-        }
-        val questions = questionLocalRepository.getQuestionsWithPackageId(packageId)
+        val questions =
+            questionLocalRepository.getQuestionsWithPackageId(getPackageId(packageDbModel))
         val filteredQuestions = questions.filter { it.isShowed.not() }
         if (filteredQuestions.isEmpty()) {
             withContext(Dispatchers.IO) {
@@ -104,21 +96,39 @@ class SpecialGameScreenViewModel @Inject constructor(
 
     suspend fun getRandomQuestion() {
         _isLoading.value = true
-        val randomQst = _packagesAndQuestions.value[_randomPackage.value!!.primaryId]?.random()
+        val packageId = getPackageId(_randomPackage.value!!)
+        val randomQst = _packagesAndQuestions.value[packageId]?.random()
         if (randomQst == null) {
-            questionLocalRepository.updateQuestionShowStatu(false, _randomPackage.value!!.primaryId)
-            val fetchedQuestions =
-                questionLocalRepository.getQuestionsWithPackageId(_randomPackage.value!!.primaryId)
-            _packagesAndQuestions.value[_randomPackage.value!!.primaryId] = fetchedQuestions
-            getRandomQuestion()
+            coroutineScope {
+                async {
+                    questionLocalRepository.updateAllQuestionsShowStatus(packageId, false)
+                }.await()
+                val fetchedQuestions = withContext(Dispatchers.IO){
+                    questionLocalRepository.getQuestionsWithPackageId(packageId)
+                }
+                _packagesAndQuestions.value[packageId] = fetchedQuestions
+                getRandomQuestion()
+            }
         } else {
             _randomQuestion.value = randomQst
             questionLocalRepository.updateQuestionShowStatu(true, randomQuestion.value!!.primaryId)
-            val listOnMap = packagesAndQuestions.value[_randomPackage.value!!.primaryId]
+            val listOnMap = packagesAndQuestions.value[packageId]
             listOnMap!!.toMutableList().remove(randomQuestion.value)
-            _packagesAndQuestions.value[_randomPackage.value!!.primaryId] = listOnMap
+            _packagesAndQuestions.value[packageId] = listOnMap
         }
         _isLoading.value = false
+    }
+
+    private fun getPackageId(packageDbModel: PackageDbModel): Int {
+        return when (packageDbModel.cloudPackageCategoryId) {
+            TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId() -> {
+                TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId()
+            }
+            TruthDareDefaultPackageEnum.DARE.getPackageCategoryId() -> {
+                TruthDareDefaultPackageEnum.DARE.getPackageCategoryId()
+            }
+            else -> packageDbModel.primaryId
+        }
     }
 
 }
