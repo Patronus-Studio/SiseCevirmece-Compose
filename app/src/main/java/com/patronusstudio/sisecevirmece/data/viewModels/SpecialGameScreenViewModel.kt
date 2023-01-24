@@ -99,19 +99,17 @@ class SpecialGameScreenViewModel @Inject constructor(
         val packageId = getPackageId(_randomPackage.value!!)
         val randomQst = _packagesAndQuestions.value[packageId]?.random()
         if (randomQst == null) {
-            coroutineScope {
-                async {
-                    questionLocalRepository.updateAllQuestionsShowStatus(packageId, false)
-                }.await()
-                val fetchedQuestions = withContext(Dispatchers.IO){
-                    questionLocalRepository.getQuestionsWithPackageId(packageId)
-                }
-                _packagesAndQuestions.value[packageId] = fetchedQuestions
-                getRandomQuestion()
+            withContext(Dispatchers.IO) {
+                questionLocalRepository.updateAllQuestionsShowStatus(packageId, false)
             }
+            val fetchedQuestions = withContext(Dispatchers.IO) {
+                questionLocalRepository.getQuestionsWithPackageId(packageId)
+            }
+            _packagesAndQuestions.value[packageId] = fetchedQuestions
+            getRandomQuestion()
         } else {
             _randomQuestion.value = randomQst
-            questionLocalRepository.updateQuestionShowStatu(true, randomQuestion.value!!.primaryId)
+            questionLocalRepository.updateQuestionShowStatu(true, randomQst.primaryId)
             val listOnMap = packagesAndQuestions.value[packageId]
             listOnMap!!.toMutableList().remove(randomQuestion.value)
             _packagesAndQuestions.value[packageId] = listOnMap
