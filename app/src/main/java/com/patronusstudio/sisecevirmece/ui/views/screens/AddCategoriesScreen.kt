@@ -12,6 +12,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,9 +51,13 @@ import com.patronusstudio.sisecevirmece.data.model.QuestionModel
 import com.patronusstudio.sisecevirmece.data.utils.resize
 import com.patronusstudio.sisecevirmece.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
-import com.patronusstudio.sisecevirmece.ui.theme.*
-import com.patronusstudio.sisecevirmece.ui.widgets.*
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithDot
+import com.patronusstudio.sisecevirmece.ui.widgets.ButtonWithPassive
+import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
@@ -238,14 +244,18 @@ private fun QuestionsCard(
                     viewModel.updateQuestionModelText(item, it)
                 }, removeBtnClicked = {
                     if (list.size > 1) {
-                        viewModel.removeQuestionModel(item)
-                        if (list.size <= 5) {
+                        if (list.size - 1 <= 9) {
                             btnAddLocationX = 0.dp
                             btnRemoveLocationX = 0.dp
                         } else {
                             btnAddLocationX = (-80).dp
                             btnRemoveLocationX = 80.dp
                         }
+                        coroutineScope.launch {
+                            delay(500L)
+                            viewModel.removeQuestionModel(item)
+                        }
+
                     }
                 })
                 if (item.id == list.last().id) {
@@ -261,7 +271,7 @@ private fun QuestionsCard(
         ) {
             CircleImageButton(id = R.drawable.add) {
                 viewModel.addNewQuestionModel()
-                if (list.size > 5) {
+                if (list.size > 9) {
                     btnAddLocationX = (-80).dp
                     btnRemoveLocationX = 80.dp
                 } else {
@@ -273,18 +283,17 @@ private fun QuestionsCard(
                 }
             }
         }
-        if (list.size > 9) {
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .offset(x = offsetStateRemoveBtn.value)
-            ) {
-                CircleImageButton(id = R.drawable.save) {
-                    coroutineScope.launch {
-                        viewModel.saveQuestions(localContext)
-                    }
-                    localFocus.clearFocus()
+        AnimatedVisibility(
+            visible = list.size > 9,
+            exit = fadeOut(tween(delayMillis = 100)),
+            enter = fadeIn(tween(delayMillis = 100)),
+            modifier = Modifier.offset(x = offsetStateRemoveBtn.value)
+        ) {
+            CircleImageButton(id = R.drawable.save) {
+                coroutineScope.launch {
+                    viewModel.saveQuestions(localContext)
                 }
+                localFocus.clearFocus()
             }
         }
     })
@@ -386,7 +395,10 @@ fun QuestionViewItem(
                 valueChange(it)
             },
             placeholder = {
-                Text(text = stringResource(id = R.string.enter_question), color = AppColor.DavysGrey)
+                Text(
+                    text = stringResource(id = R.string.enter_question),
+                    color = AppColor.DavysGrey
+                )
             },
             colors = textFieldColors,
             singleLine = true,
