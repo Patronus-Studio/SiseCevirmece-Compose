@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -107,7 +108,7 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
                         viewModel.setUserPassword(it)
                     },
                     trailClicked = {
-                        viewModel.setIsLockedPassword(viewModel.isLockedPassword.value)
+                        viewModel.setIsLockedPassword(viewModel.isLockedPassword.value.not())
                     }
                 )
                 Spacer(modifier = Modifier.height(heightRatio04))
@@ -152,7 +153,7 @@ fun EmailView(
             CustomTextField(
                 widthSize = widthSize,
                 textFieldColors = getTextFieldColor(),
-                hintText = "Email adresi",
+                hintText = stringResource(R.string.email_address),
                 changedText = userEmail,
                 onValueChange = {
                     emailChanged(it)
@@ -165,7 +166,7 @@ fun EmailView(
                 Spacer(modifier = Modifier.width((screenWidth * 0.11).dp))
                 Box(modifier = Modifier.width(widthSize)) {
                     Text(
-                        text = "Girilen email adresi hatalı", style = TextStyle(
+                        text = stringResource(R.string.entried_email_is_not_correct), style = TextStyle(
                             color = Color.Red, fontSize =
                             14.sp
                         )
@@ -241,7 +242,7 @@ fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
                 clicked()
             }) {
             Text(
-                text = "Kayıt Ol", style = TextStyle(
+                text = stringResource(R.string.register), style = TextStyle(
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
                 ), color = AppColor.SunsetOrange,
