@@ -30,6 +30,7 @@ buildscript {
         //3rd party libraries
         coil_compose = '2.2.0'
         accompanist_navigation_animation = '0.16.0'
+        accompanist_systemuicontroller = '0.27.0'
         retrofit = '2.9.0'
         retrofit_converter_gson = '2.6.2'
         okhttp = '4.10.0'

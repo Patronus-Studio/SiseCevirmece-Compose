@@ -16,6 +16,7 @@ object AppColor {
     val Heliotrope = Color(0xFFD272F9)
     val SunsetOrange = Color(0xFFFF5757)
     val BlueViolet = Color(0xFF6769AD)
+    val BlueVioletStatus = Color(0xFF5B5DB2)
     val DavysGrey = Color(0xFF59595D)
     val GreyTranspancy20 = Color(0xCD6A6A6D)
     val UnitedNationsBlue = Color(0xFF648BD9)

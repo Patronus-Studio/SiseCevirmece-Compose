@@ -64,6 +64,7 @@ dependencies {
     implementation "io.coil-kt:coil-compose:$coil_compose"
     implementation "androidx.navigation:navigation-compose:$compose_navigation"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_navigation_animation"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_systemuicontroller"
     implementation "androidx.datastore:datastore-preferences:$datastore"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_converter_gson"
