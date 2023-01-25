@@ -341,7 +341,7 @@ fun AddImage(size: Dp, bitmap: Bitmap?, selectImageClicked: () -> Unit) {
 fun CategoryTextField(text: String, placeText: String, valueChange: (String) -> Unit) {
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = AppColor.Purple200
+        focusedIndicatorColor = AppColor.Purple200, textColor = AppColor.DavysGrey
     )
     TextField(
         value = text,
@@ -350,7 +350,7 @@ fun CategoryTextField(text: String, placeText: String, valueChange: (String) -> 
             valueChange(it)
         },
         placeholder = {
-            Text(text = placeText)
+            Text(text = placeText, color = AppColor.DavysGrey)
         },
         colors = textFieldColors,
         modifier = Modifier.padding(end = 16.dp, start = 8.dp)
@@ -366,7 +366,7 @@ fun QuestionViewItem(
     val widthSize = (deviceWithSize * 0.9).dp
     val textFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = AppColor.Purple200
+        focusedIndicatorColor = AppColor.Purple200, textColor = AppColor.DavysGrey
     )
     Row(
         modifier = modifier
@@ -377,7 +377,8 @@ fun QuestionViewItem(
         Text(
             text = questionModel.id.toString(),
             modifier = modifier.fillMaxWidth(0.05f),
-            style = TextStyle().copy(textAlign = TextAlign.Center)
+            style = TextStyle().copy(textAlign = TextAlign.Center),
+            color = AppColor.DavysGrey
         )
         TextField(
             value = questionModel.question,
@@ -385,7 +386,7 @@ fun QuestionViewItem(
                 valueChange(it)
             },
             placeholder = {
-                Text(text = stringResource(id = R.string.enter_question))
+                Text(text = stringResource(id = R.string.enter_question), color = AppColor.DavysGrey)
             },
             colors = textFieldColors,
             singleLine = true,

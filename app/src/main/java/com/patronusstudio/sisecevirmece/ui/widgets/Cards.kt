@@ -70,7 +70,9 @@ fun CardImageWithText(
             AsyncImage(
                 model = image,
                 contentDescription = null,
-                modifier = Modifier.size(imageSize).clip(RoundedCornerShape(4.dp))
+                modifier = Modifier
+                    .size(imageSize)
+                    .clip(RoundedCornerShape(4.dp))
             )
             Text(
                 text = text,
@@ -121,7 +123,8 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
                         modifier = Modifier.width((cardWidth * 0.7).dp),
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
-                        fontFamily = FontFamily.SansSerif
+                        fontFamily = FontFamily.SansSerif,
+                        color = AppColor.DavysGrey
                     )
                     Spacer(modifier = Modifier.width((cardWidth * 0.15).dp))
                 }

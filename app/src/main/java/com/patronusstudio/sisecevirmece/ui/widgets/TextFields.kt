@@ -43,7 +43,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         placeholder = {
             AnimatedVisibility(visible = changedText.isEmpty()) {
-                Text(text = hintText)
+                Text(text = hintText, color = AppColor.DavysGrey)
             }
         },
         trailingIcon = if (trailingIcon == null) null else {
@@ -65,9 +65,11 @@ fun CustomTextField(
 @Composable
 fun getTextFieldColor(): TextFieldColors {
     return TextFieldDefaults.outlinedTextFieldColors(
-        backgroundColor = Color.White,
-        focusedBorderColor = Color.Green, unfocusedBorderColor = AppColor.Purple700,
-        errorBorderColor = Color.Red
+        backgroundColor = AppColor.White,
+        focusedBorderColor = AppColor.ElectricGreen,
+        unfocusedBorderColor = AppColor.Purple700,
+        errorBorderColor = AppColor.Red,
+        textColor = AppColor.DavysGrey
     )
 }
 

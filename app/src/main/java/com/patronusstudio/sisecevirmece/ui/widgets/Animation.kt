@@ -16,6 +16,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 
 @Composable
@@ -25,7 +26,8 @@ fun LoadingAnimation() {
         Surface(
             modifier = Modifier.size(120.dp),
             elevation = 4.dp,
-            shape = RoundedCornerShape(100)
+            shape = RoundedCornerShape(100),
+            color = AppColor.White
         ) {
             LottieAnimation(
                 composition = composition,

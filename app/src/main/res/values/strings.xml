@@ -30,6 +30,7 @@
     <string name="select_game_category">Oynamak İstediğiniz Kategorileri Seçin</string>
     <string name="paket_doesnt_find_to_play">Oynanacak paket bulunamadı.</string>
     <string name="at_least_5_package_add_to_play">Oynamak için en az 5 paket yükleyin.</string>
+    <string name="username">Kullanıcı Adı</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>
