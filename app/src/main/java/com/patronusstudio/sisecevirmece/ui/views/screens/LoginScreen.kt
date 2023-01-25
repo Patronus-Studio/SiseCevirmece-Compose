@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,7 +30,6 @@ import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.utils.hasInternet
-import com.patronusstudio.sisecevirmece.data.utils.isConnected
 import com.patronusstudio.sisecevirmece.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
@@ -166,13 +166,12 @@ fun UsernameView(
     val userEmailTrailIcon = remember { mutableStateOf(R.drawable.user) }
     Column {
         Box(
-            modifier = Modifier
-                .fillMaxWidth(), contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             CustomTextField(
                 widthSize = widthSize,
                 textFieldColors = getTextFieldColor(),
-                hintText = "Kullanıcı Adı",
+                hintText = stringResource(R.string.username),
                 changedText = username,
                 onValueChange = {
                     usernameChanged(it)

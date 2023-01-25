@@ -1,9 +1,12 @@
 package com.patronusstudio.sisecevirmece.ui.theme
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
 object AppColor {
     //https://www.color-name.com/hex/
+
+    @Stable
     val Purple200 = Color(0xFFBB86FC)
     val Purple500 = Color(0xFF6200EE)
     val Purple700 = Color(0xFF3700B3)
@@ -21,5 +24,7 @@ object AppColor {
     val GreenMalachite = Color(0xFF00c853)
     val White = Color(0xFFFFFFFF)
     val ScreaminGreen = Color(0xFF74FF7E)
+    val ElectricGreen = Color(0xFF00FF00)
+    val Red = Color(0xFFFF0000)
 }
 
