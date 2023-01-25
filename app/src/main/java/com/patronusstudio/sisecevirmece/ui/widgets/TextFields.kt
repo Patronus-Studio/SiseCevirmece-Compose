@@ -57,8 +57,11 @@ fun CustomTextField(
             }
         },
         modifier = Modifier.width(widthSize),
-        colors = textFieldColors, visualTransformation = visualTransformation,
-        maxLines = maxLine, isError = isError,
+        colors = textFieldColors,
+        visualTransformation = visualTransformation,
+        isError = isError,
+        maxLines = maxLine,
+        singleLine = maxLine == 1
     )
 }
 
