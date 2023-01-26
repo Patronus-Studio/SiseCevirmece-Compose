@@ -56,6 +56,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             viewModel.getAvatars()
             viewModel.getAllLevel()
             viewModel.truthDareControl(mContext)
+            viewModel.bottleControl()
         }
     }
     LaunchedEffect(
