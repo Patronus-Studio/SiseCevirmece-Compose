@@ -171,8 +171,12 @@ class HomeViewModel @Inject constructor(
     }
 
     suspend fun bottleControl() {
+        _isLoading.value = true
         val bottleSize = bottleLocalRepository.getBottles()
-        if (bottleSize.isEmpty().not()) return
+        if (bottleSize.isEmpty().not()) {
+            _isLoading.value = false
+            return
+        }
         else {
             val bottles = mutableListOf<BottleDbModel>()
             SampleBottleEnum.values().forEach {
@@ -184,6 +188,7 @@ class HomeViewModel @Inject constructor(
                 bottles.add(tempModel)
             }
             bottleLocalRepository.insertBottles(bottles)
+            _isLoading.value = false
         }
     }
 }
