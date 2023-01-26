@@ -5,13 +5,20 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.patronusstudio.sisecevirmece.data.interfaces.BottleDao
+import com.patronusstudio.sisecevirmece.data.interfaces.BottleRoom
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 
-@Database(entities = [QuestionDbModel::class, PackageDbModel::class], version = 1)
+@Database(
+    entities = [QuestionDbModel::class, PackageDbModel::class, BottleDbModel::class],
+    version = 1
+)
 abstract class BottleRoomDb : RoomDatabase() {
 
     abstract fun getBottleDao(): BottleDao
+
+    abstract fun getBottleRoomDao(): BottleRoom
 
     companion object {
 

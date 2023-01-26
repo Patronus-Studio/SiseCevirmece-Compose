@@ -5,14 +5,17 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
+import com.patronusstudio.sisecevirmece.data.enums.SampleBottleEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.model.LevelModel
 import com.patronusstudio.sisecevirmece.data.model.UserInfoModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import com.patronusstudio.sisecevirmece.data.utils.toBitmapArray
@@ -29,6 +32,7 @@ class HomeViewModel @Inject constructor(
     private val localRepository: LocalRepository,
     private val packageLocalRepository: PackageLocalRepository,
     private val questionLocalRepository: QuestionLocalRepository,
+    private val bottleLocalRepository: BottleLocalRepository
 ) : ViewModel() {
 
     private val _loginError = MutableStateFlow("")
@@ -112,25 +116,25 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = true
         val truthPackage =
             packageLocalRepository.getPackageByName(
-                 TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
+                TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
             )
         if (truthPackage == null) {
             packageLocalRepository.addPackages(
-                 getDbModel(TruthDareDefaultPackageEnum.TRUTH)
+                getDbModel(TruthDareDefaultPackageEnum.TRUTH)
             )
             val questionList =
                 questionListToDbModel(TruthDareDefaultPackageEnum.TRUTH)
-            questionLocalRepository.addQuestions( questionList)
+            questionLocalRepository.addQuestions(questionList)
         }
         val darePackage =
-            packageLocalRepository.getPackageByName( context.getString(R.string.dare))
+            packageLocalRepository.getPackageByName(context.getString(R.string.dare))
         if (darePackage == null) {
             packageLocalRepository.addPackages(
-                 getDbModel(TruthDareDefaultPackageEnum.DARE)
+                getDbModel(TruthDareDefaultPackageEnum.DARE)
             )
             val questionList =
                 questionListToDbModel(TruthDareDefaultPackageEnum.DARE)
-            questionLocalRepository.addQuestions( questionList)
+            questionLocalRepository.addQuestions(questionList)
         }
         _isLoading.value = false
     }
@@ -140,7 +144,8 @@ class HomeViewModel @Inject constructor(
     ): PackageDbModel {
         return PackageDbModel(
             cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
-            packageImage = truthDareDefaultPackageEnum.getImageId().toBitmapArray(application.applicationContext),
+            packageImage = truthDareDefaultPackageEnum.getImageId()
+                .toBitmapArray(application.applicationContext),
             version = truthDareDefaultPackageEnum.getVersion(),
             packageName = truthDareDefaultPackageEnum.getPackageName(application.applicationContext),
             packageComment = truthDareDefaultPackageEnum.getPackageComment(application.applicationContext),
@@ -163,5 +168,22 @@ class HomeViewModel @Inject constructor(
             )
         }
         return questions
+    }
+
+    suspend fun bottleControl() {
+        val bottleSize = bottleLocalRepository.getBottles()
+        if (bottleSize.isEmpty().not()) return
+        else {
+            val bottles = mutableListOf<BottleDbModel>()
+            SampleBottleEnum.values().forEach {
+                val tempModel = BottleDbModel(
+                    packageImage = it.getImageId().toBitmapArray(application.applicationContext),
+                    bottleName = it.getBottleName(application.applicationContext),
+                    isActive = it == SampleBottleEnum.ORJINAL
+                )
+                bottles.add(tempModel)
+            }
+            bottleLocalRepository.insertBottles(bottles)
+        }
     }
 }
