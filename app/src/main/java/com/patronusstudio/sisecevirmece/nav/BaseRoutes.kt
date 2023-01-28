@@ -27,4 +27,5 @@ sealed class NavInAppScreens(override val routeName: String) : BaseRoutes() {
     object NormalGameScreen : NavInAppScreens("NormalGameScreen")
     object SpecialGameCategorySelectScreen : NavInAppScreens("SpecialGameCategorySelectScreen")
     object SpecialGameScreen : NavInAppScreens("SpecialGameScreen")
+    object ProfileScreen : NavInAppScreens("ProfileScreen")
 }

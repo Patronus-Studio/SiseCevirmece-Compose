@@ -214,7 +214,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             cardSizeHeight,
             imageSize
         ) {
-            Toast.makeText(context, "Profilim", Toast.LENGTH_SHORT).show()
+            route(InAppScreenNavEnums.PROFILE)
         }
     }
 }
