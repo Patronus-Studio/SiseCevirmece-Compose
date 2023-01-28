@@ -41,6 +41,9 @@
     <string name="whisky_bottle">Viski Şişesi</string>
     <string name="wine_bottle">Şarap Şişesi</string>
     <string name="orginal_bottle">Orjinal Şişe</string>
+    <string name="bottles">Şişeler</string>
+    <string name="backgrounds">Arka Planlar</string>
+    <string name="packages">Paketler</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>
