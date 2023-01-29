@@ -7,8 +7,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +26,8 @@ import javax.inject.Inject
 class SpecialGameScreenViewModel @Inject constructor(
     private val application: Application,
     private val packageLocalRepository: PackageLocalRepository,
-    private val questionLocalRepository: QuestionLocalRepository
+    private val questionLocalRepository: QuestionLocalRepository,
+    private val bottleLocalRepository: BottleLocalRepository
 ) : ViewModel() {
 
     val _isLoading = MutableStateFlow(false)
@@ -45,6 +48,9 @@ class SpecialGameScreenViewModel @Inject constructor(
 
     private val _randomQuestion = MutableStateFlow<QuestionDbModel?>(null)
     val randomQuestion: StateFlow<QuestionDbModel?> get() = _randomQuestion
+
+    private val _activeBottle = MutableStateFlow<BottleDbModel?>(null)
+    val activeBottle : StateFlow<BottleDbModel?> get() = _activeBottle
 
     suspend fun jsonToModel(jsonModel: String) {
         _packagesAndQuestions.value = hashMapOf()
@@ -71,6 +77,11 @@ class SpecialGameScreenViewModel @Inject constructor(
         _bottleTouchListener.value = bottleTouchListener
     }
 
+    suspend fun getBottleOnDb(){
+        _isLoading.value = true
+        _activeBottle.value = bottleLocalRepository.getActiveBottle()
+        _isLoading.value = false
+    }
 
     private suspend fun getQuestions(packageDbModel: PackageDbModel) {
         val questions =

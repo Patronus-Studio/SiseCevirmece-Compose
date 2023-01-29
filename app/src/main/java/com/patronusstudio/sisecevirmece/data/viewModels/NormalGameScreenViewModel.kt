@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class NormalGameScreenViewModel @Inject constructor(
     private val application: Application,
     private val packageLocalRepository: PackageLocalRepository,
-    private val questionLocalRepository: QuestionLocalRepository
+    private val questionLocalRepository: QuestionLocalRepository,
+    private val bottleLocalRepository: BottleLocalRepository
 ) : ViewModel() {
 
     val _isLoading = MutableStateFlow(false)
@@ -37,12 +40,21 @@ class NormalGameScreenViewModel @Inject constructor(
     private val _dareQuestions = MutableStateFlow(listOf<QuestionDbModel>())
     val dareQuestions: StateFlow<List<QuestionDbModel>> get() = _dareQuestions
 
+    private val _activeBottle = MutableStateFlow<BottleDbModel?>(null)
+    val activeBottle : StateFlow<BottleDbModel?> get() = _activeBottle
+
     fun setTruthDareSelected(truthDareEnum: TruthDareEnum) {
         _truthDareSelected.value = truthDareEnum
     }
 
     fun setBottleTouchListener(bottleTouchListener: BottleTouchListener) {
         _bottleTouchListener.value = bottleTouchListener
+    }
+
+    suspend fun getBottleOnDb(){
+        _isLoading.value = true
+        _activeBottle.value = bottleLocalRepository.getActiveBottle()
+        _isLoading.value = false
     }
 
     suspend fun getTruthDareQuestions() {

@@ -2,10 +2,7 @@ package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -18,15 +15,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
-import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
@@ -56,6 +52,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         }
     )
     LaunchedEffect(key1 = Unit, block = {
+        viewModel.getBottleOnDb()
         viewModel.setTruthDareSelected(TruthDareEnum.TRUTH)
         viewModel.getTruthDareQuestions()
         viewModel.setTruthDareSelected(TruthDareEnum.DARE)
@@ -69,8 +66,10 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         CardTitle(title = stringResource(id = R.string.play_normal_title), backClicked)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Image(
-                painter = painterResource(id = R.drawable.bottle_sample), contentDescription = "",
+            AsyncImage(
+                model = viewModel.activeBottle.collectAsState().value?.packageImage
+                    ?: R.drawable.bottle_sample,
+                contentDescription = "",
                 modifier = Modifier
                     .size(bottleSize)
                     .rotate(
