@@ -1,6 +1,9 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -12,11 +15,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
@@ -45,24 +50,11 @@ fun ProfileScreen(backClicked: () -> Unit) {
                 viewModel.getDatas(it)
             }
         }
-        // TODO: animated content eklenecek
-        if (viewModel.packages.collectAsState().value.isNotEmpty()) {
-            FlowRow(
-                maxItemsInEachRow = 2,
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                viewModel.packages.collectAsState().value.forEachIndexed { index, packageDbModel ->
-                    SampleCard(
-                        width = packageCardWidth,
-                        height = packageCardHeight,
-                        model = packageDbModel
-                    )
-                    if (index == viewModel.packages.collectAsState().value.size - 1) {
-                        SampleTempCard(packageCardWidth,packageCardHeight)
-                    }
-                }
-            }
+        AnimatedVisibility(
+            visible = viewModel.packages.collectAsState().value.isNotEmpty(),
+            enter = fadeIn() + slideInVertically(), exit = fadeOut()
+        ) {
+            Bottles(viewModel.packages.collectAsState().value,packageCardWidth, packageCardHeight)
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
@@ -101,4 +93,26 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
             }
         )
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Bottles(packages: List<PackageDbModel>, packageCardWidth: Dp, packageCardHeight: Dp) {
+    FlowRow(
+        maxItemsInEachRow = 2,
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        packages.forEachIndexed { index, packageDbModel ->
+            SampleCard(
+                width = packageCardWidth,
+                height = packageCardHeight,
+                model = packageDbModel
+            )
+            if (index == packages.size - 1) {
+                SampleTempCard(packageCardWidth, packageCardHeight)
+            }
+        }
+    }
+
 }

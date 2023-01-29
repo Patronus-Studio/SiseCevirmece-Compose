@@ -11,6 +11,7 @@ import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -78,6 +79,7 @@ class ProfileScreenViewModel @Inject constructor(
     suspend fun getDatas(profileCategoryModel: ProfileCategoryModel){
         _bottles.value = listOf()
         _packages.value = listOf()
+        delay(100)
         when(profileCategoryModel.id){
             0 -> getPackages()
             1-> getBottles()
