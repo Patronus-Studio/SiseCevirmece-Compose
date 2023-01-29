@@ -9,29 +9,23 @@ import javax.inject.Inject
 
 class BottleLocalRepository @Inject constructor(private val application: Application) {
 
-    private lateinit var tempPackages: List<BottleDbModel>
 
     suspend fun getBottles(): List<BottleDbModel> {
-        return if (this::tempPackages.isInitialized) tempPackages
-        else {
-            withContext(Dispatchers.IO) {
-                tempPackages =
-                    BottleRoomDb.getInstance(application.applicationContext).getBottleRoomDao()
-                        .getBottlesList()
-                tempPackages
-            }
+        return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(application.applicationContext).getBottleRoomDao()
+                .getBottlesList()
         }
     }
 
-    suspend fun insertBottles(bottless:List<BottleDbModel>){
-        withContext(Dispatchers.IO){
+    suspend fun insertBottles(bottless: List<BottleDbModel>) {
+        withContext(Dispatchers.IO) {
             BottleRoomDb.getInstance(application.applicationContext).getBottleRoomDao()
                 .insertBottles(bottless)
         }
     }
 
-    suspend fun insertBottle(bottle:BottleDbModel):Long{
-        return withContext(Dispatchers.IO){
+    suspend fun insertBottle(bottle: BottleDbModel): Long {
+        return withContext(Dispatchers.IO) {
             BottleRoomDb.getInstance(application.applicationContext).getBottleRoomDao()
                 .insertBottle(bottle)
         }
