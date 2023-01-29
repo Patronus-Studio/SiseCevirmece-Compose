@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece.R
@@ -20,13 +21,18 @@ import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece.ui.widgets.SampleCard
+import com.patronusstudio.sisecevirmece.ui.widgets.SampleTempCard
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileScreen(backClicked: () -> Unit) {
 
     val viewModel = hiltViewModel<ProfileScreenViewModel>()
     val coroutineScope = rememberCoroutineScope()
+    val packageCardWidth = (LocalConfiguration.current.screenWidthDp * 0.4).dp
+    val packageCardHeight = (LocalConfiguration.current.screenHeightDp * 0.25).dp
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getPackages()
     })
@@ -39,9 +45,23 @@ fun ProfileScreen(backClicked: () -> Unit) {
                 viewModel.getDatas(it)
             }
         }
-        if(viewModel.packages.collectAsState().value.isNotEmpty()){
-            viewModel.packages.collectAsState().value.forEach {
-                Text(text = it.packageName)
+        // TODO: animated content eklenecek
+        if (viewModel.packages.collectAsState().value.isNotEmpty()) {
+            FlowRow(
+                maxItemsInEachRow = 2,
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                viewModel.packages.collectAsState().value.forEachIndexed { index, packageDbModel ->
+                    SampleCard(
+                        width = packageCardWidth,
+                        height = packageCardHeight,
+                        model = packageDbModel
+                    )
+                    if (index == viewModel.packages.collectAsState().value.size - 1) {
+                        SampleTempCard(packageCardWidth,packageCardHeight)
+                    }
+                }
             }
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {

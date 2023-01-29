@@ -1,10 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +31,7 @@ import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
 @Composable
@@ -261,4 +259,58 @@ fun BaseBackground(
         content()
     }
 }
+
+@Composable
+fun SampleCard(
+    width: Dp,
+    height: Dp,
+    model: PackageDbModel,
+    clicked: (() -> Unit)? = null
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(width)
+                .height(height)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AppColor.WhiteSoft, RoundedCornerShape(8.dp))
+                .clickable {
+                    if (clicked != null) clicked()
+                }
+        ) {
+            Column(
+                Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AsyncImage(
+                    model = model.packageImage,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width((width.value * 0.7).dp)
+                        .height((height.value * 0.7).dp)
+                        .border(1.dp, AppColor.SoftBlack, shape = RoundedCornerShape(8.dp))
+                )
+                // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
+                Text(text = model.packageName)
+            }
+        }
+    }
+}
+
+@Composable
+fun SampleTempCard(
+    width: Dp,
+    height: Dp
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(width)
+                .height(height)
+                .background(Color.Transparent)
+        )
+    }
+}
+
 
