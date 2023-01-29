@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.viewModels.SpecialGameScreenViewModel
@@ -50,13 +51,16 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
         }
     )
     LaunchedEffect(key1 = Unit, block = {
+        viewModel.getBottleOnDb()
         viewModel.jsonToModel(selectedPackages)
     })
 
     BaseBackground(titleId = R.string.play_special_title, backClicked = backClicked) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Image(
-                painter = painterResource(id = R.drawable.bottle_sample), contentDescription = "",
+            AsyncImage(
+                model = viewModel.activeBottle.collectAsState().value?.packageImage
+                    ?: R.drawable.bottle_sample,
+                contentDescription = "",
                 modifier = Modifier
                     .size(bottleSize)
                     .rotate(
