@@ -60,7 +60,9 @@ fun ProfileScreen(backClicked: () -> Unit) {
         }
         AnimatedVisibility(
             visible = viewModel.packages.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically(), exit = fadeOut()
+            enter = fadeIn() + slideInVertically {
+                it / 2
+            }, exit = fadeOut()
         ) {
             Packages(
                 viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
@@ -68,7 +70,9 @@ fun ProfileScreen(backClicked: () -> Unit) {
         }
         AnimatedVisibility(
             visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically(), exit = fadeOut()
+            enter = fadeIn() + slideInVertically{
+                it / 2
+            }, exit = fadeOut()
         ) {
             val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
             Bottles(
