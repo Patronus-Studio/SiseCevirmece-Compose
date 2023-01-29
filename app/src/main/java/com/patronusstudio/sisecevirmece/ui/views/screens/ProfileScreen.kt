@@ -74,7 +74,10 @@ fun ProfileScreen(backClicked: () -> Unit) {
             Bottles(
                 viewModel.bottles.collectAsState().value, bottleCardSize
             ) {
-                viewModel.setBottleActiveStatu(it.primaryId)
+                coroutineScope.launch {
+                    viewModel.setBottleActiveStatuOnDb(it.primaryId)
+                    viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                }
             }
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {

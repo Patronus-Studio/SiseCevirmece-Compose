@@ -31,4 +31,10 @@ class BottleLocalRepository @Inject constructor(private val application: Applica
         }
     }
 
+    suspend fun updateActiveStatu(primaryId:Int,isActive:Boolean){
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(application.applicationContext).getBottleRoomDao()
+                .updateBottleStatu(primaryId,isActive)
+        }
+    }
 }

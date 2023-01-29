@@ -82,7 +82,7 @@ class ProfileScreenViewModel @Inject constructor(
     suspend fun getDatas(profileCategoryModel: ProfileCategoryModel) {
         _bottles.value = listOf()
         _packages.value = listOf()
-        delay(100)
+        delay (100)
         when (profileCategoryModel.id) {
             0 -> getPackages()
             1 -> getBottles()
@@ -102,7 +102,7 @@ class ProfileScreenViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    fun setBottleActiveStatu(clickedItemId: Int) {
+    fun setBottleActiveStatuOnLocal(clickedItemId: Int) {
         _isLoading.value = true
         val findedActiveBtnIndex = _bottles.value.indexOfFirst {
             it.isActive
@@ -119,6 +119,19 @@ class ProfileScreenViewModel @Inject constructor(
             else tempList.add(it.copy())
         }
         _bottles.value = tempList
+        _isLoading.value = false
+    }
+
+    suspend fun setBottleActiveStatuOnDb(clickedItemId: Int){
+        _isLoading.value = true
+        val findedActiveModel = _bottles.value.first {
+            it.isActive
+        }
+        val findedClickedModel = _bottles.value.first {
+            clickedItemId == it.primaryId
+        }
+        bottleLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
+        bottleLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
         _isLoading.value = false
     }
 
