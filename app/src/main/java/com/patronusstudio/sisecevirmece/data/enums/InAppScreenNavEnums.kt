@@ -4,5 +4,6 @@ enum class InAppScreenNavEnums {
     PLAY_GAME,
     LOGOUT,
     STORES,
-    ADD_CATEGORIES
+    ADD_CATEGORIES,
+    PROFILE
 }

@@ -56,6 +56,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             viewModel.getAvatars()
             viewModel.getAllLevel()
             viewModel.truthDareControl(mContext)
+            viewModel.bottleControl()
         }
     }
     LaunchedEffect(
@@ -213,7 +214,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             cardSizeHeight,
             imageSize
         ) {
-            Toast.makeText(context, "Profilim", Toast.LENGTH_SHORT).show()
+            route(InAppScreenNavEnums.PROFILE)
         }
     }
 }

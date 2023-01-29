@@ -8,6 +8,7 @@ import com.patronusstudio.sisecevirmece.data.DbTables
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 
+// TODO: burası background,package,question olarak ayrılacak
 @Dao
 interface BottleDao {
 

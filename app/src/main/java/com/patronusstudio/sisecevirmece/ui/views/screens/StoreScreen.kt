@@ -29,6 +29,7 @@ import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
+import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
 import com.patronusstudio.sisecevirmece.data.viewModels.PackageViewModel
@@ -135,9 +136,17 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
                 items = list
             ) { item: PackageCategoryModel ->
                 Spacer(modifier = Modifier.width(16.dp))
-                PackageSelectButton(item) {
+                PackageSelectButton(item, content = {
+                    val textColor = Color(
+                        android.graphics.Color.parseColor(
+                            if (item.isSelected == SelectableEnum.YES) item.activeTextColor
+                            else item.passiveTextColor
+                        )
+                    )
+                    Text(text = item.name, color = textColor)
+                }, clicked = {
                     clicked((item.id).toInt())
-                }
+                })
             }
             item {
                 Spacer(modifier = Modifier.width(16.dp))
@@ -147,7 +156,7 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
 }
 
 @Composable
-private fun PackageSelectButton(item: PackageCategoryModel, clicked: () -> Unit) {
+fun PackageSelectButton(item: BaseCategoryModel, content:(@Composable ()->Unit)? = null, clicked: () -> Unit) {
     val backgroundColor = Color(
         android.graphics.Color.parseColor(
             if (item.isSelected == SelectableEnum.YES) item.activeBtnColor
@@ -160,12 +169,6 @@ private fun PackageSelectButton(item: PackageCategoryModel, clicked: () -> Unit)
             else item.activeBtnColor
         )
     )
-    val textColor = Color(
-        android.graphics.Color.parseColor(
-            if (item.isSelected == SelectableEnum.YES) item.activeTextColor
-            else item.passiveTextColor
-        )
-    )
     Box(
         modifier = Modifier
             .wrapContentSize()
@@ -176,7 +179,7 @@ private fun PackageSelectButton(item: PackageCategoryModel, clicked: () -> Unit)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = item.name, color = textColor)
+        if(content != null) content()
     }
 }
 

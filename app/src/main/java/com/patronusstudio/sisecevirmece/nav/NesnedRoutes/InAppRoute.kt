@@ -62,6 +62,9 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                     InAppScreenNavEnums.ADD_CATEGORIES -> {
                         navController.navigate(NavInAppScreens.AddCategoriesScreen.routeName)
                     }
+                    InAppScreenNavEnums.PROFILE -> {
+                        navController.navigate(NavInAppScreens.ProfileScreen.routeName)
+                    }
                 }
             }
         }
@@ -102,6 +105,11 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                 navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedPackages")
             navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedPackages")
             SpecialGameScreen(list ?: "") {
+                navController.popBackStack()
+            }
+        }
+        composable(route = NavInAppScreens.ProfileScreen.routeName) {
+            ProfileScreen {
                 navController.popBackStack()
             }
         }

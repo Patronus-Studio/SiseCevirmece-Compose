@@ -34,6 +34,16 @@
     <string name="register">Kayıt Ol</string>
     <string name="entried_email_is_not_correct">Girilen email adresi hatalı</string>
     <string name="email_address">Email adresi</string>
+    <string name="beer_bottle">Bira Şişesi</string>
+    <string name="champagne_bottle">Şampanya Şişesi</string>
+    <string name="cola_bottle">Kola Şişesi</string>
+    <string name="tea_kettle">Çaydanlık</string>
+    <string name="whisky_bottle">Viski Şişesi</string>
+    <string name="wine_bottle">Şarap Şişesi</string>
+    <string name="orginal_bottle">Orjinal Şişe</string>
+    <string name="bottles">Şişeler</string>
+    <string name="backgrounds">Arka Planlar</string>
+    <string name="packages">Paketler</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>

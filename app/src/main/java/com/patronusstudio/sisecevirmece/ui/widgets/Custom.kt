@@ -71,7 +71,6 @@ fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: S
             ) {
                 Box(
                     modifier = Modifier
-                        // TODO: 10.dp silinecek
                         .width(currentLeverBarSize)
                         .height(barHeight)
                         .clip(RoundedCornerShape(16.dp))
