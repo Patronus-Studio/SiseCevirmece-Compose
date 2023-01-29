@@ -60,7 +60,10 @@ class ProfileScreenViewModel @Inject constructor(
         val findedActiveBtnIndex = _titles.value.indexOfFirst {
             it.isSelected == SelectableEnum.YES
         }
-        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) return
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
         val tempList = mutableListOf<ProfileCategoryModel>()
         _titles.value.forEach {
             it as ProfileCategoryModel
@@ -76,13 +79,13 @@ class ProfileScreenViewModel @Inject constructor(
         _currentTitle.value = profileCategoryModel
     }
 
-    suspend fun getDatas(profileCategoryModel: ProfileCategoryModel){
+    suspend fun getDatas(profileCategoryModel: ProfileCategoryModel) {
         _bottles.value = listOf()
         _packages.value = listOf()
         delay(100)
-        when(profileCategoryModel.id){
+        when (profileCategoryModel.id) {
             0 -> getPackages()
-            1-> getBottles()
+            1 -> getBottles()
             // TODO: getbackgrounds eklenecek
         }
     }
@@ -96,6 +99,26 @@ class ProfileScreenViewModel @Inject constructor(
     suspend fun getBottles() {
         _isLoading.value = true
         _bottles.value = bottleLocalRepository.getBottles()
+        _isLoading.value = false
+    }
+
+    fun setBottleActiveStatu(clickedItemId: Int) {
+        _isLoading.value = true
+        val findedActiveBtnIndex = _bottles.value.indexOfFirst {
+            it.isActive
+        }
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
+        val findedActiveModel = _bottles.value[findedActiveBtnIndex]
+        val tempList = mutableListOf<BottleDbModel>()
+        _bottles.value.forEach {
+            if (findedActiveModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+            else if (clickedItemId == it.primaryId) tempList.add(it.copy(isActive = true))
+            else tempList.add(it.copy())
+        }
+        _bottles.value = tempList
         _isLoading.value = false
     }
 

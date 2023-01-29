@@ -74,7 +74,7 @@ fun ProfileScreen(backClicked: () -> Unit) {
             Bottles(
                 viewModel.bottles.collectAsState().value, bottleCardSize
             ) {
-
+                viewModel.setBottleActiveStatu(it.primaryId)
             }
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
@@ -157,11 +157,10 @@ private fun Bottles(
         packages.forEach {
             BottleCard(cardSize, it, clicked)
         }
-        if(packages.size % 3 == 1){
+        if (packages.size % 3 == 1) {
             SampleBottleCard(cardSize)
             SampleBottleCard(cardSize)
-        }
-        else if(packages.size % 3 == 2){
+        } else if (packages.size % 3 == 2) {
             SampleBottleCard(cardSize)
         }
     }
@@ -170,7 +169,7 @@ private fun Bottles(
 @Composable
 private fun BottleCard(cardSize: Dp, model: BottleDbModel, clicked: (BottleDbModel) -> Unit) {
     val shape = RoundedCornerShape(4.dp)
-    val backgroundColor = if(model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
+    val backgroundColor = if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
     Box(modifier = Modifier.padding(top = 16.dp)) {
         Box(
             modifier = Modifier
@@ -178,7 +177,7 @@ private fun BottleCard(cardSize: Dp, model: BottleDbModel, clicked: (BottleDbMod
                 .clip(shape)
                 .background(backgroundColor, shape)
                 .clickable {
-                    clicked(model)
+                    if (model.isActive.not()) clicked(model)
                 }, contentAlignment = Alignment.Center
         ) {
             AsyncImage(
