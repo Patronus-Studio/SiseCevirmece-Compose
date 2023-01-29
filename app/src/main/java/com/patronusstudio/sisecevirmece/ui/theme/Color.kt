@@ -19,13 +19,16 @@ object AppColor {
     val BlueVioletStatus = Color(0xFF5B5DB2)
     val DavysGrey = Color(0xFF59595D)
     val GreyTranspancy20 = Color(0xCD6A6A6D)
+    val LightTranspancy = Color(0xCDC6C6C6)
     val UnitedNationsBlue = Color(0xFF648BD9)
     val Beaver = Color(0xFFA18276)
     val Green = Color(0xFFa7c957)
     val GreenMalachite = Color(0xFF00c853)
     val White = Color(0xFFFFFFFF)
+    val WhiteSoft = Color(0x8FFFFFFF)
     val ScreaminGreen = Color(0xFF74FF7E)
     val ElectricGreen = Color(0xFF00FF00)
     val Red = Color(0xFFFF0000)
+    val SoftBlack = Color(0xFF7D7D7D)
 }
 

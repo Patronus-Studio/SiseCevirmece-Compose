@@ -5,9 +5,13 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.ProfileTitlesEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
+import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -15,14 +19,24 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val application: Application,
-    private val localRepository: BottleLocalRepository
+    private val packageLocalRepository: PackageLocalRepository,
+    private val bottleLocalRepository: BottleLocalRepository
 ) : ViewModel() {
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _titles = MutableStateFlow<List<BaseCategoryModel>>(listOf())
     val titles: StateFlow<List<BaseCategoryModel>> get() = _titles
 
     private val _currentTitle = MutableStateFlow<ProfileCategoryModel?>(null)
     val currentTitle: StateFlow<ProfileCategoryModel?> get() = _currentTitle
+
+    private val _packages = MutableStateFlow<List<PackageDbModel>>(listOf())
+    val packages: StateFlow<List<PackageDbModel>> get() = _packages
+
+    private val _bottles = MutableStateFlow<List<BottleDbModel>>(listOf())
+    val bottles: StateFlow<List<BottleDbModel>> get() = _bottles
 
     init {
         val list = List(3) {
@@ -42,10 +56,14 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun clickedBtn(clickedItemId: Int) {
+        _isLoading.value = true
         val findedActiveBtnIndex = _titles.value.indexOfFirst {
             it.isSelected == SelectableEnum.YES
         }
-        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) return
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
         val tempList = mutableListOf<ProfileCategoryModel>()
         _titles.value.forEach {
             it as ProfileCategoryModel
@@ -54,10 +72,67 @@ class ProfileScreenViewModel @Inject constructor(
             else tempList.add(it.copy())
         }
         _titles.value = tempList
+        _isLoading.value = false
     }
 
-    fun setTitle(profileCategoryModel: ProfileCategoryModel){
+    fun setTitle(profileCategoryModel: ProfileCategoryModel) {
         _currentTitle.value = profileCategoryModel
+    }
+
+    suspend fun getDatas(profileCategoryModel: ProfileCategoryModel) {
+        _bottles.value = listOf()
+        _packages.value = listOf()
+        delay (100)
+        when (profileCategoryModel.id) {
+            0 -> getPackages()
+            1 -> getBottles()
+            // TODO: getbackgrounds eklenecek
+        }
+    }
+
+    suspend fun getPackages() {
+        _isLoading.value = true
+        _packages.value = packageLocalRepository.getPackages()
+        _isLoading.value = false
+    }
+
+    suspend fun getBottles() {
+        _isLoading.value = true
+        _bottles.value = bottleLocalRepository.getBottles()
+        _isLoading.value = false
+    }
+
+    fun setBottleActiveStatuOnLocal(clickedItemId: Int) {
+        _isLoading.value = true
+        val findedActiveBtnIndex = _bottles.value.indexOfFirst {
+            it.isActive
+        }
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
+        val findedActiveModel = _bottles.value[findedActiveBtnIndex]
+        val tempList = mutableListOf<BottleDbModel>()
+        _bottles.value.forEach {
+            if (findedActiveModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+            else if (clickedItemId == it.primaryId) tempList.add(it.copy(isActive = true))
+            else tempList.add(it.copy())
+        }
+        _bottles.value = tempList
+        _isLoading.value = false
+    }
+
+    suspend fun setBottleActiveStatuOnDb(clickedItemId: Int){
+        _isLoading.value = true
+        val findedActiveModel = _bottles.value.first {
+            it.isActive
+        }
+        val findedClickedModel = _bottles.value.first {
+            clickedItemId == it.primaryId
+        }
+        bottleLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
+        bottleLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
+        _isLoading.value = false
     }
 
 }
