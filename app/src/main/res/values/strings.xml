@@ -44,6 +44,10 @@
     <string name="bottles">Şişeler</string>
     <string name="backgrounds">Arka Planlar</string>
     <string name="packages">Paketler</string>
+    <string name="original_background">Orjinal Arka Plan</string>
+    <string name="wood_light_background">Light Arka Plan</string>
+    <string name="wood_normal_background">Normal Arka Plan</string>
+    <string name="wood_texture_background">Yapı Arka Plan</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>

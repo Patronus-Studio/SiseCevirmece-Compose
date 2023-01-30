@@ -53,10 +53,6 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         this.launch(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)
-            viewModel.getAvatars()
-            viewModel.getAllLevel()
-            viewModel.truthDareControl(mContext)
-            viewModel.bottleControl()
         }
     }
     LaunchedEffect(
@@ -64,7 +60,16 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     ) {
         if (viewModel.loginError.value.isNotEmpty()) {
             if (sheetState.isVisible.not()) sheetState.show()
-        } else sheetState.hide()
+        } else {
+            sheetState.hide()
+            viewModel.getAvatars()
+            viewModel.getAllLevel()
+            withContext(Dispatchers.Main){
+                viewModel.truthDareControl()
+                viewModel.bottleControl()
+                viewModel.backgroundControl()
+            }
+        }
     }
     ModalBottomSheetLayout(
         sheetState = sheetState,
