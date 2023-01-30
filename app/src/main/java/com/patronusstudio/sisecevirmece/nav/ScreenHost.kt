@@ -19,8 +19,7 @@ fun ScreenHost(navController: NavHostController) {
     ) {
         composable(route = NavSplashScreen.SplashScreens.routeName) {
             SplashScreen {
-                if (it) navController.navigate(NavInAppScreens.RootNesned.routeName)
-                else navController.navigate(NavAppLandingScreens.RootNesned.routeName)
+                navController.navigate(NavInAppScreens.RootNesned.routeName)
             }
         }
         //this.passToAppLandingRoute(navController)

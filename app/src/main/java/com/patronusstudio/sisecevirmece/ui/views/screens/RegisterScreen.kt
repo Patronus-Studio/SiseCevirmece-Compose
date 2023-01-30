@@ -123,6 +123,7 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
                     LoadingAnimation()
                 }
             }
+            PatronusStudio()
         }
     )
 }
@@ -226,7 +227,7 @@ fun GenderPicker(selectedGender: GenderEnum, clicked: (GenderEnum) -> Unit) {
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.profile),
+                painter = painterResource(id = R.drawable.player_man),
                 contentDescription = "Player Man"
             )
         }
@@ -240,7 +241,7 @@ fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
             .width(widthSize)
             .clickable {
                 clicked()
-            }) {
+            }, shape = RoundedCornerShape(16.dp)) {
             Text(
                 text = stringResource(R.string.register), style = TextStyle(
                     fontSize = 24.sp,

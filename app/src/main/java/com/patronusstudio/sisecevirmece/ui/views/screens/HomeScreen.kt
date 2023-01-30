@@ -127,6 +127,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                         else -> ""
                     }
                 }
+                PatronusStudio()
                 AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                     LoadingAnimation()
                 }

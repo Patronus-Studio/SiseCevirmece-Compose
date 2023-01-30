@@ -157,14 +157,22 @@ class ProfileScreenViewModel @Inject constructor(
     fun setBackgroundActiveStatuOnLocal(model: BackgroundDbModel) {
         if (model.isActive) return
         _isLoading.value = true
-        val findedClickedModel = _backgrounds.value.first {
-            it.isActive
-        }
         val tempList = mutableListOf<BackgroundDbModel>()
-        _backgrounds.value.forEach {
-            if (model.primaryId == it.primaryId) tempList.add(it.copy(isActive = true))
-            else if (findedClickedModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
-            else tempList.add(it.copy(isActive = false))
+        try {
+            val findedClickedModel = _backgrounds.value.first {
+                it.isActive
+            }
+            _backgrounds.value.forEach {
+                if (model.primaryId == it.primaryId) tempList.add(it.copy(isActive = true))
+                else if (findedClickedModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+                else tempList.add(it.copy(isActive = false))
+            }
+        }
+        catch (e:Exception){
+            _backgrounds.value.forEach {
+                if (model.primaryId == it.primaryId) tempList.add(it.copy(isActive = true))
+                else tempList.add(it.copy(isActive = false))
+            }
         }
         _backgrounds.value = listOf()
         _backgrounds.value = tempList
@@ -173,20 +181,31 @@ class ProfileScreenViewModel @Inject constructor(
 
     fun setBackgroundActiveStatuOnDb(model: BackgroundDbModel) {
         if (model.isActive) return
-
-        val findedClickedModel = _backgrounds.value.first {
-            it.isActive
+        try {
+            val findedClickedModel = _backgrounds.value.first {
+                it.isActive
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                _isLoading.value = true
+                withContext(Dispatchers.IO) {
+                    backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId, false)
+                }
+                withContext(Dispatchers.IO) {
+                    backgroundLocalRepository.updateActiveStatu(model.primaryId, true)
+                }
+                delay(200)
+                _isLoading.value = false
+            }
         }
-        CoroutineScope(Dispatchers.Main).launch {
-            _isLoading.value = true
-            withContext(Dispatchers.IO) {
-                backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId, false)
+        catch (e:Exception){
+            CoroutineScope(Dispatchers.Main).launch {
+                _isLoading.value = true
+                withContext(Dispatchers.IO) {
+                    backgroundLocalRepository.updateActiveStatu(model.primaryId, true)
+                }
+                delay(200)
+                _isLoading.value = false
             }
-            withContext(Dispatchers.IO) {
-                backgroundLocalRepository.updateActiveStatu(model.primaryId, true)
-            }
-            delay(200)
-            _isLoading.value = false
         }
     }
 }

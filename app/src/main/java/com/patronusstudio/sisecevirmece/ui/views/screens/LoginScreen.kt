@@ -26,6 +26,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.LoginScreenNavEnums
@@ -47,13 +51,14 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val sheet = remember {
         mutableStateOf(false)
     }
+    val lottiAnim by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.register_animation))
     val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
     val widthRatio10 = (widthSize * 0.1).dp
 
-    val heightRatio40 = (heightSize * 0.40).dp
+    val heightRatio40 = (heightSize * 0.35).dp
     val heightRatio04 = (heightSize * 0.04).dp
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
@@ -99,10 +104,17 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColor.BlueViolet),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Center
         ) {
-            TopImage(widthRatio80, heightRatio40)
-            Spacer(modifier = Modifier.height(heightRatio10))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                LottieAnimation(
+                    composition = lottiAnim,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .width(widthRatio80)
+                        .height(heightRatio40),
+                )
+            }
             UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
                 viewModel.setUsername(username)
             }
@@ -121,7 +133,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                         viewModel.setTrailIconClicked(true)
                     }
                 })
-            Spacer(modifier = Modifier.height(heightRatio04))
+            Spacer(modifier = Modifier.height(heightRatio10))
             LoginButton(widthRatio80) {
                 if (hasInternet(context) == true) {
                     viewModel.loginWithEmailPass()
@@ -134,13 +146,11 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 goToAnotherScreen(LoginScreenNavEnums.REGISTER)
             }
             Spacer(modifier = Modifier.height(heightRatio04))
-            GoogleSignIn()
-            Spacer(modifier = Modifier.height(heightRatio04))
             AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
                 LoadingAnimation()
             }
         }
-
+        PatronusStudio()
     }
 }
 
@@ -215,7 +225,7 @@ fun LoginButton(widthSize: Dp, clicked: () -> Unit) {
             .width(widthSize)
             .clickable {
                 clicked()
-            }) {
+            }, shape = RoundedCornerShape(16.dp)) {
             Text(
                 text = "Giriş Yap", style = TextStyle(
                     fontSize = 24.sp,
@@ -243,41 +253,14 @@ fun SignInText(widthSize: Dp, spaceSize: Dp, clicked: () -> Unit) {
 }
 
 @Composable
-fun GoogleSignIn() {
+fun PatronusStudio() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val buttonSize = (screenWidth * 0.08).dp
-    val lineSize = (screenWidth * 0.31).dp
-    val spaceSize = (screenWidth * 0.05).dp
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Row(modifier = Modifier.width((screenWidth * 0.8).dp)) {
-            Box(
-                modifier = Modifier
-                    .height(2.dp)
-                    .width(lineSize)
-                    .background(Color.LightGray)
-                    .align(Alignment.CenterVertically)
-            )
-            Spacer(modifier = Modifier.width(spaceSize))
-            Box(
-                modifier = Modifier
-                    .size(buttonSize)
-                    .clip(RoundedCornerShape(100)), contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.googleicon),
-                    contentDescription = "Google girişi",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(buttonSize)
-                )
-            }
-            Spacer(modifier = Modifier.width(spaceSize))
-            Box(
-                modifier = Modifier
-                    .height(2.dp)
-                    .width(lineSize)
-                    .background(Color.LightGray)
-                    .align(Alignment.CenterVertically)
-            )
-        }
+    val buttonSize = (screenWidth * 0.4).dp
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        Image(
+            painter = painterResource(id = R.drawable.patronus_studio),
+            contentDescription = "Google girişi",
+            modifier = Modifier.size(buttonSize)
+        )
     }
 }
