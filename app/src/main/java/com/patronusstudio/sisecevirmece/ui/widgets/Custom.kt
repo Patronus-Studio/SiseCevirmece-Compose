@@ -137,12 +137,12 @@ fun UserPic(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val imageSize = (screenWidth * ratio).dp
-    val bitmapImage = ImageBitmap.imageResource(id = R.drawable.lock)
+    //val bitmapImage = ImageBitmap.imageResource(id = R.drawable.lock)
     val isLoading = remember { mutableStateOf(true) }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             if (isLoading.value) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
@@ -151,9 +151,10 @@ fun UserPic(
                     .size(imageSize)
                     .clip(CircleShape)
                     .clickable {
-                        if (avatar.buyedStatu == AvatarStatu.BUYED) {
-                            clickedImage!!(avatar)
-                        }
+                        //if (avatar.buyedStatu == AvatarStatu.BUYED) {
+                        // clickedImage!!(avatar)
+                        //}
+                        clickedImage!!(avatar)
                     }
             ) {
                 AsyncImage(
@@ -171,45 +172,45 @@ fun UserPic(
                         isLoading.value = false
                     }
                 )
-                if (avatar.buyedStatu == AvatarStatu.NON_BUYED) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(AppColor.GreyTranspancy20)
-                    )
-                    Canvas(modifier = Modifier
-                        .fillMaxSize(), onDraw = {
-                        val rect = Rect(Offset.Zero, size)
-                        val yellowSize = Size(rect.width + 70f, rect.width - 70f)
-                        drawLine(
-                            Color.White,
-                            start = yellowSize.center,
-                            end = rect.topRight,
-                            strokeWidth = 20f, cap = StrokeCap.Square
-                        )
-                        val blueSize = Size(rect.width - 70f, rect.width + 70f)
-                        drawLine(
-                            Color.White,
-                            start = blueSize.center,
-                            end = rect.bottomLeft,
-                            strokeWidth = 20f, cap = StrokeCap.Square
-                        )
-                        drawOval(
-                            color = Color.White,
-                            topLeft = Offset(rect.center.x - 40f, rect.center.y - 40f),
-                            size = Size(80f, 80f),
-                            style = Stroke(width = 5f)
-                        )
-                        drawImage(
-                            bitmapImage,
-                            dstOffset = IntOffset(
-                                rect.center.x.toInt() - 25,
-                                rect.center.y.toInt() - 25
-                            ),
-                            dstSize = IntSize(50, 50),
-                        )
-                    })
-                }
+//                if (avatar.buyedStatu == AvatarStatu.NON_BUYED) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .background(AppColor.GreyTranspancy20)
+//                    )
+//                    Canvas(modifier = Modifier
+//                        .fillMaxSize(), onDraw = {
+//                        val rect = Rect(Offset.Zero, size)
+//                        val yellowSize = Size(rect.width + 70f, rect.width - 70f)
+//                        drawLine(
+//                            Color.White,
+//                            start = yellowSize.center,
+//                            end = rect.topRight,
+//                            strokeWidth = 20f, cap = StrokeCap.Square
+//                        )
+//                        val blueSize = Size(rect.width - 70f, rect.width + 70f)
+//                        drawLine(
+//                            Color.White,
+//                            start = blueSize.center,
+//                            end = rect.bottomLeft,
+//                            strokeWidth = 20f, cap = StrokeCap.Square
+//                        )
+//                        drawOval(
+//                            color = Color.White,
+//                            topLeft = Offset(rect.center.x - 40f, rect.center.y - 40f),
+//                            size = Size(80f, 80f),
+//                            style = Stroke(width = 5f)
+//                        )
+//                        drawImage(
+//                            bitmapImage,
+//                            dstOffset = IntOffset(
+//                                rect.center.x.toInt() - 25,
+//                                rect.center.y.toInt() - 25
+//                            ),
+//                            dstSize = IntSize(50, 50),
+//                        )
+//                    })
+//                }
             }
         }
     }

@@ -23,7 +23,7 @@ fun ScreenHost(navController: NavHostController) {
                 else navController.navigate(NavAppLandingScreens.RootNesned.routeName)
             }
         }
-        this.passToAppLandingRoute(navController)
+        //this.passToAppLandingRoute(navController)
         this.passToInAppRoute(navController)
     }
 }

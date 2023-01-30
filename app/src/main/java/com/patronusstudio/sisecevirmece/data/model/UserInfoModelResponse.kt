@@ -12,7 +12,7 @@ data class UserInfoModel(
     val achievement: Any,
     val bottleFlipCount: Int,
     val buyedAvatars: String,
-    val currentAvatar: String,
+    var currentAvatar: String,
     val level: Int,
     val myBottles: Any,
     val myPackages: Any,

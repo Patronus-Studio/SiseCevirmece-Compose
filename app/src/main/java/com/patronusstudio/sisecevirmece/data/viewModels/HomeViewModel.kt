@@ -82,6 +82,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentAvatar(avatarId:Int){
+        _userGameInfoModel.value!!.currentAvatar = avatarId.toString()
+    }
+
     suspend fun getAvatars() {
         _isLoading.value = true
         val avatarsResponse = networkRepository.getAvatars(_userGameInfoModel.value?.username ?: "")
@@ -228,5 +232,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    suspend fun updateAvatar(avatarId:Int){
+        _isLoading.value = true
+        networkRepository.updateAvatar(_userGameInfoModel.value?.username ?: "",avatarId)
+        _isLoading.value = false
+    }
 
 }

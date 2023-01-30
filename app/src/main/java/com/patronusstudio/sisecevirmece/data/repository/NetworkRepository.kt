@@ -51,4 +51,9 @@ class NetworkRepository @Inject constructor() {
         }
     }
 
+    suspend fun updateAvatar(username: String,avatarId:Int){
+        withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().updateCurrentAvatar(username,avatarId)
+        }
+    }
 }

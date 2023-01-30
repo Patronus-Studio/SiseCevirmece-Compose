@@ -33,5 +33,7 @@ interface BottleService {
     @GET("package/getPackageByCategoryName")
     suspend fun getPackageByCategoryName(@Query("packageCategory") packageCategory: Int):Response<PackageResponseModel>
 
+    @POST("userGameInfo/updateCurrentAvatar")
+    suspend fun updateCurrentAvatar(@Query("username") username: String,@Query("currentAvatar") currentAvatar: Int)
 
 }

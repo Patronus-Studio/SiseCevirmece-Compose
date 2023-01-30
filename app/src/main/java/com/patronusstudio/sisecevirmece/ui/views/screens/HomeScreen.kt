@@ -51,9 +51,16 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coroutine = rememberCoroutineScope()
     LaunchedEffect(key1 = Unit) {
-        this.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO){
             viewModel.getUserGameInfo(MainApplication.authToken)
         }
+        withContext(Dispatchers.IO){
+            viewModel.getAvatars()
+            viewModel.truthDareControl()
+            viewModel.bottleControl()
+            viewModel.backgroundControl()
+        }
+
     }
     LaunchedEffect(
         key1 = viewModel.loginError.collectAsState().value
@@ -62,13 +69,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             if (sheetState.isVisible.not()) sheetState.show()
         } else {
             sheetState.hide()
-            viewModel.getAvatars()
             //viewModel.getAllLevel()
-            withContext(Dispatchers.Main){
-                viewModel.truthDareControl()
-                viewModel.bottleControl()
-                viewModel.backgroundControl()
-            }
         }
     }
     ModalBottomSheetLayout(
@@ -97,7 +98,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 Title()
                 Space(0.05)
                 UserPicHousting(viewModel)
-                Space(0.02)
+                Space(0.05)
                 Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
                 /*LevelBar(
                     currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
@@ -159,14 +160,24 @@ fun Space(ratio: Double) {
 @Composable
 private fun UserPicHousting(viewModel: HomeViewModel) {
     val currentImage = remember { mutableStateOf(viewModel.getCurrentAvatar()) }
+    LaunchedEffect(key1 = viewModel.avatar.collectAsState().value, block ={
+        currentImage.value = viewModel.getCurrentAvatar()
+    } )
     val isClicked = remember { mutableStateOf(false) }
     if (isClicked.value) {
         OpenDialog(viewModel) {
             isClicked.value = false
-            if (it != null) currentImage.value = it
+            if (it != null) {
+                currentImage.value = it
+                viewModel.setCurrentAvatar(it.id)
+                CoroutineScope(Dispatchers.IO).launch{
+                    viewModel.updateAvatar(it.id)
+                }
+
+            }
         }
     }
-    UserPic(0.4, viewModel.getCurrentAvatar() ?: AvatarModel(0, "", 1, AvatarStatu.BUYED)) {
+    UserPic(0.6, currentImage.value ?: AvatarModel(0, "")) {
         isClicked.value = true
     }
 }
@@ -283,9 +294,10 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
                                         .padding(vertical = 8.dp)
                                 ) {
                                     UserPic(ratio = 0.25, avatar = itemValue) {
-                                        if (itemValue.buyedStatu == AvatarStatu.BUYED) {
-                                            dismiss(itemValue)
-                                        }
+                                        //if (itemValue.buyedStatu == AvatarStatu.BUYED) {
+                                        //    dismiss(itemValue)
+                                        //}
+                                        dismiss(itemValue)
                                     }
                                 }
                             })
