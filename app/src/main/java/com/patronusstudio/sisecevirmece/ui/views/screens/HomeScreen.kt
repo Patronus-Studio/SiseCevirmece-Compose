@@ -53,10 +53,6 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         this.launch(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)
-            viewModel.getAvatars()
-            viewModel.getAllLevel()
-            viewModel.truthDareControl(mContext)
-            viewModel.bottleControl()
         }
     }
     LaunchedEffect(
@@ -64,7 +60,16 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     ) {
         if (viewModel.loginError.value.isNotEmpty()) {
             if (sheetState.isVisible.not()) sheetState.show()
-        } else sheetState.hide()
+        } else {
+            sheetState.hide()
+            viewModel.getAvatars()
+            //viewModel.getAllLevel()
+            withContext(Dispatchers.Main){
+                viewModel.truthDareControl()
+                viewModel.bottleControl()
+                viewModel.backgroundControl()
+            }
+        }
     }
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -94,14 +99,14 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 UserPicHousting(viewModel)
                 Space(0.02)
                 Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
-                LevelBar(
+                /*LevelBar(
                     currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
                         ?: 0,
                     currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
                     nextLevelNeedStar = viewModel.calculateNextLevelStarSize(
                         viewModel.levels.collectAsState().value ?: listOf()
                     )
-                )
+                )*/
                 Space(0.03)
                 HomeCards(route)
                 Space(0.05)

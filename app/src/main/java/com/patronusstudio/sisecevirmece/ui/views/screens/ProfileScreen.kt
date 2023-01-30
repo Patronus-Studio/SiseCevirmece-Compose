@@ -28,6 +28,7 @@ import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
@@ -35,6 +36,7 @@ import com.patronusstudio.sisecevirmece.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece.ui.widgets.SampleBackgroundCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleTempCard
 import kotlinx.coroutines.launch
@@ -50,44 +52,62 @@ fun ProfileScreen(backClicked: () -> Unit) {
         viewModel.getPackages()
     })
 
-    BaseBackground(titleId = R.string.my_profile, backClicked = backClicked) {
-        Titles(list = viewModel.titles.collectAsState().value) {
-            viewModel.clickedBtn(it.id)
-            viewModel.setTitle(it)
-            coroutineScope.launch {
-                viewModel.getDatas(it)
-            }
-        }
-        AnimatedVisibility(
-            visible = viewModel.packages.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically {
-                it / 2
-            }, exit = fadeOut()
-        ) {
-            Packages(
-                viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
-            )
-        }
-        AnimatedVisibility(
-            visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically{
-                it / 2
-            }, exit = fadeOut()
-        ) {
-            val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
-            Bottles(
-                viewModel.bottles.collectAsState().value, bottleCardSize
-            ) {
+    BaseBackground(
+        titleId = R.string.my_profile,
+        backClicked = backClicked,
+        contentOnTitleBottom = {
+            Titles(list = viewModel.titles.collectAsState().value) {
+                viewModel.clickedBtn(it.id)
+                viewModel.setTitle(it)
                 coroutineScope.launch {
-                    viewModel.setBottleActiveStatuOnDb(it.primaryId)
-                    viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                    viewModel.getDatas(it)
                 }
             }
-        }
-        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-            LoadingAnimation()
-        }
-    }
+            AnimatedVisibility(
+                visible = viewModel.packages.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
+            ) {
+                Packages(
+                    viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
+                )
+            }
+            AnimatedVisibility(
+                visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
+            ) {
+                val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
+                Bottles(
+                    viewModel.bottles.collectAsState().value, bottleCardSize
+                ) {
+                    coroutineScope.launch {
+                        viewModel.setBottleActiveStatuOnDb(it.primaryId)
+                        viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = viewModel.backgrounds.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
+            ) {
+                Backgrounds(
+                    viewModel.backgrounds.collectAsState().value,
+                    packageCardWidth,
+                    packageCardHeight
+                ) {
+                    viewModel.setBackgroundActiveStatuOnDb(it)
+                    viewModel.setBackgroundActiveStatuOnLocal(it)
+                }
+            }
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
+            }
+        })
 }
 
 @Composable
@@ -209,7 +229,32 @@ private fun SampleBottleCard(cardSize: Dp) {
     }
 }
 
-
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Backgrounds(
+    backgrounds: List<BackgroundDbModel>,
+    packageCardWidth: Dp,
+    packageCardHeight: Dp, clicked: (BackgroundDbModel) -> Unit
+) {
+    FlowRow(
+        maxItemsInEachRow = 2,
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        backgrounds.forEachIndexed { index, backgroundDbModel ->
+            SampleBackgroundCard(
+                width = packageCardWidth,
+                height = packageCardHeight,
+                model = backgroundDbModel
+            ) {
+                clicked(backgroundDbModel)
+            }
+            if (index == backgrounds.size - 1) {
+                SampleTempCard(packageCardWidth, packageCardHeight)
+            }
+        }
+    }
+}
 
 
 

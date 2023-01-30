@@ -5,23 +5,28 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
+import com.patronusstudio.sisecevirmece.data.enums.SampleBackgroundEnum
 import com.patronusstudio.sisecevirmece.data.enums.SampleBottleEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.model.LevelModel
 import com.patronusstudio.sisecevirmece.data.model.UserInfoModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece.data.repository.LocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.NetworkRepository
+import com.patronusstudio.sisecevirmece.data.repository.local.BackgroundLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
 import com.patronusstudio.sisecevirmece.data.utils.toBitmapArray
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -32,7 +37,8 @@ class HomeViewModel @Inject constructor(
     private val localRepository: LocalRepository,
     private val packageLocalRepository: PackageLocalRepository,
     private val questionLocalRepository: QuestionLocalRepository,
-    private val bottleLocalRepository: BottleLocalRepository
+    private val bottleLocalRepository: BottleLocalRepository,
+    private val backgroundLocalRepository: BackgroundLocalRepository
 ) : ViewModel() {
 
     private val _loginError = MutableStateFlow("")
@@ -112,11 +118,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun truthDareControl(context: Context) {
+    suspend fun truthDareControl() {
         _isLoading.value = true
         val truthPackage =
             packageLocalRepository.getPackageByName(
-                TruthDareDefaultPackageEnum.TRUTH.getPackageName(context)
+                TruthDareDefaultPackageEnum.TRUTH.getPackageName(application.applicationContext)
             )
         if (truthPackage == null) {
             packageLocalRepository.addPackages(
@@ -127,7 +133,7 @@ class HomeViewModel @Inject constructor(
             questionLocalRepository.addQuestions(questionList)
         }
         val darePackage =
-            packageLocalRepository.getPackageByName(context.getString(R.string.dare))
+            packageLocalRepository.getPackageByName(application.applicationContext.getString(R.string.dare))
         if (darePackage == null) {
             packageLocalRepository.addPackages(
                 getDbModel(TruthDareDefaultPackageEnum.DARE)
@@ -139,13 +145,15 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    private fun getDbModel(
+    private suspend fun getDbModel(
         truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): PackageDbModel {
+        val image =  withContext(Dispatchers.IO){
+            truthDareDefaultPackageEnum.getImageId().toBitmapArray(application.applicationContext)
+        }
         return PackageDbModel(
             cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
-            packageImage = truthDareDefaultPackageEnum.getImageId()
-                .toBitmapArray(application.applicationContext),
+            packageImage = image,
             version = truthDareDefaultPackageEnum.getVersion(),
             packageName = truthDareDefaultPackageEnum.getPackageName(application.applicationContext),
             packageComment = truthDareDefaultPackageEnum.getPackageComment(application.applicationContext),
@@ -180,8 +188,11 @@ class HomeViewModel @Inject constructor(
         else {
             val bottles = mutableListOf<BottleDbModel>()
             SampleBottleEnum.values().forEach {
+                val image =  withContext(Dispatchers.IO){
+                    it.getImageId().toBitmapArray(application.applicationContext)
+                }
                 val tempModel = BottleDbModel(
-                    packageImage = it.getImageId().toBitmapArray(application.applicationContext),
+                    packageImage = image,
                     bottleName = it.getBottleName(application.applicationContext),
                     isActive = it == SampleBottleEnum.ORJINAL
                 )
@@ -191,4 +202,31 @@ class HomeViewModel @Inject constructor(
             _isLoading.value = false
         }
     }
+
+    suspend fun backgroundControl() {
+        _isLoading.value = true
+        val backgroundsSize = backgroundLocalRepository.getBackgrounds()
+        if (backgroundsSize.isEmpty().not()) {
+            _isLoading.value = false
+            return
+        }
+        else {
+            val backgrounds = mutableListOf<BackgroundDbModel>()
+            SampleBackgroundEnum.values().forEach {
+                val image =  withContext(Dispatchers.IO){
+                    it.getImageId().toBitmapArray(application.applicationContext)
+                }
+                val tempModel = BackgroundDbModel(
+                    packageImage = image,
+                    backgroundName = it.getBottleName(application.applicationContext),
+                    isActive = it == SampleBackgroundEnum.ORJINAL
+                )
+                backgrounds.add(tempModel)
+            }
+            backgroundLocalRepository.insertBackgrounds(backgrounds)
+            _isLoading.value = false
+        }
+    }
+
+
 }

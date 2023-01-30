@@ -31,6 +31,7 @@ import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
@@ -246,17 +247,26 @@ fun BaseBackground(
     modifier: Modifier = Modifier,
     @StringRes titleId: Int,
     backClicked: () -> Unit,
-    content: @Composable () -> Unit
+    contentOnTitleBottom: (@Composable () -> Unit)? = null,
+    contentOnFullScreen: (@Composable () -> Unit)? = null
 ) {
+    if (contentOnFullScreen != null) {
+        Box(
+            modifier = modifier.fillMaxSize()
+        ) {
+            contentOnFullScreen()
+        }
+    }
     Column(
-        modifier = modifier
+        modifier = if (contentOnFullScreen != null) modifier
+            .fillMaxSize() else modifier
             .fillMaxSize()
             .background(AppColor.BlueViolet)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         CardTitle(title = stringResource(id = titleId), backClicked)
         Spacer(modifier = Modifier.height(16.dp))
-        content()
+        if (contentOnTitleBottom != null) contentOnTitleBottom()
     }
 }
 
@@ -289,7 +299,7 @@ fun SampleCard(
                     modifier = Modifier
                         .width((width.value * 0.7).dp)
                         .height((height.value * 0.7).dp)
-                        .border(1.dp, AppColor.SoftBlack, shape = RoundedCornerShape(8.dp))
+                        .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
                 Text(text = model.packageName)
@@ -297,6 +307,47 @@ fun SampleCard(
         }
     }
 }
+
+@Composable
+fun SampleBackgroundCard(
+    width: Dp,
+    height: Dp,
+    model: BackgroundDbModel,
+    clicked: (() -> Unit)? = null
+) {
+    val backgroundColor = if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(width)
+                .height(height)
+                .clip(RoundedCornerShape(8.dp))
+                .background(backgroundColor, RoundedCornerShape(8.dp))
+                .clickable {
+                    if (clicked != null) clicked()
+                }
+        ) {
+            Column(
+                Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AsyncImage(
+                    model = model.packageImage,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width((width.value * 0.7).dp)
+                        .height((height.value * 0.7).dp)
+                        .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
+                Text(text = model.backgroundName)
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SampleTempCard(

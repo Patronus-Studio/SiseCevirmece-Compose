@@ -4,6 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 import java.io.ByteArrayOutputStream
 
 
@@ -36,7 +44,8 @@ fun Bitmap.resize(maxWidth: Int, maxHeight: Int): Bitmap {
     } else this
 }
 
-fun  Int.toBitmapArray(context:Context): ByteArray{
-    val bitmapImage = Glide.with(context).asBitmap().load(this).centerInside().submit().get()
-    return bitmapImage.toByteArrray(Bitmap.CompressFormat.PNG)
+fun Int.toBitmapArray(context:Context): ByteArray {
+    val result = Glide.with(context).asBitmap().load(this).centerInside().submit().get()
+    return result.toByteArrray(Bitmap.CompressFormat.PNG)
 }
+

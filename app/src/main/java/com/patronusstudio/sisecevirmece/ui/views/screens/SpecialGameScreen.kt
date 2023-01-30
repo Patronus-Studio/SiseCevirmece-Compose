@@ -2,7 +2,6 @@ package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -16,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -51,59 +50,70 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
         }
     )
     LaunchedEffect(key1 = Unit, block = {
+        viewModel.getActiveBackground()
         viewModel.getBottleOnDb()
         viewModel.jsonToModel(selectedPackages)
     })
 
-    BaseBackground(titleId = R.string.play_special_title, backClicked = backClicked) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    BaseBackground(
+        titleId = R.string.play_special_title,
+        backClicked = backClicked,
+        contentOnFullScreen = {
             AsyncImage(
-                model = viewModel.activeBottle.collectAsState().value?.packageImage
-                    ?: R.drawable.bottle_sample,
-                contentDescription = "",
-                modifier = Modifier
-                    .size(bottleSize)
-                    .rotate(
-                        when (viewModel.bottleTouchListener.collectAsState().value) {
-                            BottleTouchListener.ANIM_STARTED -> {
-                                bottleFlipAnim.value
-                            }
-                            else -> degree.value
-                        }
-                    )
-                    .pointerInput(Unit) {
-                        this.detectTransformGestures { centroid, pan, zoom, rotation ->
-                            if (isSpinning.value.not()) {
-                                if (pan.x > 0 && pan.y > 0) degree.value += bottleRotationValue
-                                else if (pan.x < 0 && pan.y < 0) degree.value -= bottleRotationValue
-                                else if (pan.x > 0 && pan.y < 0) degree.value -= bottleRotationValue
-                                else degree.value += bottleRotationValue
-                                spinTimer++
-                            }
-                        }
-                    }
-                    .pointerInput(Unit) {
-                        awaitEachGesture {
-                            awaitFirstDown(requireUnconsumed = false)
-                            do {
-                                val event = awaitPointerEvent()
-                                val canceled =
-                                    event.changes.any { it.isConsumed && it.positionChanged() }
-                            } while (!canceled && event.changes.any { it.pressed })
-                            if (isSpinning.value.not()) {
-                                viewModel.setBottleTouchListener(BottleTouchListener.ANIM_STARTED)
-                                val result = degree.value % 100
-                                degree.value = if (result < 50)
-                                    (result * (Random.nextInt(50, 75)) + spinTimer)
-                                else (result * (Random.nextInt(20, 35)) + spinTimer)
-                                spinTimer = 0
-                                isSpinning.value = true
-                            }
-                        }
-                    }
+                model = viewModel.backgroundModel.collectAsState().value?.packageImage
+                    ?: R.drawable.background_original, contentDescription = "",
+                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
             )
-        }
-    }
+        },
+        contentOnTitleBottom = {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                AsyncImage(
+                    model = viewModel.activeBottle.collectAsState().value?.packageImage
+                        ?: R.drawable.bottle_sample,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(bottleSize)
+                        .rotate(
+                            when (viewModel.bottleTouchListener.collectAsState().value) {
+                                BottleTouchListener.ANIM_STARTED -> {
+                                    bottleFlipAnim.value
+                                }
+                                else -> degree.value
+                            }
+                        )
+                        .pointerInput(Unit) {
+                            this.detectTransformGestures { centroid, pan, zoom, rotation ->
+                                if (isSpinning.value.not()) {
+                                    if (pan.x > 0 && pan.y > 0) degree.value += bottleRotationValue
+                                    else if (pan.x < 0 && pan.y < 0) degree.value -= bottleRotationValue
+                                    else if (pan.x > 0 && pan.y < 0) degree.value -= bottleRotationValue
+                                    else degree.value += bottleRotationValue
+                                    spinTimer++
+                                }
+                            }
+                        }
+                        .pointerInput(Unit) {
+                            awaitEachGesture {
+                                awaitFirstDown(requireUnconsumed = false)
+                                do {
+                                    val event = awaitPointerEvent()
+                                    val canceled =
+                                        event.changes.any { it.isConsumed && it.positionChanged() }
+                                } while (!canceled && event.changes.any { it.pressed })
+                                if (isSpinning.value.not()) {
+                                    viewModel.setBottleTouchListener(BottleTouchListener.ANIM_STARTED)
+                                    val result = degree.value % 100
+                                    degree.value = if (result < 50)
+                                        (result * (Random.nextInt(50, 75)) + spinTimer)
+                                    else (result * (Random.nextInt(20, 35)) + spinTimer)
+                                    spinTimer = 0
+                                    isSpinning.value = true
+                                }
+                            }
+                        }
+                )
+            }
+        })
     if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_ENDED) {
         Dialog(
             onDismissRequest = {
