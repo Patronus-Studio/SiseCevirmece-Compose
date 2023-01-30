@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.ProfileTitlesEnum
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
+import com.patronusstudio.sisecevirmece.data.repository.local.BackgroundLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class ProfileScreenViewModel @Inject constructor(
     private val application: Application,
     private val packageLocalRepository: PackageLocalRepository,
-    private val bottleLocalRepository: BottleLocalRepository
+    private val bottleLocalRepository: BottleLocalRepository,
+    private val backgroundLocalRepository: BackgroundLocalRepository
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -37,6 +40,9 @@ class ProfileScreenViewModel @Inject constructor(
 
     private val _bottles = MutableStateFlow<List<BottleDbModel>>(listOf())
     val bottles: StateFlow<List<BottleDbModel>> get() = _bottles
+
+    private val _backgrounds = MutableStateFlow<List<BackgroundDbModel>>(listOf())
+    val backgrounds: StateFlow<List<BackgroundDbModel>> get() = _backgrounds
 
     init {
         val list = List(3) {
@@ -86,7 +92,7 @@ class ProfileScreenViewModel @Inject constructor(
         when (profileCategoryModel.id) {
             0 -> getPackages()
             1 -> getBottles()
-            // TODO: getbackgrounds eklenecek
+            2 -> getBackgrounds()
         }
     }
 
@@ -99,6 +105,12 @@ class ProfileScreenViewModel @Inject constructor(
     suspend fun getBottles() {
         _isLoading.value = true
         _bottles.value = bottleLocalRepository.getBottles()
+        _isLoading.value = false
+    }
+
+    suspend fun getBackgrounds(){
+        _isLoading.value = true
+        _backgrounds.value = backgroundLocalRepository.getBackgrounds()
         _isLoading.value = false
     }
 
@@ -135,4 +147,36 @@ class ProfileScreenViewModel @Inject constructor(
         _isLoading.value = false
     }
 
+    fun setBackgroundActiveStatuOnLocal(clickedItemId: Int) {
+        _isLoading.value = true
+        val findedActiveBtnIndex = _backgrounds.value.indexOfFirst {
+            it.isActive
+        }
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
+        val findedActiveModel = _backgrounds.value[findedActiveBtnIndex]
+        val tempList = mutableListOf<BackgroundDbModel>()
+        _backgrounds.value.forEach {
+            if (findedActiveModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+            else if (clickedItemId == it.primaryId) tempList.add(it.copy(isActive = true))
+            else tempList.add(it.copy())
+        }
+        _backgrounds.value = tempList
+        _isLoading.value = false
+    }
+
+    suspend fun setBackgroundActiveStatuOnDb(clickedItemId: Int){
+        _isLoading.value = true
+        val findedActiveModel = _backgrounds.value.first {
+            it.isActive
+        }
+        val findedClickedModel = _backgrounds.value.first {
+            clickedItemId == it.primaryId
+        }
+        backgroundLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
+        backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
+        _isLoading.value = false
+    }
 }

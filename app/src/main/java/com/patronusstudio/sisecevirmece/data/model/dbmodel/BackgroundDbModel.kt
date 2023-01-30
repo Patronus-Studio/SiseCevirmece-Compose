@@ -13,21 +13,21 @@ data class BackgroundDbModel(
     val primaryId: Int = 0,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     var packageImage: ByteArray? = null,
-    val bottleName: String,
+    val backgroundName: String,
     val isActive: Boolean
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as BottleDbModel
+        other as BackgroundDbModel
 
         if (primaryId != other.primaryId) return false
         if (packageImage != null) {
             if (other.packageImage == null) return false
             if (!packageImage.contentEquals(other.packageImage)) return false
         } else if (other.packageImage != null) return false
-        if (bottleName != other.bottleName) return false
+        if (backgroundName != other.backgroundName) return false
         if (isActive != other.isActive) return false
 
         return true
@@ -36,7 +36,7 @@ data class BackgroundDbModel(
     override fun hashCode(): Int {
         var result = primaryId
         result = 31 * result + (packageImage?.contentHashCode() ?: 0)
-        result = 31 * result + bottleName.hashCode()
+        result = 31 * result + backgroundName.hashCode()
         result = 31 * result + isActive.hashCode()
         return result
     }

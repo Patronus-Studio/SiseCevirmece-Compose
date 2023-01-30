@@ -28,6 +28,7 @@ import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece.data.model.BaseCategoryModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.ProfileCategoryModel
@@ -35,8 +36,10 @@ import com.patronusstudio.sisecevirmece.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece.ui.widgets.SampleBackgroundCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleTempCard
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,7 +73,7 @@ fun ProfileScreen(backClicked: () -> Unit) {
         }
         AnimatedVisibility(
             visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically{
+            enter = fadeIn() + slideInVertically {
                 it / 2
             }, exit = fadeOut()
         ) {
@@ -80,7 +83,24 @@ fun ProfileScreen(backClicked: () -> Unit) {
             ) {
                 coroutineScope.launch {
                     viewModel.setBottleActiveStatuOnDb(it.primaryId)
+                    delay(200)
                     viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = viewModel.backgrounds.collectAsState().value.isNotEmpty(),
+            enter = fadeIn() + slideInVertically {
+                it / 2
+            }, exit = fadeOut()
+        ) {
+            Backgrounds(
+                viewModel.backgrounds.collectAsState().value, packageCardWidth, packageCardHeight
+            ){
+                coroutineScope.launch {
+                    viewModel.setBackgroundActiveStatuOnDb(it.primaryId)
+                    delay(200)
+                    viewModel.setBackgroundActiveStatuOnLocal(it.primaryId)
                 }
             }
         }
@@ -209,7 +229,32 @@ private fun SampleBottleCard(cardSize: Dp) {
     }
 }
 
-
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Backgrounds(
+    backgrounds: List<BackgroundDbModel>,
+    packageCardWidth: Dp,
+    packageCardHeight: Dp, clicked: (BackgroundDbModel) -> Unit
+) {
+    FlowRow(
+        maxItemsInEachRow = 2,
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        backgrounds.forEachIndexed { index, backgroundDbModel ->
+            SampleBackgroundCard(
+                width = packageCardWidth,
+                height = packageCardHeight,
+                model = backgroundDbModel
+            ){
+                clicked(backgroundDbModel)
+            }
+            if (index == backgrounds.size - 1) {
+                SampleTempCard(packageCardWidth, packageCardHeight)
+            }
+        }
+    }
+}
 
 
 
