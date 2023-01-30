@@ -99,7 +99,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 Space(0.05)
                 UserPicHousting(viewModel)
                 Space(0.05)
-                Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
+                Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "")
                 /*LevelBar(
                     currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
                         ?: 0,
