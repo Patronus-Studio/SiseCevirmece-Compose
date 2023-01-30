@@ -306,13 +306,14 @@ fun SampleBackgroundCard(
     model: BackgroundDbModel,
     clicked: (() -> Unit)? = null
 ) {
+    val backgroundColor = if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
     Box(modifier = Modifier.padding(top = 16.dp)) {
         Box(
             modifier = Modifier
                 .width(width)
                 .height(height)
                 .clip(RoundedCornerShape(8.dp))
-                .background(AppColor.WhiteSoft, RoundedCornerShape(8.dp))
+                .background(backgroundColor, RoundedCornerShape(8.dp))
                 .clickable {
                     if (clicked != null) clicked()
                 }

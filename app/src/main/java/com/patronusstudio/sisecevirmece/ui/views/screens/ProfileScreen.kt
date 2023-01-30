@@ -39,6 +39,7 @@ import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleBackgroundCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleTempCard
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,6 +83,7 @@ fun ProfileScreen(backClicked: () -> Unit) {
             ) {
                 coroutineScope.launch {
                     viewModel.setBottleActiveStatuOnDb(it.primaryId)
+                    delay(200)
                     viewModel.setBottleActiveStatuOnLocal(it.primaryId)
                 }
             }
@@ -94,7 +96,13 @@ fun ProfileScreen(backClicked: () -> Unit) {
         ) {
             Backgrounds(
                 viewModel.backgrounds.collectAsState().value, packageCardWidth, packageCardHeight
-            )
+            ){
+                coroutineScope.launch {
+                    viewModel.setBackgroundActiveStatuOnDb(it.primaryId)
+                    delay(200)
+                    viewModel.setBackgroundActiveStatuOnLocal(it.primaryId)
+                }
+            }
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
@@ -226,7 +234,7 @@ private fun SampleBottleCard(cardSize: Dp) {
 private fun Backgrounds(
     backgrounds: List<BackgroundDbModel>,
     packageCardWidth: Dp,
-    packageCardHeight: Dp
+    packageCardHeight: Dp, clicked: (BackgroundDbModel) -> Unit
 ) {
     FlowRow(
         maxItemsInEachRow = 2,
@@ -238,7 +246,9 @@ private fun Backgrounds(
                 width = packageCardWidth,
                 height = packageCardHeight,
                 model = backgroundDbModel
-            )
+            ){
+                clicked(backgroundDbModel)
+            }
             if (index == backgrounds.size - 1) {
                 SampleTempCard(packageCardWidth, packageCardHeight)
             }

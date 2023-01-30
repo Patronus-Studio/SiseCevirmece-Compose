@@ -147,4 +147,36 @@ class ProfileScreenViewModel @Inject constructor(
         _isLoading.value = false
     }
 
+    fun setBackgroundActiveStatuOnLocal(clickedItemId: Int) {
+        _isLoading.value = true
+        val findedActiveBtnIndex = _backgrounds.value.indexOfFirst {
+            it.isActive
+        }
+        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
+            _isLoading.value = false
+            return
+        }
+        val findedActiveModel = _backgrounds.value[findedActiveBtnIndex]
+        val tempList = mutableListOf<BackgroundDbModel>()
+        _backgrounds.value.forEach {
+            if (findedActiveModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+            else if (clickedItemId == it.primaryId) tempList.add(it.copy(isActive = true))
+            else tempList.add(it.copy())
+        }
+        _backgrounds.value = tempList
+        _isLoading.value = false
+    }
+
+    suspend fun setBackgroundActiveStatuOnDb(clickedItemId: Int){
+        _isLoading.value = true
+        val findedActiveModel = _backgrounds.value.first {
+            it.isActive
+        }
+        val findedClickedModel = _backgrounds.value.first {
+            clickedItemId == it.primaryId
+        }
+        backgroundLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
+        backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
+        _isLoading.value = false
+    }
 }
