@@ -13,7 +13,7 @@ import com.patronusstudio.sisecevirmece.data.repository.local.BackgroundLocalRep
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -88,7 +88,7 @@ class ProfileScreenViewModel @Inject constructor(
     suspend fun getDatas(profileCategoryModel: ProfileCategoryModel) {
         _bottles.value = listOf()
         _packages.value = listOf()
-        delay (100)
+        delay(100)
         when (profileCategoryModel.id) {
             0 -> getPackages()
             1 -> getBottles()
@@ -108,7 +108,7 @@ class ProfileScreenViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    suspend fun getBackgrounds(){
+    suspend fun getBackgrounds() {
         _isLoading.value = true
         _backgrounds.value = backgroundLocalRepository.getBackgrounds()
         _isLoading.value = false
@@ -134,49 +134,59 @@ class ProfileScreenViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    suspend fun setBottleActiveStatuOnDb(clickedItemId: Int){
-        _isLoading.value = true
-        val findedActiveModel = _bottles.value.first {
-            it.isActive
+    fun setBottleActiveStatuOnDb(clickedItemId: Int) {
+        var findedActiveModel: BottleDbModel? = null
+        var findedClickedModel: BottleDbModel? = null
+        _bottles.value.forEach {
+            if (it.isActive) findedActiveModel = it
+            if (clickedItemId == it.primaryId) findedClickedModel = it
         }
-        val findedClickedModel = _bottles.value.first {
-            clickedItemId == it.primaryId
+        CoroutineScope(Dispatchers.Main).launch {
+            _isLoading.value = true
+            withContext(Dispatchers.IO) {
+                bottleLocalRepository.updateActiveStatu(findedActiveModel!!.primaryId, false)
+            }
+            withContext(Dispatchers.IO) {
+                bottleLocalRepository.updateActiveStatu(findedClickedModel!!.primaryId, true)
+            }
+            delay(200)
+            _isLoading.value = false
         }
-        bottleLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
-        bottleLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
-        _isLoading.value = false
     }
 
-    fun setBackgroundActiveStatuOnLocal(clickedItemId: Int) {
+    fun setBackgroundActiveStatuOnLocal(model: BackgroundDbModel) {
+        if (model.isActive) return
         _isLoading.value = true
-        val findedActiveBtnIndex = _backgrounds.value.indexOfFirst {
+        val findedClickedModel = _backgrounds.value.first {
             it.isActive
         }
-        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) {
-            _isLoading.value = false
-            return
-        }
-        val findedActiveModel = _backgrounds.value[findedActiveBtnIndex]
         val tempList = mutableListOf<BackgroundDbModel>()
         _backgrounds.value.forEach {
-            if (findedActiveModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
-            else if (clickedItemId == it.primaryId) tempList.add(it.copy(isActive = true))
-            else tempList.add(it.copy())
+            if (model.primaryId == it.primaryId) tempList.add(it.copy(isActive = true))
+            else if (findedClickedModel.primaryId == it.primaryId) tempList.add(it.copy(isActive = false))
+            else tempList.add(it.copy(isActive = false))
         }
+        _backgrounds.value = listOf()
         _backgrounds.value = tempList
         _isLoading.value = false
     }
 
-    suspend fun setBackgroundActiveStatuOnDb(clickedItemId: Int){
-        _isLoading.value = true
-        val findedActiveModel = _backgrounds.value.first {
+    fun setBackgroundActiveStatuOnDb(model: BackgroundDbModel) {
+        if (model.isActive) return
+
+        val findedClickedModel = _backgrounds.value.first {
             it.isActive
         }
-        val findedClickedModel = _backgrounds.value.first {
-            clickedItemId == it.primaryId
+        CoroutineScope(Dispatchers.Main).launch {
+            _isLoading.value = true
+            withContext(Dispatchers.IO) {
+                backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId, false)
+            }
+            withContext(Dispatchers.IO) {
+                backgroundLocalRepository.updateActiveStatu(model.primaryId, true)
+            }
+            delay(200)
+            _isLoading.value = false
         }
-        backgroundLocalRepository.updateActiveStatu(findedActiveModel.primaryId,false)
-        backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId,true)
-        _isLoading.value = false
     }
 }

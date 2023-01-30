@@ -119,7 +119,7 @@ fun AddCategoriesScreen(back: () -> Unit) {
         },
         sheetState = sheetState
     ) {
-        BaseBackground(titleId = R.string.add_category, backClicked = { back() }) {
+        BaseBackground(titleId = R.string.add_category, backClicked = { back() }, contentOnTitleBottom = {
             CategoryCard(
                 questionCardMaxWidth,
                 viewModel.packageName.collectAsState().value,
@@ -140,7 +140,7 @@ fun AddCategoriesScreen(back: () -> Unit) {
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                 LoadingAnimation()
             }
-        }
+        })
     }
 }
 

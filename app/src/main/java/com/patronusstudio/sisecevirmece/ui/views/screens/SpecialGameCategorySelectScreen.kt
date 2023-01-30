@@ -49,7 +49,7 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: (St
         viewModel.getAllPackages()
         isFirstInit.value = false
     })
-    BaseBackground(titleId = R.string.select_game_category, backClicked = backClicked) {
+    BaseBackground(titleId = R.string.select_game_category, backClicked = backClicked, contentOnTitleBottom = {
         FlowRow(
             maxItemsInEachRow = 2,
             modifier = Modifier.fillMaxSize(),
@@ -65,7 +65,7 @@ fun SpecialGameCategorySelectScreen(backClicked: () -> Unit, passGameScreen: (St
                 }
             }
         }
-    }
+    })
     PlayButton(
         selectedPackageSize = viewModel.selectedPackage.size,
         playButtonWidth = playButtonWidth

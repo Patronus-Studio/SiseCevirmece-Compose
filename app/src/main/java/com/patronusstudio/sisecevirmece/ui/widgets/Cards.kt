@@ -247,17 +247,26 @@ fun BaseBackground(
     modifier: Modifier = Modifier,
     @StringRes titleId: Int,
     backClicked: () -> Unit,
-    content: @Composable () -> Unit
+    contentOnTitleBottom: (@Composable () -> Unit)? = null,
+    contentOnFullScreen: (@Composable () -> Unit)? = null
 ) {
+    if (contentOnFullScreen != null) {
+        Box(
+            modifier = modifier.fillMaxSize()
+        ) {
+            contentOnFullScreen()
+        }
+    }
     Column(
-        modifier = modifier
+        modifier = if (contentOnFullScreen != null) modifier
+            .fillMaxSize() else modifier
             .fillMaxSize()
             .background(AppColor.BlueViolet)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         CardTitle(title = stringResource(id = titleId), backClicked)
         Spacer(modifier = Modifier.height(16.dp))
-        content()
+        if (contentOnTitleBottom != null) contentOnTitleBottom()
     }
 }
 
