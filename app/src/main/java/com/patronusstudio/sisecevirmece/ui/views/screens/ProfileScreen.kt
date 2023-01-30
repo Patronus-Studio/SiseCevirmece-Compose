@@ -53,7 +53,7 @@ fun ProfileScreen(backClicked: () -> Unit) {
         viewModel.getPackages()
     })
 
-    BaseBackground(titleId = R.string.my_profile, backClicked = backClicked) {
+    BaseBackground(titleId = R.string.my_profile, backClicked = backClicked, contentOnTitleBottom = {
         Titles(list = viewModel.titles.collectAsState().value) {
             viewModel.clickedBtn(it.id)
             viewModel.setTitle(it)
@@ -107,7 +107,7 @@ fun ProfileScreen(backClicked: () -> Unit) {
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
         }
-    }
+    })
 }
 
 @Composable

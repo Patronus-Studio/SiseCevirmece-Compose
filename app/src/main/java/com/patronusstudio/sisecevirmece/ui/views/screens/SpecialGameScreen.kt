@@ -55,7 +55,7 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
         viewModel.jsonToModel(selectedPackages)
     })
 
-    BaseBackground(titleId = R.string.play_special_title, backClicked = backClicked) {
+    BaseBackground(titleId = R.string.play_special_title, backClicked = backClicked, contentOnTitleBottom = {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             AsyncImage(
                 model = viewModel.activeBottle.collectAsState().value?.packageImage
@@ -103,7 +103,7 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
                     }
             )
         }
-    }
+    })
     if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_ENDED) {
         Dialog(
             onDismissRequest = {

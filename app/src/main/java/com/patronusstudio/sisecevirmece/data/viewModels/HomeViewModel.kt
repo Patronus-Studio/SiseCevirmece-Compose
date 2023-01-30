@@ -218,7 +218,7 @@ class HomeViewModel @Inject constructor(
                 }
                 val tempModel = BackgroundDbModel(
                     packageImage = image,
-                    bottleName = it.getBottleName(application.applicationContext),
+                    backgroundName = it.getBottleName(application.applicationContext),
                     isActive = it == SampleBackgroundEnum.ORJINAL
                 )
                 backgrounds.add(tempModel)

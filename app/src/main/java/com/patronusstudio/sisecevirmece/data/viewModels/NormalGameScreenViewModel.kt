@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareEnum
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece.data.repository.local.BackgroundLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.PackageLocalRepository
 import com.patronusstudio.sisecevirmece.data.repository.local.QuestionLocalRepository
@@ -22,7 +24,8 @@ class NormalGameScreenViewModel @Inject constructor(
     private val application: Application,
     private val packageLocalRepository: PackageLocalRepository,
     private val questionLocalRepository: QuestionLocalRepository,
-    private val bottleLocalRepository: BottleLocalRepository
+    private val bottleLocalRepository: BottleLocalRepository,
+    private val backgroundLocalRepository: BackgroundLocalRepository
 ) : ViewModel() {
 
     val _isLoading = MutableStateFlow(false)
@@ -43,12 +46,21 @@ class NormalGameScreenViewModel @Inject constructor(
     private val _activeBottle = MutableStateFlow<BottleDbModel?>(null)
     val activeBottle : StateFlow<BottleDbModel?> get() = _activeBottle
 
+    private val _backgroundModel = MutableStateFlow<BackgroundDbModel?>(null)
+    val backgroundModel: StateFlow<BackgroundDbModel?> get() = _backgroundModel
+
     fun setTruthDareSelected(truthDareEnum: TruthDareEnum) {
         _truthDareSelected.value = truthDareEnum
     }
 
     fun setBottleTouchListener(bottleTouchListener: BottleTouchListener) {
         _bottleTouchListener.value = bottleTouchListener
+    }
+
+    suspend fun getActiveBackground(){
+        _isLoading.value = true
+        _backgroundModel.value = backgroundLocalRepository.getActiveBackground()
+        _isLoading.value = false
     }
 
     suspend fun getBottleOnDb(){

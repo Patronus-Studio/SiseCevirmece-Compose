@@ -60,7 +60,7 @@ fun StoreScreen(back: () -> Unit) {
         viewModel.setPackageModel(item)
         popupStatu.value = true
     }
-    BaseBackground(titleId = R.string.store, backClicked = { back() }) {
+    BaseBackground(titleId = R.string.store, backClicked = { back() }, contentOnTitleBottom = {
         Column(modifier = Modifier.fillMaxSize()) {
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -99,7 +99,7 @@ fun StoreScreen(back: () -> Unit) {
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
         }
-    }
+    })
 }
 
 @Composable
