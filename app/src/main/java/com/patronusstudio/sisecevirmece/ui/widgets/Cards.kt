@@ -31,6 +31,7 @@ import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece.data.model.PackageModel
+import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 
@@ -289,7 +290,7 @@ fun SampleCard(
                     modifier = Modifier
                         .width((width.value * 0.7).dp)
                         .height((height.value * 0.7).dp)
-                        .border(1.dp, AppColor.SoftBlack, shape = RoundedCornerShape(8.dp))
+                        .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
                 Text(text = model.packageName)
@@ -297,6 +298,46 @@ fun SampleCard(
         }
     }
 }
+
+@Composable
+fun SampleBackgroundCard(
+    width: Dp,
+    height: Dp,
+    model: BackgroundDbModel,
+    clicked: (() -> Unit)? = null
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(width)
+                .height(height)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AppColor.WhiteSoft, RoundedCornerShape(8.dp))
+                .clickable {
+                    if (clicked != null) clicked()
+                }
+        ) {
+            Column(
+                Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AsyncImage(
+                    model = model.packageImage,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width((width.value * 0.7).dp)
+                        .height((height.value * 0.7).dp)
+                        .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
+                Text(text = model.backgroundName)
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SampleTempCard(
