@@ -39,7 +39,6 @@ import com.patronusstudio.sisecevirmece.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleBackgroundCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleCard
 import com.patronusstudio.sisecevirmece.ui.widgets.SampleTempCard
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,61 +52,62 @@ fun ProfileScreen(backClicked: () -> Unit) {
         viewModel.getPackages()
     })
 
-    BaseBackground(titleId = R.string.my_profile, backClicked = backClicked, contentOnTitleBottom = {
-        Titles(list = viewModel.titles.collectAsState().value) {
-            viewModel.clickedBtn(it.id)
-            viewModel.setTitle(it)
-            coroutineScope.launch {
-                viewModel.getDatas(it)
+    BaseBackground(
+        titleId = R.string.my_profile,
+        backClicked = backClicked,
+        contentOnTitleBottom = {
+            Titles(list = viewModel.titles.collectAsState().value) {
+                viewModel.clickedBtn(it.id)
+                viewModel.setTitle(it)
+                coroutineScope.launch {
+                    viewModel.getDatas(it)
+                }
             }
-        }
-        AnimatedVisibility(
-            visible = viewModel.packages.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically {
-                it / 2
-            }, exit = fadeOut()
-        ) {
-            Packages(
-                viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
-            )
-        }
-        AnimatedVisibility(
-            visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically {
-                it / 2
-            }, exit = fadeOut()
-        ) {
-            val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
-            Bottles(
-                viewModel.bottles.collectAsState().value, bottleCardSize
+            AnimatedVisibility(
+                visible = viewModel.packages.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
             ) {
-                coroutineScope.launch {
-                    viewModel.setBottleActiveStatuOnDb(it.primaryId)
-                    delay(200)
-                    viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                Packages(
+                    viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
+                )
+            }
+            AnimatedVisibility(
+                visible = viewModel.bottles.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
+            ) {
+                val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
+                Bottles(
+                    viewModel.bottles.collectAsState().value, bottleCardSize
+                ) {
+                    coroutineScope.launch {
+                        viewModel.setBottleActiveStatuOnDb(it.primaryId)
+                        viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                    }
                 }
             }
-        }
-        AnimatedVisibility(
-            visible = viewModel.backgrounds.collectAsState().value.isNotEmpty(),
-            enter = fadeIn() + slideInVertically {
-                it / 2
-            }, exit = fadeOut()
-        ) {
-            Backgrounds(
-                viewModel.backgrounds.collectAsState().value, packageCardWidth, packageCardHeight
-            ){
-                coroutineScope.launch {
-                    viewModel.setBackgroundActiveStatuOnDb(it.primaryId)
-                    delay(200)
-                    viewModel.setBackgroundActiveStatuOnLocal(it.primaryId)
+            AnimatedVisibility(
+                visible = viewModel.backgrounds.collectAsState().value.isNotEmpty(),
+                enter = fadeIn() + slideInVertically {
+                    it / 2
+                }, exit = fadeOut()
+            ) {
+                Backgrounds(
+                    viewModel.backgrounds.collectAsState().value,
+                    packageCardWidth,
+                    packageCardHeight
+                ) {
+                    viewModel.setBackgroundActiveStatuOnDb(it)
+                    viewModel.setBackgroundActiveStatuOnLocal(it)
                 }
             }
-        }
-        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-            LoadingAnimation()
-        }
-    })
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
+            }
+        })
 }
 
 @Composable
@@ -246,7 +246,7 @@ private fun Backgrounds(
                 width = packageCardWidth,
                 height = packageCardHeight,
                 model = backgroundDbModel
-            ){
+            ) {
                 clicked(backgroundDbModel)
             }
             if (index == backgrounds.size - 1) {

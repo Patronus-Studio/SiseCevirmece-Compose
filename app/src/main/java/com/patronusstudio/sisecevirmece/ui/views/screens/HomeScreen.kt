@@ -63,7 +63,7 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
         } else {
             sheetState.hide()
             viewModel.getAvatars()
-            viewModel.getAllLevel()
+            //viewModel.getAllLevel()
             withContext(Dispatchers.Main){
                 viewModel.truthDareControl()
                 viewModel.bottleControl()
@@ -99,14 +99,14 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                 UserPicHousting(viewModel)
                 Space(0.02)
                 Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "za xd")
-                LevelBar(
+                /*LevelBar(
                     currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
                         ?: 0,
                     currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
                     nextLevelNeedStar = viewModel.calculateNextLevelStarSize(
                         viewModel.levels.collectAsState().value ?: listOf()
                     )
-                )
+                )*/
                 Space(0.03)
                 HomeCards(route)
                 Space(0.05)
