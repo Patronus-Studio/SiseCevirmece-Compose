@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.patronusstudio.sisecevirmece.nav.ScreenHost
 import com.patronusstudio.sisecevirmece.ui.theme.SiseCevirmeceTheme
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
             SiseCevirmeceTheme {
                 val navController = rememberNavController()
                 Surface(
