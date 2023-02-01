@@ -138,7 +138,7 @@ fun PackageDetailCard(
     packageDetailCardBtnEnum: PackageDetailCardBtnEnum,
     clickedBtn: () -> Unit
 ) {
-    val imageSize = 64.dp
+    val imageSize = 80.dp
     val buttonHeight = 50.dp
     Column(
         modifier = Modifier
@@ -167,15 +167,15 @@ fun PackageDetailCard(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.height(imageSize)
             ) {
-                SampleText(content = packageModel.packageName, 1, 16)
-                SampleText(content = packageModel.packageComment, 3)
+                SampleText(content = packageModel.packageName, 1, 20)
+                SampleText(content = packageModel.packageComment, 3, fontSize = 12)
             }
         }
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(60.dp)
         ) {
             val (lineRef, leftRef, rightRef) = createRefs()
             Box(
@@ -192,24 +192,23 @@ fun PackageDetailCard(
             Column(
                 modifier = Modifier
                     .constrainAs(leftRef) {
-                        this.linkTo(start = parent.start, end = lineRef.start, bias = 0.9f)
+                        this.linkTo(start = parent.start, end = lineRef.start, bias = 0.5f)
                         this.linkTo(top = lineRef.top, bottom = lineRef.bottom)
                     }
                     .fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                SampleText(content = packageModel.numberOfDownload.toInt().toString())
-                SampleText(content = packageModel.version.toInt().toString())
+                SampleText(content = "Soru Sayısı : ${packageModel.questions.split(";").size}")
+                SampleText(content = "Version Numarası : ${packageModel.version}")
             }
-
             Column(
                 modifier = Modifier
                     .constrainAs(rightRef) {
-                        this.linkTo(start = lineRef.end, end = parent.end)
+                        this.linkTo(start = lineRef.start, end = parent.end, bias = 0.5f)
                         this.linkTo(top = lineRef.top, bottom = lineRef.bottom)
                     }
                     .fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                SampleText(content = packageModel.numberOfLike.toInt().toString())
+                SampleText(content = "İndirme Sayısı : ${packageModel.numberOfDownload.toInt()}")
                 SampleText(content = packageModel.updatedTime)
             }
         }
