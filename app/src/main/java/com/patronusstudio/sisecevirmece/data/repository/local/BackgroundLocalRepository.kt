@@ -39,6 +39,13 @@ class BackgroundLocalRepository @Inject constructor(private val application: App
         }
     }
 
+    suspend fun updateAllActiveStatu(isActive:Boolean){
+        withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(application.applicationContext).getBackgroundRoomDao()
+                .updateAllBackgroundStatu(isActive)
+        }
+    }
+
     suspend fun getActiveBackground():BackgroundDbModel {
         return withContext(Dispatchers.IO) {
             BottleRoomDb.getInstance(application.applicationContext).getBackgroundRoomDao()

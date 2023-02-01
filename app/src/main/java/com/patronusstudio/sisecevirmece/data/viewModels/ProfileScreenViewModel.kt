@@ -135,17 +135,15 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun setBottleActiveStatuOnDb(clickedItemId: Int) {
-        var findedActiveModel: BottleDbModel? = null
-        var findedClickedModel: BottleDbModel? = null
-        _bottles.value.forEach {
-            if (it.isActive) findedActiveModel = it
-            if (clickedItemId == it.primaryId) findedClickedModel = it
+        val findedClickedModel = _bottles.value.find {
+            clickedItemId == it.primaryId
         }
         CoroutineScope(Dispatchers.Main).launch {
             _isLoading.value = true
             withContext(Dispatchers.IO) {
-                bottleLocalRepository.updateActiveStatu(findedActiveModel!!.primaryId, false)
+                bottleLocalRepository.updateAllActiveStatu(false)
             }
+            delay(200)
             withContext(Dispatchers.IO) {
                 bottleLocalRepository.updateActiveStatu(findedClickedModel!!.primaryId, true)
             }
@@ -182,14 +180,12 @@ class ProfileScreenViewModel @Inject constructor(
     fun setBackgroundActiveStatuOnDb(model: BackgroundDbModel) {
         if (model.isActive) return
         try {
-            val findedClickedModel = _backgrounds.value.first {
-                it.isActive
-            }
             CoroutineScope(Dispatchers.Main).launch {
                 _isLoading.value = true
                 withContext(Dispatchers.IO) {
-                    backgroundLocalRepository.updateActiveStatu(findedClickedModel.primaryId, false)
+                    backgroundLocalRepository.updateAllActiveStatu( false)
                 }
+                delay(200)
                 withContext(Dispatchers.IO) {
                     backgroundLocalRepository.updateActiveStatu(model.primaryId, true)
                 }

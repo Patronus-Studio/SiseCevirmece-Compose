@@ -20,7 +20,10 @@ interface BottleRoom {
     suspend fun getBottlesList(): List<BottleDbModel>
 
     @Query("Update ${DbTables.bottleTable} set isActive= :isActive where primaryId= :primaryId")
-    suspend fun updateBottleStatu(primaryId:Int,isActive:Boolean)
+    suspend fun updateBottleStatu(primaryId:Int,isActive:Boolean):Int
+
+    @Query("Update ${DbTables.bottleTable} set isActive= :isActive")
+    suspend fun updateAllBottleStatu(isActive:Boolean)
 
     @Query("Select * from ${DbTables.bottleTable} where isActive = 1")
     suspend fun getActiveBottle():BottleDbModel

@@ -23,6 +23,9 @@ interface BackgroundRoom {
     @Query("Update ${DbTables.backgroundTable} set isActive= :isActive where primaryId= :primaryId")
     suspend fun updateBackgroundStatu(primaryId:Int,isActive:Boolean)
 
+    @Query("Update ${DbTables.backgroundTable} set isActive= :isActive")
+    suspend fun updateAllBackgroundStatu(isActive:Boolean)
+
     @Query("Select * from ${DbTables.backgroundTable} where isActive = 1")
     suspend fun getActiveBackground():BackgroundDbModel
 }
