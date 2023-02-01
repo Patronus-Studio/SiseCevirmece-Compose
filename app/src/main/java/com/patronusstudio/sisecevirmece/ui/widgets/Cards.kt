@@ -140,12 +140,16 @@ fun PackageDetailCard(
 ) {
     val imageSize = 80.dp
     val buttonHeight = 50.dp
+    val roundedCornerShape = RoundedCornerShape(16.dp)
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(16.dp)
+            .background(Color.White, roundedCornerShape)
+            .clip(roundedCornerShape)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             Modifier
                 .fillMaxWidth()
@@ -215,7 +219,7 @@ fun PackageDetailCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp, bottom = 16.dp),
+                .padding(top = 32.dp, bottom = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Button(

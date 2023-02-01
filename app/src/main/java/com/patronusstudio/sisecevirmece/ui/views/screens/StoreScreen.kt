@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -21,8 +22,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -54,7 +55,7 @@ fun StoreScreen(back: () -> Unit) {
     }
     LaunchedEffect(Unit) {
         viewModel.getPackageCategories()
-        viewModel.getPackageFromCategory( 1)
+        viewModel.getPackageFromCategory(1)
     }
     val clickedPackage = { item: PackageModel ->
         viewModel.setPackageModel(item)
@@ -83,6 +84,7 @@ fun StoreScreen(back: () -> Unit) {
                 }
             }
         }
+
         if (popupStatu.value) {
             PackagePopup(viewModel.currentPackage.collectAsState().value!!, dismissListener = {
                 popupStatu.value = popupStatu.value.not()
@@ -101,6 +103,7 @@ fun StoreScreen(back: () -> Unit) {
                     }
                 }
             })
+
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
@@ -108,23 +111,16 @@ fun StoreScreen(back: () -> Unit) {
     })
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit, clickedBtn: () -> Unit) {
-    val roundedCornerShape = RoundedCornerShape(16.dp)
-    val popupProperties = PopupProperties(focusable = true)
-    Popup(
-        alignment = Alignment.BottomCenter,
-        properties = popupProperties,
-        onDismissRequest = dismissListener
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(16.dp)
-                .background(Color.White, roundedCornerShape)
-                .clip(roundedCornerShape)
-        ) {
+    val popupProperties = DialogProperties(
+        usePlatformDefaultWidth = false,
+        dismissOnBackPress = true,
+        dismissOnClickOutside = true
+    )
+    Dialog(onDismissRequest = { dismissListener() }, popupProperties) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             PackageDetailCard(
                 packageModel,
                 packageDetailCardBtnEnum = packageModel.packageStatu,
@@ -162,7 +158,11 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
 }
 
 @Composable
-fun PackageSelectButton(item: BaseCategoryModel, content:(@Composable ()->Unit)? = null, clicked: () -> Unit) {
+fun PackageSelectButton(
+    item: BaseCategoryModel,
+    content: (@Composable () -> Unit)? = null,
+    clicked: () -> Unit
+) {
     val backgroundColor = Color(
         android.graphics.Color.parseColor(
             if (item.isSelected == SelectableEnum.YES) item.activeBtnColor
@@ -185,7 +185,7 @@ fun PackageSelectButton(item: BaseCategoryModel, content:(@Composable ()->Unit)?
             .padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        if(content != null) content()
+        if (content != null) content()
     }
 }
 
