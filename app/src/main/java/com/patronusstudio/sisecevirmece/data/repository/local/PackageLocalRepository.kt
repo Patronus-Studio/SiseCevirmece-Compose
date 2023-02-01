@@ -9,17 +9,10 @@ import javax.inject.Inject
 
 class PackageLocalRepository @Inject constructor(private val application: Application) {
 
-    private lateinit var tempPackages: List<PackageDbModel>
-
     suspend fun getPackages(): List<PackageDbModel> {
-        return if (this::tempPackages.isInitialized) tempPackages
-        else {
-            withContext(Dispatchers.IO) {
-                tempPackages =
-                    BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
-                        .getPackages()
-                tempPackages
-            }
+       return withContext(Dispatchers.IO) {
+            BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+                .getPackages()
         }
     }
 
