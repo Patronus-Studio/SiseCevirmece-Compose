@@ -163,15 +163,18 @@ class PackageViewModel @Inject constructor(
     }
 
     private suspend fun insertQuestions(packagePrimaryId: Int) {
+
         val questions = mutableListOf<QuestionDbModel>().apply {
-            _currentPackage.value!!.questions.forEach {
-                this.add(
-                    QuestionDbModel(
-                        localPackagePrimaryId = packagePrimaryId,
-                        question = it,
-                        isShowed = false
+            _currentPackage.value!!.questions.split(";").forEach {
+                if(it.isNotEmpty()&& it.isNotBlank()){
+                    this.add(
+                        QuestionDbModel(
+                            localPackagePrimaryId = packagePrimaryId,
+                            question = it,
+                            isShowed = false
+                        )
                     )
-                )
+                }
             }
         }
         questionLocalRepository.addQuestions(questions)

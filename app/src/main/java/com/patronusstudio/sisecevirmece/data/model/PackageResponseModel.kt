@@ -23,7 +23,7 @@ data class PackageModel(
     val numberOfLike: Double,
     val numberOfUnlike: Double,
     val packageCategory: Double,
-    val questions: List<String>,
+    val questions: String,
     override val updatedTime: String,
     val username: String,
     override val version: Int,
