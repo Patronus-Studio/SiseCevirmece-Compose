@@ -1,7 +1,9 @@
 package com.patronusstudio.sisecevirmece.data.repository.network
 
+import com.patronusstudio.sisecevirmece.data.model.BaseResponse
 import com.patronusstudio.sisecevirmece.data.model.PackageCategoryResponseModel
 import com.patronusstudio.sisecevirmece.data.model.PackageResponseModel
+import com.patronusstudio.sisecevirmece.data.model.SampleResponse
 import com.patronusstudio.sisecevirmece.data.objects.RetrofitObjects
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +21,12 @@ class PackageNetworkRepository @Inject constructor() {
     suspend fun getPackageCategories(): Response<PackageCategoryResponseModel> {
         return withContext(Dispatchers.IO) {
             RetrofitObjects.getApi().getAllPackageCategories()
+        }
+    }
+
+    suspend fun updatePackageNumberOfDownload(packageId: Int): Response<SampleResponse> {
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().updatePackageNumberOfDownload(packageId)
         }
     }
 

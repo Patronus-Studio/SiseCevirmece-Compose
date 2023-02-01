@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.app.Application
-import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
@@ -140,7 +139,10 @@ class PackageViewModel @Inject constructor(
 
     suspend fun updatePackage() {
         _isLoading.value = true
-        val byteArray = downloadImage(application.applicationContext,_currentPackage.value!!.imageUrl).toByteArrray()
+        val byteArray = downloadImage(
+            application.applicationContext,
+            _currentPackage.value!!.imageUrl
+        ).toByteArrray()
         val dbPackageModel =
             packageLocalRepository.getPackageOnCloudPackageCategoryId(
 
@@ -166,7 +168,7 @@ class PackageViewModel @Inject constructor(
 
         val questions = mutableListOf<QuestionDbModel>().apply {
             _currentPackage.value!!.questions.split(";").forEach {
-                if(it.isNotEmpty()&& it.isNotBlank()){
+                if (it.isNotEmpty() && it.isNotBlank()) {
                     this.add(
                         QuestionDbModel(
                             localPackagePrimaryId = packagePrimaryId,
@@ -215,5 +217,13 @@ class PackageViewModel @Inject constructor(
 
     private enum class PackageControlStatu {
         DOWNLOADED, UPDATED, REMOVED
+    }
+
+    suspend fun updateDownloadCountOnService() {
+        _isLoading.value = true
+        _currentPackage.value?.let {
+            packageNetworkRepository.updatePackageNumberOfDownload(it.id)
+        }
+        _isLoading.value = false
     }
 }

@@ -36,4 +36,8 @@ interface BottleService {
     @POST("userGameInfo/updateCurrentAvatar")
     suspend fun updateCurrentAvatar(@Query("username") username: String,@Query("currentAvatar") currentAvatar: Int)
 
+    @POST("package/updatePackageNumberOfDownload")
+    suspend fun updatePackageNumberOfDownload(@Query("packageId") packageId:Int):Response<SampleResponse>
+
+
 }

@@ -89,8 +89,14 @@ fun StoreScreen(back: () -> Unit) {
             }, clickedBtn = {
                 coroutineScope.launch(Dispatchers.Main) {
                     when (viewModel.currentPackage.value!!.packageStatu) {
-                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> viewModel.downloadPackage()
-                        PackageDetailCardBtnEnum.NEED_UPDATE -> viewModel.updatePackage()
+                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> {
+                            viewModel.downloadPackage()
+                            viewModel.updateDownloadCountOnService()
+                        }
+                        PackageDetailCardBtnEnum.NEED_UPDATE -> {
+                            viewModel.updatePackage()
+                            viewModel.updateDownloadCountOnService()
+                        }
                         PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
                     }
                 }
