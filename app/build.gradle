@@ -82,6 +82,9 @@ dependencies {
     implementation "androidx.room:room-ktx:$room"
     annotationProcessor "androidx.room:room-compiler:$room"
     kapt "androidx.room:room-compiler:$room"
+
+    implementation 'com.github.a914-gowtham:compose-ratingbar:1.2.4'
+
 }
 kapt {
     correctErrorTypes true

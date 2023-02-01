@@ -1,9 +1,10 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,13 +14,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,19 +31,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarConfig
+import com.gowtham.ratingbar.RatingBarStyle
+import com.gowtham.ratingbar.StepSize
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
-import com.patronusstudio.sisecevirmece.data.AvatarStatu
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
-import com.patronusstudio.sisecevirmece.ui.theme.*
+import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
-import com.patronusstudio.sisecevirmece.ui.widgets.LevelBar
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -50,11 +57,12 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<HomeViewModel>()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coroutine = rememberCoroutineScope()
+    val popupClicked = remember { mutableStateOf(false) }
     LaunchedEffect(key1 = Unit) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)
         }
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             viewModel.getAvatars()
             viewModel.truthDareControl()
             viewModel.bottleControl()
@@ -116,17 +124,20 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                         InAppScreenNavEnums.PLAY_GAME -> {
                             route(it)
                         }
-                        InAppScreenNavEnums.LOGOUT -> {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                withContext(Dispatchers.IO) {
-                                    viewModel.clearAuthToken(mContext)
-                                }
-                                route(InAppScreenNavEnums.LOGOUT)
-                            }
-                        }
                         else -> ""
                     }
                 }
+                TwoButtons(dialogClicked = {
+                    popupClicked.value = true
+                }, route = {
+                    coroutine.launch(Dispatchers.Main) {
+                        withContext(Dispatchers.IO) {
+                            viewModel.clearAuthToken(mContext)
+                        }
+                        route(InAppScreenNavEnums.LOGOUT)
+                    }
+                })
+                if (popupClicked.value) UserComment { popupClicked.value = false }
                 PatronusStudio()
                 AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                     LoadingAnimation()
@@ -161,9 +172,9 @@ fun Space(ratio: Double) {
 @Composable
 private fun UserPicHousting(viewModel: HomeViewModel) {
     val currentImage = remember { mutableStateOf(viewModel.getCurrentAvatar()) }
-    LaunchedEffect(key1 = viewModel.avatar.collectAsState().value, block ={
+    LaunchedEffect(key1 = viewModel.avatar.collectAsState().value, block = {
         currentImage.value = viewModel.getCurrentAvatar()
-    } )
+    })
     val isClicked = remember { mutableStateOf(false) }
     if (isClicked.value) {
         OpenDialog(viewModel) {
@@ -171,7 +182,7 @@ private fun UserPicHousting(viewModel: HomeViewModel) {
             if (it != null) {
                 currentImage.value = it
                 viewModel.setCurrentAvatar(it.id)
-                CoroutineScope(Dispatchers.IO).launch{
+                CoroutineScope(Dispatchers.IO).launch {
                     viewModel.updateAvatar(it.id)
                 }
 
@@ -203,9 +214,13 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CardImageWithText(
-            context.resources.getDrawable(R.drawable.category,null), stringResource(id = R.string.add_category),
-            backgroundColor = Color.White, textColor = AppColor.Heliotrope,
-            borderColor = AppColor.SeaSerpent, cardSizeWidth, cardSizeHeight,
+            context.resources.getDrawable(R.drawable.category, null),
+            stringResource(id = R.string.add_category),
+            backgroundColor = Color.White,
+            textColor = AppColor.Heliotrope,
+            borderColor = AppColor.SeaSerpent,
+            cardSizeWidth,
+            cardSizeHeight,
             imageSize
         ) {
             route(InAppScreenNavEnums.ADD_CATEGORIES)
@@ -244,11 +259,9 @@ private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
         Card(
             modifier = Modifier
                 .width(width = (width * 0.8).dp)
-                .padding(vertical = 16.dp)
+                .padding(bottom = 16.dp)
                 .combinedClickable(onClick = {
                     playGame(InAppScreenNavEnums.PLAY_GAME)
-                }, onLongClick = {
-                    playGame(InAppScreenNavEnums.LOGOUT)
                 }),
             backgroundColor = AppColor.Mustard,
             shape = RoundedCornerShape(16.dp)
@@ -303,6 +316,130 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
                                 }
                             })
                     })
+            }
+        }
+    }
+}
+
+@Composable
+private fun TwoButtons(dialogClicked: () -> Unit, route: (InAppScreenNavEnums) -> Unit) {
+    val width = LocalConfiguration.current.screenWidthDp
+    val cardSizeWidth = (width * 0.2).dp
+    val cardSizeHeight = (width * 0.2).dp
+    val imageSize = (width * 0.1).dp
+    val context = LocalContext.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        CardImageWithText(
+            context.resources.getDrawable(R.drawable.comment, null),
+            stringResource(R.string.user_comment),
+            backgroundColor = AppColor.White,
+            textColor = AppColor.Heliotrope,
+            borderColor = AppColor.SeaSerpent,
+            cardSizeWidth,
+            cardSizeHeight,
+            imageSize
+        ) {
+            dialogClicked()
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        CardImageWithText(
+            context.resources.getDrawable(R.drawable.logout),
+            stringResource(R.string.logout),
+            backgroundColor = AppColor.White,
+            imageSize = imageSize,
+            textColor = AppColor.SunsetOrange,
+            borderColor = AppColor.SeaSerpent,
+            cardSizeWidth = cardSizeWidth,
+            cardSizeHeight = cardSizeHeight
+        ) {
+            route(InAppScreenNavEnums.LOGOUT)
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun UserComment(dismiss: () -> Unit) {
+    val width = (LocalConfiguration.current.screenWidthDp * 0.9).dp
+    val height = (LocalConfiguration.current.screenHeightDp * 0.45).dp
+    val outlinedTextHeight = (height.value * 0.4).dp
+    val buttonHeight = (height.value * 0.12).dp
+    val starWidth = (width.value * 0.1).dp
+    var rating: Float by remember { mutableStateOf(5f) }
+    val roundedCornerShape = RoundedCornerShape(16.dp)
+    val comment = remember {
+        mutableStateOf("")
+    }
+
+    Dialog(
+        onDismissRequest = { dismiss() },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = true,
+            dismissOnBackPress = true
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .height(height)
+                .width(width)
+                .background(AppColor.White, roundedCornerShape)
+                .clip(roundedCornerShape)
+                .border(1.dp, AppColor.BlueViolet)
+                .imePadding()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                RatingBar(value = rating, onValueChange = {
+                    rating = it
+                }, onRatingChanged = {
+                    Log.d("Sülo", "$rating")
+                }, config = RatingBarConfig()
+                    .size(starWidth)
+                    .stepSize(StepSize.HALF)
+                    .style(RatingBarStyle.HighLighted)
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                OutlinedTextField(
+                    value = comment.value,
+                    onValueChange = {
+                        comment.value = it
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(outlinedTextHeight),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high)
+                    )
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = {
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = 0.9f)
+                            .height(buttonHeight),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = AppColor.Heliotrope)
+                    ) {
+                        Text(text = "Gönder", color = AppColor.White)
+                    }
+                }
             }
         }
     }

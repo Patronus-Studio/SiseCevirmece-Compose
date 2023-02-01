@@ -26,6 +26,7 @@ object AppColor {
     val GreenMalachite = Color(0xFF00c853)
     val White = Color(0xFFFFFFFF)
     val WhiteSoft = Color(0x8FFFFFFF)
+    val WhiteSoftPlus = Color(0xCDFFFFFF)
     val ScreaminGreen = Color(0xFF74FF7E)
     val ElectricGreen = Color(0xFF00FF00)
     val Red = Color(0xFFFF0000)

@@ -155,19 +155,6 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
 }
 
 @Composable
-fun TopImage(widthRatio80: Dp, heightRatio40: Dp) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_undraw_beer_xg5f),
-            contentDescription = "Google girişi", contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .width(widthRatio80)
-                .height(heightRatio40)
-        )
-    }
-}
-
-@Composable
 fun UsernameView(
     username: String,
     widthSize: Dp,

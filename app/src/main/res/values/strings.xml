@@ -48,6 +48,8 @@
     <string name="wood_light_background">Light Arka Plan</string>
     <string name="wood_normal_background">Normal Arka Plan</string>
     <string name="wood_texture_background">Yapı Arka Plan</string>
+    <string name="user_comment">Geri Bildirim</string>
+    <string name="logout">Çıkış Yap</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>

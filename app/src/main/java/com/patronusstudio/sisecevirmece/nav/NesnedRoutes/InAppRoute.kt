@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
+import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.NavInAppScreens
 import com.patronusstudio.sisecevirmece.data.enums.GameMode
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
@@ -50,6 +51,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             HomeScreen {
                 when (it) {
                     InAppScreenNavEnums.LOGOUT -> {
+                        MainApplication.authToken = ""
                         navController.popBackStack()
                         navController.navigate(NavInAppScreens.LoginScreen.routeName)
                     }
