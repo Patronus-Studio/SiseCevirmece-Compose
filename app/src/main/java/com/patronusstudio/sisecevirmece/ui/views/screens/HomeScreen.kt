@@ -1,10 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -46,10 +42,7 @@ import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
 import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -138,7 +131,17 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
                         route(InAppScreenNavEnums.LOGOUT)
                     }
                 })
-                if (popupClicked.value) UserComment { popupClicked.value = false }
+                if (popupClicked.value) {
+                    UserComment(
+                        dissmis = { popupClicked.value = false },
+                        clicked = { comment, star ->
+                            coroutine.launch {
+                                viewModel.addNewComment(comment, star)
+                                delay(300)
+                                popupClicked.value = false
+                            }
+                        })
+                }
                 PatronusStudio()
                 AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                     LoadingAnimation()
@@ -364,15 +367,14 @@ private fun TwoButtons(dialogClicked: () -> Unit, route: (InAppScreenNavEnums) -
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-@Preview
 @Composable
-private fun UserComment(dissmis: () -> Unit) {
+private fun UserComment(dissmis: () -> Unit, clicked: (String, Float) -> Unit) {
     val width = (LocalConfiguration.current.screenWidthDp * 0.9).dp
     val height = (LocalConfiguration.current.screenHeightDp * 0.35).dp
     val outlinedTextHeight = (height.value * 0.3).dp
     val buttonHeight = (height.value * 0.15).dp
     val starWidth = (width.value * 0.14).dp
-    var rating: Float by remember { mutableStateOf(5f) }
+    val rating = remember { mutableStateOf(5f) }
     val circularCornerShape = RoundedCornerShape(32.dp)
     val comment = remember { mutableStateOf("") }
     Dialog(
@@ -414,8 +416,8 @@ private fun UserComment(dissmis: () -> Unit) {
                     Spacer(
                         modifier = Modifier.height(16.dp)
                     )
-                    RatingBar(value = rating, onValueChange = {
-                        rating = it
+                    RatingBar(value = rating.value, onValueChange = {
+                        rating.value = it
                     }, onRatingChanged = {}, config = RatingBarConfig()
                         .size(starWidth)
                         .stepSize(StepSize.HALF)
@@ -464,6 +466,9 @@ private fun UserComment(dissmis: () -> Unit) {
                         this.top.linkTo(cardRef.bottom)
                         this.bottom.linkTo(cardRef.bottom)
                         this.centerHorizontallyTo(cardRef)
+                    }
+                    .clickable {
+                        clicked(comment.value, rating.value)
                     },
                 contentAlignment = Alignment.Center
             ) {

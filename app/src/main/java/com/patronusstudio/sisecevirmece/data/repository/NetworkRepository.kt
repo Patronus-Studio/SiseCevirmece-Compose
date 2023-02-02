@@ -51,9 +51,16 @@ class NetworkRepository @Inject constructor() {
         }
     }
 
-    suspend fun updateAvatar(username: String,avatarId:Int){
+    suspend fun updateAvatar(username: String, avatarId: Int) {
         withContext(Dispatchers.IO) {
-            RetrofitObjects.getApi().updateCurrentAvatar(username,avatarId)
+            RetrofitObjects.getApi().updateCurrentAvatar(username, avatarId)
         }
     }
+
+    suspend fun addNewComment(model: UserCommentRequest): Response<SampleResponse> {
+        return withContext(Dispatchers.IO) {
+            RetrofitObjects.getApi().addNewComment(model)
+        }
+    }
+
 }

@@ -19,25 +19,29 @@ interface BottleService {
     suspend fun checkUsername(@Query("username") username: String): Response<SampleResponse>
 
     @POST("userGameInfo/getUserGameInfo")
-    suspend fun getUserGameInfo(@Query("authToken") authToken: String) : Response<UserInfoModelResponse>
+    suspend fun getUserGameInfo(@Query("authToken") authToken: String): Response<UserInfoModelResponse>
 
     @GET("avatar/getAvatars")
-    suspend fun getAvatars(@Query("username") username: String):Response<AvatarResponseModel>
+    suspend fun getAvatars(@Query("username") username: String): Response<AvatarResponseModel>
 
     @GET("level/getAllLevel")
-    suspend fun getAllLevel():Response<LevelResponseModel>
+    suspend fun getAllLevel(): Response<LevelResponseModel>
 
     @GET("package/getAllPackageCategories")
-    suspend fun getAllPackageCategories():Response<PackageCategoryResponseModel>
+    suspend fun getAllPackageCategories(): Response<PackageCategoryResponseModel>
 
     @GET("package/getPackageByCategoryName")
-    suspend fun getPackageByCategoryName(@Query("packageCategory") packageCategory: Int):Response<PackageResponseModel>
+    suspend fun getPackageByCategoryName(@Query("packageCategory") packageCategory: Int): Response<PackageResponseModel>
 
     @POST("userGameInfo/updateCurrentAvatar")
-    suspend fun updateCurrentAvatar(@Query("username") username: String,@Query("currentAvatar") currentAvatar: Int)
+    suspend fun updateCurrentAvatar(
+        @Query("username") username: String,
+        @Query("currentAvatar") currentAvatar: Int
+    )
 
     @POST("package/updatePackageNumberOfDownload")
-    suspend fun updatePackageNumberOfDownload(@Query("packageId") packageId:Int):Response<SampleResponse>
+    suspend fun updatePackageNumberOfDownload(@Query("packageId") packageId: Int): Response<SampleResponse>
 
-
+    @POST("userComment/setUserComment")
+    suspend fun addNewComment(@Body userCommentRequest: UserCommentRequest): Response<SampleResponse>
 }

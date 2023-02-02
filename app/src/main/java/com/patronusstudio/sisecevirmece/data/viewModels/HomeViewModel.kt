@@ -2,7 +2,9 @@ package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.lifecycle.ViewModel
+import com.patronusstudio.sisecevirmece.BuildConfig
 import com.patronusstudio.sisecevirmece.R
 import com.patronusstudio.sisecevirmece.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece.data.enums.SampleBackgroundEnum
@@ -10,6 +12,7 @@ import com.patronusstudio.sisecevirmece.data.enums.SampleBottleEnum
 import com.patronusstudio.sisecevirmece.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.model.LevelModel
+import com.patronusstudio.sisecevirmece.data.model.UserCommentRequest
 import com.patronusstudio.sisecevirmece.data.model.UserInfoModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece.data.model.dbmodel.BottleDbModel
@@ -82,7 +85,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setCurrentAvatar(avatarId:Int){
+    fun setCurrentAvatar(avatarId: Int) {
         _userGameInfoModel.value!!.currentAvatar = avatarId.toString()
     }
 
@@ -152,7 +155,7 @@ class HomeViewModel @Inject constructor(
     private suspend fun getDbModel(
         truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): PackageDbModel {
-        val image =  withContext(Dispatchers.IO){
+        val image = withContext(Dispatchers.IO) {
             truthDareDefaultPackageEnum.getImageId().toBitmapArray(application.applicationContext)
         }
         return PackageDbModel(
@@ -188,11 +191,10 @@ class HomeViewModel @Inject constructor(
         if (bottleSize.isEmpty().not()) {
             _isLoading.value = false
             return
-        }
-        else {
+        } else {
             val bottles = mutableListOf<BottleDbModel>()
             SampleBottleEnum.values().forEach {
-                val image =  withContext(Dispatchers.IO){
+                val image = withContext(Dispatchers.IO) {
                     it.getImageId().toBitmapArray(application.applicationContext)
                 }
                 val tempModel = BottleDbModel(
@@ -213,11 +215,10 @@ class HomeViewModel @Inject constructor(
         if (backgroundsSize.isEmpty().not()) {
             _isLoading.value = false
             return
-        }
-        else {
+        } else {
             val backgrounds = mutableListOf<BackgroundDbModel>()
             SampleBackgroundEnum.values().forEach {
-                val image =  withContext(Dispatchers.IO){
+                val image = withContext(Dispatchers.IO) {
                     it.getImageId().toBitmapArray(application.applicationContext)
                 }
                 val tempModel = BackgroundDbModel(
@@ -232,9 +233,28 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateAvatar(avatarId:Int){
+    suspend fun updateAvatar(avatarId: Int) {
         _isLoading.value = true
-        networkRepository.updateAvatar(_userGameInfoModel.value?.username ?: "",avatarId)
+        networkRepository.updateAvatar(_userGameInfoModel.value?.username ?: "", avatarId)
+        _isLoading.value = false
+    }
+
+    suspend fun addNewComment(comment: String, starSize: Float) {
+        _isLoading.value = true
+        val userCommentRequest = UserCommentRequest(
+            appVersion = BuildConfig.VERSION_NAME,
+            comment = comment,
+            deviceModel = Build.MODEL + " - " + Build.MANUFACTURER,
+            deviceType = "GMS",
+            sendDate = System.currentTimeMillis().toString(),
+            starCount = starSize,
+            username = _userGameInfoModel.value?.username ?: ""
+        )
+        val result = networkRepository.addNewComment(userCommentRequest)
+        if (result.body()?.status != HttpStatusEnum.OK) {
+            _errorMessage.value = result.body()?.message
+                ?: application.applicationContext.getString(R.string.getting_some_error)
+        }
         _isLoading.value = false
     }
 
