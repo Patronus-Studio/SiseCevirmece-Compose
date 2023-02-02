@@ -31,5 +31,7 @@ object AppColor {
     val ElectricGreen = Color(0xFF00FF00)
     val Red = Color(0xFFFF0000)
     val SoftBlack = Color(0xFF7D7D7D)
+    val AmericanColor = Color(0xFF42B83A)
+    val MaximumRed = Color(0xFFDE1A1E)
 }
 

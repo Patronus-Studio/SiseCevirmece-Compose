@@ -1,6 +1,5 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -26,10 +25,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
@@ -363,84 +364,117 @@ private fun TwoButtons(dialogClicked: () -> Unit, route: (InAppScreenNavEnums) -
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
+@Preview
 @Composable
-private fun UserComment(dismiss: () -> Unit) {
+private fun UserComment(dissmis: () -> Unit) {
     val width = (LocalConfiguration.current.screenWidthDp * 0.9).dp
-    val height = (LocalConfiguration.current.screenHeightDp * 0.45).dp
-    val outlinedTextHeight = (height.value * 0.4).dp
-    val buttonHeight = (height.value * 0.12).dp
-    val starWidth = (width.value * 0.1).dp
+    val height = (LocalConfiguration.current.screenHeightDp * 0.35).dp
+    val outlinedTextHeight = (height.value * 0.3).dp
+    val buttonHeight = (height.value * 0.15).dp
+    val starWidth = (width.value * 0.14).dp
     var rating: Float by remember { mutableStateOf(5f) }
-    val roundedCornerShape = RoundedCornerShape(16.dp)
-    val comment = remember {
-        mutableStateOf("")
-    }
-
+    val circularCornerShape = RoundedCornerShape(32.dp)
+    val comment = remember { mutableStateOf("") }
     Dialog(
-        onDismissRequest = { dismiss() },
+        onDismissRequest = { dissmis() },
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnClickOutside = true,
             dismissOnBackPress = true
         )
     ) {
-        Box(
-            modifier = Modifier
-                .height(height)
-                .width(width)
-                .background(AppColor.White, roundedCornerShape)
-                .clip(roundedCornerShape)
-                .border(1.dp, AppColor.BlueViolet)
-                .imePadding()
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+        ConstraintLayout(modifier = Modifier.imePadding()) {
+            val (cardRef, sendBtnRef) = createRefs()
+            Box(
+                modifier = Modifier
+                    .height(height)
+                    .width(width)
+                    .background(AppColor.AmericanColor, circularCornerShape)
+                    .clip(circularCornerShape)
+                    .border(1.dp, AppColor.BlueViolet)
+                    .padding(16.dp)
+                    .constrainAs(cardRef) {
+                        this.centerHorizontallyTo(parent)
+                        this.centerVerticallyTo(parent)
+                    }
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                RatingBar(value = rating, onValueChange = {
-                    rating = it
-                }, onRatingChanged = {
-                    Log.d("Sülo", "$rating")
-                }, config = RatingBarConfig()
-                    .size(starWidth)
-                    .stepSize(StepSize.HALF)
-                    .style(RatingBarStyle.HighLighted)
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                OutlinedTextField(
-                    value = comment.value,
-                    onValueChange = {
-                        comment.value = it
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(outlinedTextHeight),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        unfocusedBorderColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high)
-                    )
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = {
-
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.vote_for_us),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = AppColor.White
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
+                    RatingBar(value = rating, onValueChange = {
+                        rating = it
+                    }, onRatingChanged = {}, config = RatingBarConfig()
+                        .size(starWidth)
+                        .stepSize(StepSize.HALF)
+                        .style(RatingBarStyle.HighLighted)
+                        .inactiveBorderColor(Color(0xffffd740))
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    OutlinedTextField(
+                        value = comment.value,
+                        onValueChange = {
+                            comment.value = it
+                        },
+                        placeholder = {
+                            AnimatedVisibility(visible = comment.value.isEmpty()) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.suggestion_comment_hint),
+                                        color = AppColor.WhiteSoft
+                                    )
+                                }
+                            }
                         },
                         modifier = Modifier
-                            .fillMaxWidth(fraction = 0.9f)
-                            .height(buttonHeight),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = AppColor.Heliotrope)
-                    ) {
-                        Text(text = "Gönder", color = AppColor.White)
-                    }
+                            .fillMaxWidth(0.9f)
+                            .height(outlinedTextHeight),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            unfocusedBorderColor = AppColor.WhiteSoft,
+                            focusedBorderColor = AppColor.WhiteSoftPlus,
+                            textColor = AppColor.White,
+                            cursorColor = AppColor.White
+                        )
+                    )
                 }
             }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.5f)
+                    .height(buttonHeight)
+                    .clip(circularCornerShape)
+                    .background(AppColor.MaximumRed, circularCornerShape)
+                    .border(1.dp, AppColor.White, circularCornerShape)
+                    .constrainAs(sendBtnRef) {
+                        this.top.linkTo(cardRef.bottom)
+                        this.bottom.linkTo(cardRef.bottom)
+                        this.centerHorizontallyTo(cardRef)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Gönder",
+                    color = AppColor.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+            }
+
         }
     }
 }
