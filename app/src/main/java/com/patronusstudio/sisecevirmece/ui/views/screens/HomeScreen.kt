@@ -8,7 +8,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -50,9 +53,8 @@ import kotlinx.coroutines.*
 fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<HomeViewModel>()
     val coroutineScope = rememberCoroutineScope()
-    val popupClicked = remember { mutableStateOf(false) }
     val popupVisibleAnimation = remember { mutableStateOf(AnimStatus.INIT) }
-    val exitStatus = remember { mutableStateOf(false) }
+    val popupIsVisible = remember { mutableStateOf(AnimStatus.INIT) }
     val destinationStatus = remember { mutableStateOf(InAppScreenNavEnums.INIT) }
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
@@ -78,13 +80,18 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             else -> route(destinationStatus.value)
         }
     })
-    LaunchedEffect(key1 = popupClicked.value, block = {
-        if (popupClicked.value) {
-            delay(AnimMillis.SHORT.millis.toLong())
+    LaunchedEffect(key1 = popupIsVisible.value, block = {
+        if (popupIsVisible.value == AnimStatus.START) {
+            delay(AnimMillis.VERY_SHORT.millis.toLong())
             popupVisibleAnimation.value = AnimStatus.START
-        } else {
+        } else if (popupIsVisible.value == AnimStatus.EXIT) {
+            delay(AnimMillis.VERY_SHORT.millis.toLong())
             popupVisibleAnimation.value = AnimStatus.EXIT
-            delay(AnimMillis.SHORT.millis.toLong())
+            delay(AnimMillis.VERY_SHORT.millis.toLong())
+            popupIsVisible.value = AnimStatus.INIT
+        } else {
+            popupVisibleAnimation.value = AnimStatus.INIT
+            popupIsVisible.value = AnimStatus.INIT
         }
     })
     Column(
@@ -115,25 +122,24 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             destinationStatus.value = it
         }
         TwoButtons(exitClicked = {
-            exitStatus.value = true
+            destinationStatus.value = InAppScreenNavEnums.LOGOUT
         }, dialogClicked = {
-            popupClicked.value = true
+            popupIsVisible.value = AnimStatus.START
         })
         PatronusStudio()
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
         }
-        // TODO: exit animation have error
-        if (popupClicked.value) {
+        if (popupIsVisible.value != AnimStatus.INIT) {
             UserComment(
                 animStatus = popupVisibleAnimation.value,
                 dissmis = {
-                    popupClicked.value = false
+                    popupIsVisible.value = AnimStatus.EXIT
                 },
                 clicked = { comment, star ->
                     coroutineScope.launch {
                         viewModel.addNewComment(comment, star)
-                        popupClicked.value = false
+                        popupIsVisible.value = AnimStatus.EXIT
                     }
                 })
         }
@@ -368,15 +374,17 @@ private fun UserComment(
     clicked: (String, Float) -> Unit
 ) {
     val width = (LocalConfiguration.current.screenWidthDp * 0.9).dp
-    val height = (LocalConfiguration.current.screenHeightDp * 0.35).dp
-    val outlinedTextHeight = (height.value * 0.3).dp
+    val height = (LocalConfiguration.current.screenHeightDp * 0.38).dp
+    val outlinedTextHeight = (height.value * 0.25).dp
     val buttonHeight = (height.value * 0.15).dp
     val starWidth = (width.value * 0.14).dp
     val rating = remember { mutableStateOf(5f) }
     val circularCornerShape = RoundedCornerShape(32.dp)
     val comment = remember { mutableStateOf("") }
     Dialog(
-        onDismissRequest = { dissmis() },
+        onDismissRequest = {
+            dissmis()
+        },
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnClickOutside = true,
@@ -384,18 +392,28 @@ private fun UserComment(
         )
     ) {
         AnimatedVisibility(
-            visible = animStatus == AnimStatus.START, enter = slideInVertically(
-                animationSpec = tween(AnimMillis.SHORT.millis), initialOffsetY = {
+            visible = animStatus == AnimStatus.START,
+            enter = slideInVertically(
+                animationSpec = tween(AnimMillis.SHORT.millis),
+                initialOffsetY = {
                     it
-                }
-            ) + fadeIn(animationSpec = tween(AnimMillis.SHORT.millis)),
+                }) +
+                    fadeIn(
+                        animationSpec = tween(
+                            AnimMillis.SHORT.millis
+                        )
+                    ),
             exit = slideOutVertically(
                 animationSpec = tween(AnimMillis.SHORT.millis),
                 targetOffsetY = {
                     -it
-                }) + fadeOut(
-                animationSpec = tween(AnimMillis.SHORT.millis)
-            )
+                }) +
+                    fadeOut(
+                        animationSpec = tween(
+                            AnimMillis.SHORT.millis,
+                            delayMillis = AnimMillis.VERY_SHORT.millis
+                        )
+                    )
         ) {
             ConstraintLayout(modifier = Modifier.imePadding()) {
                 val (cardRef, sendBtnRef) = createRefs()

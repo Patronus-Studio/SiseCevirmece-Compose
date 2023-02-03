@@ -67,6 +67,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
                     InAppScreenNavEnums.PROFILE -> {
                         navController.navigate(NavInAppScreens.ProfileScreen.routeName)
                     }
+                    else -> ""
                 }
             }
         }
