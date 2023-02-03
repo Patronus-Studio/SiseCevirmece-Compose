@@ -58,6 +58,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         viewModel.getTruthDareQuestions()
         viewModel.setTruthDareSelected(TruthDareEnum.DARE)
         viewModel.getTruthDareQuestions()
+        isSpinning.value = false
     })
     BaseBackground(
         titleId = R.string.play_normal_title,

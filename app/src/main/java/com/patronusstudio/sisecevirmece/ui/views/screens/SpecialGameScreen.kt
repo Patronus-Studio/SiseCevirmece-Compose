@@ -53,6 +53,7 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
         viewModel.getActiveBackground()
         viewModel.getBottleOnDb()
         viewModel.jsonToModel(selectedPackages)
+        isSpinning.value = false
     })
 
     BaseBackground(
