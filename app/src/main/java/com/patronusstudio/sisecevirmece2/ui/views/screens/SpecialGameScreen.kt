@@ -2,6 +2,7 @@ package com.patronusstudio.sisecevirmece2.ui.views.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.ContentScale
@@ -22,10 +24,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.SpecialQuestionDialog
+import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
@@ -65,6 +69,14 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
                     ?: R.drawable.background_original, contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
             )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                BannerAdView(BuildConfig.in_game_special_banner)
+            }
         },
         contentOnTitleBottom = {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
