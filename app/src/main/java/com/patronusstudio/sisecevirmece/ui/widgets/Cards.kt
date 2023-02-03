@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece.ui.widgets
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -47,6 +48,7 @@ fun CardImageWithText(
     imageSize: Dp,
     clicked: () -> Unit,
 ) {
+    Log.d("call", text)
     Card(
         modifier = Modifier
             .width(cardSizeWidth)

@@ -1,6 +1,7 @@
 package com.patronusstudio.sisecevirmece.ui.views.screens
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -34,24 +35,25 @@ import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
 import com.patronusstudio.sisecevirmece.MainApplication
 import com.patronusstudio.sisecevirmece.R
+import com.patronusstudio.sisecevirmece.data.enums.AnimMillis
+import com.patronusstudio.sisecevirmece.data.enums.AnimStatus
 import com.patronusstudio.sisecevirmece.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece.ui.widgets.CardImageWithText
-import com.patronusstudio.sisecevirmece.ui.widgets.ErrorSheet
 import com.patronusstudio.sisecevirmece.ui.widgets.UserPic
 import kotlinx.coroutines.*
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
-    val mContext = LocalContext.current
     val viewModel = hiltViewModel<HomeViewModel>()
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val coroutine = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val popupClicked = remember { mutableStateOf(false) }
+    val popupVisibleAnimation = remember { mutableStateOf(AnimStatus.INIT) }
+    val exitStatus = remember { mutableStateOf(false) }
+    val destinationStatus = remember { mutableStateOf(InAppScreenNavEnums.INIT) }
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)
@@ -61,93 +63,82 @@ fun HomeScreen(route: (InAppScreenNavEnums) -> Unit) {
             viewModel.truthDareControl()
             viewModel.bottleControl()
             viewModel.backgroundControl()
-        }
-
-    }
-    LaunchedEffect(
-        key1 = viewModel.loginError.collectAsState().value
-    ) {
-        if (viewModel.loginError.value.isNotEmpty()) {
-            if (sheetState.isVisible.not()) sheetState.show()
-        } else {
-            sheetState.hide()
             //viewModel.getAllLevel()
         }
     }
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetContent = {
-            ErrorSheet(
-                message = viewModel.loginError.collectAsState().value,
-                errorIconClicked = {
-                    coroutine.launch(Dispatchers.Main) {
-                        withContext(Dispatchers.IO) {
-                            viewModel.clearAuthToken(mContext)
-                        }
-                        route(InAppScreenNavEnums.LOGOUT)
-                    }
-                })
-
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(AppColor.BlueViolet)
-            ) {
-                Space(0.02)
-                Title()
-                Space(0.05)
-                UserPicHousting(viewModel)
-                Space(0.05)
-                Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "")
-                /*LevelBar(
-                    currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
-                        ?: 0,
-                    currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
-                    nextLevelNeedStar = viewModel.calculateNextLevelStarSize(
-                        viewModel.levels.collectAsState().value ?: listOf()
-                    )
-                )*/
-                Space(0.03)
-                HomeCards(route)
-                Space(0.05)
-                PlayButton {
-                    when (it) {
-                        InAppScreenNavEnums.PLAY_GAME -> {
-                            route(it)
-                        }
-                        else -> ""
-                    }
+    LaunchedEffect(key1 = destinationStatus.value, block = {
+        when (destinationStatus.value) {
+            InAppScreenNavEnums.INIT -> return@LaunchedEffect
+            InAppScreenNavEnums.LOGOUT -> {
+                withContext(Dispatchers.IO) {
+                    viewModel.clearAuthToken()
                 }
-                TwoButtons(dialogClicked = {
-                    popupClicked.value = true
-                }, route = {
-                    coroutine.launch(Dispatchers.Main) {
-                        withContext(Dispatchers.IO) {
-                            viewModel.clearAuthToken(mContext)
-                        }
-                        route(InAppScreenNavEnums.LOGOUT)
-                    }
-                })
-                if (popupClicked.value) {
-                    UserComment(
-                        dissmis = { popupClicked.value = false },
-                        clicked = { comment, star ->
-                            coroutine.launch {
-                                viewModel.addNewComment(comment, star)
-                                delay(300)
-                                popupClicked.value = false
-                            }
-                        })
-                }
-                PatronusStudio()
-                AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-                    LoadingAnimation()
-                }
+                route(InAppScreenNavEnums.LOGOUT)
             }
+            else -> route(destinationStatus.value)
+        }
+    })
+    LaunchedEffect(key1 = popupClicked.value, block = {
+        if (popupClicked.value) {
+            delay(AnimMillis.SHORT.millis.toLong())
+            popupVisibleAnimation.value = AnimStatus.START
+        } else {
+            popupVisibleAnimation.value = AnimStatus.EXIT
+            delay(AnimMillis.SHORT.millis.toLong())
+        }
+    })
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.BlueViolet)
+    ) {
+        Space(0.02)
+        Title()
+        Space(0.05)
+        UserPicHousting(viewModel)
+        Space(0.05)
+        Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "")
+        /*LevelBar(
+            currentStar = viewModel.userGameInfoModel.collectAsState().value?.starCount
+                ?: 0,
+            currentLevel = viewModel.userGameInfoModel.collectAsState().value?.level.toString(),
+            nextLevelNeedStar = viewModel.calculateNextLevelStarSize(
+                viewModel.levels.collectAsState().value ?: listOf()
+            )
+        )*/
+        Space(0.03)
+        HomeCards {
+            destinationStatus.value = it
+        }
+        Space(0.05)
+        PlayButton {
+            destinationStatus.value = it
+        }
+        TwoButtons(exitClicked = {
+            exitStatus.value = true
+        }, dialogClicked = {
+            popupClicked.value = true
         })
+        PatronusStudio()
+        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+            LoadingAnimation()
+        }
+        // TODO: exit animation have error
+        if (popupClicked.value) {
+            UserComment(
+                animStatus = popupVisibleAnimation.value,
+                dissmis = {
+                    popupClicked.value = false
+                },
+                clicked = { comment, star ->
+                    coroutineScope.launch {
+                        viewModel.addNewComment(comment, star)
+                        popupClicked.value = false
+                    }
+                })
+        }
+    }
+
 }
 
 @Composable
@@ -206,7 +197,7 @@ private fun Username(username: String) {
 }
 
 @Composable
-private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
+private fun HomeCards(destination: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val cardSizeWidth = (width * 0.25).dp
     val cardSizeHeight = (width * 0.25).dp
@@ -227,7 +218,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             cardSizeHeight,
             imageSize
         ) {
-            route(InAppScreenNavEnums.ADD_CATEGORIES)
+            destination(InAppScreenNavEnums.ADD_CATEGORIES)
         }
         CardImageWithText(
             context.resources.getDrawable(R.drawable.store),
@@ -238,7 +229,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             cardSizeWidth = cardSizeWidth,
             cardSizeHeight = cardSizeHeight
         ) {
-            route(InAppScreenNavEnums.STORES)
+            destination(InAppScreenNavEnums.STORES)
         }
         CardImageWithText(
             context.resources.getDrawable(R.drawable.profile),
@@ -250,7 +241,7 @@ private fun HomeCards(route: (InAppScreenNavEnums) -> Unit) {
             cardSizeHeight,
             imageSize
         ) {
-            route(InAppScreenNavEnums.PROFILE)
+            destination(InAppScreenNavEnums.PROFILE)
         }
     }
 }
@@ -326,7 +317,10 @@ fun OpenDialog(viewModel: HomeViewModel, dismiss: (AvatarModel?) -> Unit) {
 }
 
 @Composable
-private fun TwoButtons(dialogClicked: () -> Unit, route: (InAppScreenNavEnums) -> Unit) {
+private fun TwoButtons(
+    exitClicked: () -> Unit,
+    dialogClicked: () -> Unit
+) {
     val width = LocalConfiguration.current.screenWidthDp
     val cardSizeWidth = (width * 0.2).dp
     val cardSizeHeight = (width * 0.2).dp
@@ -361,14 +355,18 @@ private fun TwoButtons(dialogClicked: () -> Unit, route: (InAppScreenNavEnums) -
             cardSizeWidth = cardSizeWidth,
             cardSizeHeight = cardSizeHeight
         ) {
-            route(InAppScreenNavEnums.LOGOUT)
+            exitClicked()
         }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun UserComment(dissmis: () -> Unit, clicked: (String, Float) -> Unit) {
+private fun UserComment(
+    animStatus: AnimStatus,
+    dissmis: () -> Unit,
+    clicked: (String, Float) -> Unit
+) {
     val width = (LocalConfiguration.current.screenWidthDp * 0.9).dp
     val height = (LocalConfiguration.current.screenHeightDp * 0.35).dp
     val outlinedTextHeight = (height.value * 0.3).dp
@@ -385,101 +383,116 @@ private fun UserComment(dissmis: () -> Unit, clicked: (String, Float) -> Unit) {
             dismissOnBackPress = true
         )
     ) {
-        ConstraintLayout(modifier = Modifier.imePadding()) {
-            val (cardRef, sendBtnRef) = createRefs()
-            Box(
-                modifier = Modifier
-                    .height(height)
-                    .width(width)
-                    .background(AppColor.AmericanColor, circularCornerShape)
-                    .clip(circularCornerShape)
-                    .border(1.dp, AppColor.BlueViolet)
-                    .padding(16.dp)
-                    .constrainAs(cardRef) {
-                        this.centerHorizontallyTo(parent)
-                        this.centerVerticallyTo(parent)
-                    }
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+        AnimatedVisibility(
+            visible = animStatus == AnimStatus.START, enter = slideInVertically(
+                animationSpec = tween(AnimMillis.SHORT.millis), initialOffsetY = {
+                    it
+                }
+            ) + fadeIn(animationSpec = tween(AnimMillis.SHORT.millis)),
+            exit = slideOutVertically(
+                animationSpec = tween(AnimMillis.SHORT.millis),
+                targetOffsetY = {
+                    -it
+                }) + fadeOut(
+                animationSpec = tween(AnimMillis.SHORT.millis)
+            )
+        ) {
+            ConstraintLayout(modifier = Modifier.imePadding()) {
+                val (cardRef, sendBtnRef) = createRefs()
+                Box(
+                    modifier = Modifier
+                        .height(height)
+                        .width(width)
+                        .background(AppColor.AmericanColor, circularCornerShape)
+                        .clip(circularCornerShape)
+                        .border(1.dp, AppColor.BlueViolet)
+                        .padding(16.dp)
+                        .constrainAs(cardRef) {
+                            this.centerHorizontallyTo(parent)
+                            this.centerVerticallyTo(parent)
+                        }
                 ) {
-                    Spacer(
-                        modifier = Modifier.height(16.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.vote_for_us),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        color = AppColor.White
-                    )
-                    Spacer(
-                        modifier = Modifier.height(16.dp)
-                    )
-                    RatingBar(value = rating.value, onValueChange = {
-                        rating.value = it
-                    }, onRatingChanged = {}, config = RatingBarConfig()
-                        .size(starWidth)
-                        .stepSize(StepSize.HALF)
-                        .style(RatingBarStyle.HighLighted)
-                        .inactiveBorderColor(Color(0xffffd740))
-                    )
-                    Spacer(modifier = Modifier.height(32.dp))
-                    OutlinedTextField(
-                        value = comment.value,
-                        onValueChange = {
-                            comment.value = it
-                        },
-                        placeholder = {
-                            AnimatedVisibility(visible = comment.value.isEmpty()) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.suggestion_comment_hint),
-                                        color = AppColor.WhiteSoft
-                                    )
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .height(outlinedTextHeight),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            unfocusedBorderColor = AppColor.WhiteSoft,
-                            focusedBorderColor = AppColor.WhiteSoftPlus,
-                            textColor = AppColor.White,
-                            cursorColor = AppColor.White
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(
+                            modifier = Modifier.height(16.dp)
                         )
+                        Text(
+                            text = stringResource(R.string.vote_for_us),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
+                            color = AppColor.White
+                        )
+                        Spacer(
+                            modifier = Modifier.height(16.dp)
+                        )
+                        RatingBar(value = rating.value, onValueChange = {
+                            rating.value = it
+                        }, onRatingChanged = {}, config = RatingBarConfig()
+                            .size(starWidth)
+                            .stepSize(StepSize.HALF)
+                            .style(RatingBarStyle.HighLighted)
+                            .inactiveBorderColor(Color(0xffffd740))
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                        OutlinedTextField(
+                            value = comment.value,
+                            onValueChange = {
+                                comment.value = it
+                            },
+                            placeholder = {
+                                AnimatedVisibility(visible = comment.value.isEmpty()) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.suggestion_comment_hint),
+                                            color = AppColor.WhiteSoft
+                                        )
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .height(outlinedTextHeight),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = AppColor.WhiteSoft,
+                                focusedBorderColor = AppColor.WhiteSoftPlus,
+                                textColor = AppColor.White,
+                                cursorColor = AppColor.White
+                            )
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.5f)
+                        .height(buttonHeight)
+                        .clip(circularCornerShape)
+                        .background(AppColor.MaximumRed, circularCornerShape)
+                        .border(1.dp, AppColor.White, circularCornerShape)
+                        .constrainAs(sendBtnRef) {
+                            this.top.linkTo(cardRef.bottom)
+                            this.bottom.linkTo(cardRef.bottom)
+                            this.centerHorizontallyTo(cardRef)
+                        }
+                        .clickable {
+                            clicked(comment.value, rating.value)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Gönder",
+                        color = AppColor.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
                     )
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.5f)
-                    .height(buttonHeight)
-                    .clip(circularCornerShape)
-                    .background(AppColor.MaximumRed, circularCornerShape)
-                    .border(1.dp, AppColor.White, circularCornerShape)
-                    .constrainAs(sendBtnRef) {
-                        this.top.linkTo(cardRef.bottom)
-                        this.bottom.linkTo(cardRef.bottom)
-                        this.centerHorizontallyTo(cardRef)
-                    }
-                    .clickable {
-                        clicked(comment.value, rating.value)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Gönder",
-                    color = AppColor.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-            }
 
+            }
         }
     }
 }

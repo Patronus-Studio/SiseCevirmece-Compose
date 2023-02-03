@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece.data.viewModels
 
 import android.app.Application
-import android.content.Context
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece.BuildConfig
@@ -29,6 +28,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _loginError = MutableStateFlow("")
-    val loginError: StateFlow<String> = _loginError
+    val loginError = _loginError.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
@@ -75,8 +75,8 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    suspend fun clearAuthToken(mContext: Context) {
-        localRepository.removeUserToken(mContext)
+    suspend fun clearAuthToken() {
+        localRepository.removeUserToken(application.applicationContext)
     }
 
     fun getCurrentAvatar(): AvatarModel? {
