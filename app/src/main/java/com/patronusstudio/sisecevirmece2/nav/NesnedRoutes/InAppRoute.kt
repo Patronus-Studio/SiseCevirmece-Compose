@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.NavInAppScreens
 import com.patronusstudio.sisecevirmece2.data.enums.GameMode
@@ -12,7 +13,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece2.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece2.ui.views.screens.*
 
-fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
+fun NavGraphBuilder.passToInAppRoute(navController: NavHostController,mixpanelAPI: MixpanelAPI) {
     navigation(
         startDestination = NavInAppScreens.LoginScreen.routeName,
         route = NavInAppScreens.RootNesned.routeName
@@ -48,7 +49,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
         composable(
             route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
-            HomeScreen {
+            HomeScreen(mixpanelAPI) {
                 when (it) {
                     InAppScreenNavEnums.LOGOUT -> {
                         MainApplication.authToken = ""

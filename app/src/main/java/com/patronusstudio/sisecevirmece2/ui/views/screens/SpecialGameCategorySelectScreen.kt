@@ -136,7 +136,7 @@ private fun PlayButton(selectedPackageSize: Int, playButtonWidth: Dp, clicked: (
                 modifier = Modifier.width(playButtonWidth)
             ) {
                 Text(
-                    text = "OYNA", textAlign = TextAlign.Center, style = TextStyle(
+                    text = stringResource(R.string.play_bigger), textAlign = TextAlign.Center, style = TextStyle(
                         color = AppColor.White, fontSize = 24.sp, fontWeight = FontWeight.Bold
                     )
                 )
