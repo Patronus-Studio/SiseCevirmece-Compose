@@ -436,6 +436,7 @@ fun GetCardWithConstraint(
                 .width(cardMaxWidthSize.dp)
                 .wrapContentHeight()
                 .padding(bottom = 16.dp)
+                .imePadding()
         ) {
             val (cardRef, addBtnRef) = createRefs()
             Box(
