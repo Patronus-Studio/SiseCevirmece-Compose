@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">SiseCevirmece</string>
+    <string name="app_name">SiseCevirmece2</string>
     <string name="add_category">Kategori Ekle</string>
     <string name="store">Mağaza</string>
     <string name="my_profile">Profilim</string>
     <string name="play">OYNA</string>
     <string name="level">Level</string>
-    <string name="app_name_with_blank">Şişe Çevirmece</string>
+    <string name="app_name_with_blank">Şişe Çevirmece 2</string>
     <string name="getting_some_error">Bir hatayla karşılaşıldı.</string>
     <string name="enter_package_name">Paket ismi girin</string>
     <string name="enter_package_comment">Paket açıklaması girin</string>
