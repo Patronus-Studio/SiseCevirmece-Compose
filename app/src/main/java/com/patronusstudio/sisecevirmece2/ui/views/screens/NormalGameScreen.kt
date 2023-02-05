@@ -25,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
@@ -38,7 +39,7 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NormalGameScreen(backClicked: () -> Unit) {
+fun NormalGameScreen(mixpanelAPI:MixpanelAPI,backClicked: () -> Unit) {
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val bottleSize = (screenWidth * 0.9).dp
@@ -154,7 +155,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                 ) {
                     TruthDareQuestionDialog(
                         closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
-                        viewModel
+                        mixpanelAPI = mixpanelAPI, viewModel = viewModel
                     )
                 }
             }

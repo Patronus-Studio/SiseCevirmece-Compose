@@ -78,23 +78,24 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController,mixpanelAP
             }
         }
         composable(route = NavInAppScreens.AddCategoriesScreen.routeName) {
-            AddCategoriesScreen {
+            AddCategoriesScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.GameTypeSelection.routeName) {
-            GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
+            GameTypeSelection(mixpanelAPI,back = { navController.popBackStack() }, gameModeSelection = {
                 if (it == GameMode.NORMAL_MODE) navController.navigate(NavInAppScreens.NormalGameScreen.routeName)
                 if (it == GameMode.SPECIAL_MODE) navController.navigate(NavInAppScreens.SpecialGameCategorySelectScreen.routeName)
             })
         }
         composable(route = NavInAppScreens.NormalGameScreen.routeName) {
-            NormalGameScreen {
+            NormalGameScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.SpecialGameCategorySelectScreen.routeName) {
             SpecialGameCategorySelectScreen(
+                mixpanelAPI,
                 backClicked = {
                     navController.popBackStack()
                 }, passGameScreen = {
@@ -108,12 +109,12 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController,mixpanelAP
             val list =
                 navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedPackages")
             navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedPackages")
-            SpecialGameScreen(list ?: "") {
+            SpecialGameScreen(mixpanelAPI = mixpanelAPI,list ?: "") {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.ProfileScreen.routeName) {
-            ProfileScreen {
+            ProfileScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }

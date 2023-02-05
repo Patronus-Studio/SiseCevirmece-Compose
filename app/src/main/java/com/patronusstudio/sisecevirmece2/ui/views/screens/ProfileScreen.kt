@@ -6,8 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -25,10 +23,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
@@ -36,6 +36,7 @@ import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
@@ -46,8 +47,8 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.SampleTempCard
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(backClicked: () -> Unit) {
-
+fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
+    val localContext = LocalContext.current
     val viewModel = hiltViewModel<ProfileScreenViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val packageCardWidth = (LocalConfiguration.current.screenWidthDp * 0.4).dp
@@ -91,6 +92,10 @@ fun ProfileScreen(backClicked: () -> Unit) {
                         viewModel.setBottleActiveStatuOnDb(it.primaryId)
                         viewModel.setBottleActiveStatuOnLocal(it.primaryId)
                     }
+                    val eventName = localContext.getString(R.string.bottles)
+                    val events =
+                        mapOf(Pair(localContext.getString(R.string.played_bottles), it.bottleName))
+                    mixpanelAPI.multiEventSend(eventName, events)
                 }
             }
             AnimatedVisibility(
@@ -106,6 +111,10 @@ fun ProfileScreen(backClicked: () -> Unit) {
                 ) {
                     viewModel.setBackgroundActiveStatuOnDb(it)
                     viewModel.setBackgroundActiveStatuOnLocal(it)
+                    val eventName = localContext.getString(R.string.bottles)
+                    val events =
+                        mapOf(Pair(localContext.getString(R.string.played_bottles), it.backgroundName))
+                    mixpanelAPI.multiEventSend(eventName, events)
                 }
             }
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
@@ -157,7 +166,9 @@ private fun Packages(
     val scroolState = rememberScrollState()
     FlowRow(
         maxItemsInEachRow = 2,
-        modifier = Modifier.fillMaxSize().verticalScroll(scroolState),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         packages.forEachIndexed { index, packageDbModel ->
@@ -184,7 +195,9 @@ private fun Bottles(
     val scroolState = rememberScrollState()
     FlowRow(
         maxItemsInEachRow = 3,
-        modifier = Modifier.fillMaxSize().verticalScroll(state = scroolState),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         packages.forEach {
