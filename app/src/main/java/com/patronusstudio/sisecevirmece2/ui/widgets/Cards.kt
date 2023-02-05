@@ -11,7 +11,9 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,9 +28,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
@@ -273,6 +281,65 @@ fun BaseBackground(
         Spacer(modifier = Modifier.height(16.dp))
         if (contentOnTitleBottom != null) contentOnTitleBottom()
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SampleError(closeClicked: () -> Unit) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Column(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(0.dp))
+                    .background(
+                        AppColor.White,
+                        RoundedCornerShape(16.dp)
+                    ),
+                verticalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    Image(painter = painterResource(id = R.drawable.error),
+                        contentDescription = "Close btn",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable {
+                                closeClicked()
+                            })
+                }
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.size(150.dp),
+                    )
+                }
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Text(text = "Hata")
+                }
+            }
+        }
+    }
+
 }
 
 @Composable

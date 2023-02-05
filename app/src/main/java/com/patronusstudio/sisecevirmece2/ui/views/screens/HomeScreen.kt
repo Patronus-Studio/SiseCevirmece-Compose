@@ -48,6 +48,7 @@ import com.patronusstudio.sisecevirmece2.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.CardImageWithText
+import com.patronusstudio.sisecevirmece2.ui.widgets.SampleError
 import com.patronusstudio.sisecevirmece2.ui.widgets.UserPic
 import kotlinx.coroutines.*
 
@@ -149,6 +150,11 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
                         popupIsVisible.value = AnimStatus.EXIT
                     }
                 })
+        }
+        if(viewModel.errorMessage.collectAsState().value.isNotBlank()){
+            SampleError {
+                destinationStatus.value = InAppScreenNavEnums.LOGOUT
+            }
         }
     }
 
