@@ -6,10 +6,14 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -150,9 +154,10 @@ private fun Packages(
     packageCardWidth: Dp,
     packageCardHeight: Dp
 ) {
+    val scroolState = rememberScrollState()
     FlowRow(
         maxItemsInEachRow = 2,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().verticalScroll(scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         packages.forEachIndexed { index, packageDbModel ->
@@ -176,9 +181,10 @@ private fun Bottles(
     cardSize: Dp,
     clicked: (BottleDbModel) -> Unit
 ) {
+    val scroolState = rememberScrollState()
     FlowRow(
         maxItemsInEachRow = 3,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().verticalScroll(state = scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         packages.forEach {
@@ -236,9 +242,12 @@ private fun Backgrounds(
     packageCardWidth: Dp,
     packageCardHeight: Dp, clicked: (BackgroundDbModel) -> Unit
 ) {
+    val scroolState = rememberScrollState()
     FlowRow(
         maxItemsInEachRow = 2,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         backgrounds.forEachIndexed { index, backgroundDbModel ->
