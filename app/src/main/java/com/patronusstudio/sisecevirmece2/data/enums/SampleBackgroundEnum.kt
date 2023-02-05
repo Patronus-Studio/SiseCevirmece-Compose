@@ -32,49 +32,49 @@ enum class SampleBackgroundEnum {
         override fun getImageId(): Int = R.drawable.tas1
 
         override fun getBottleName(context: Context): String =
-            "Taş 1 Arka Plan"
+            context.getString(R.string.stone_1_background)
     },
     TAS2{
         override fun getImageId(): Int = R.drawable.tas2
 
         override fun getBottleName(context: Context): String =
-            "Taş 2 Arka Plan"
+            context.getString(R.string.stone_2_background)
     },
     TAS3{
         override fun getImageId(): Int = R.drawable.tas3
 
         override fun getBottleName(context: Context): String =
-            "Taş 3 Arka Plan"
+            context.getString(R.string.stone_3_background)
     },
     TAS4{
         override fun getImageId(): Int = R.drawable.tas4
 
         override fun getBottleName(context: Context): String =
-            "Taş 4 Arka Plan"
+            context.getString(R.string.stone_4_background)
     },
     TAS5{
         override fun getImageId(): Int = R.drawable.tas5
 
         override fun getBottleName(context: Context): String =
-            "Taş 5 Arka Plan"
+            context.getString(R.string.stone_5_background)
     },
     MERMER_HARD{
         override fun getImageId(): Int = R.drawable.mermerhard
 
         override fun getBottleName(context: Context): String =
-            "Koyu Mermer Arka Plan"
+            context.getString(R.string.marble_hard_background)
     },
     MERMER_LIGHT{
         override fun getImageId(): Int = R.drawable.mermerlight
 
         override fun getBottleName(context: Context): String =
-            "Açık Mermer Arka Olan"
+            context.getString(R.string.marble_light_background)
     },
     TUGLA{
         override fun getImageId(): Int = R.drawable.tugla
 
         override fun getBottleName(context: Context): String =
-            "Tuğla Arka Plan"
+            context.getString(R.string.brink_background)
     };
 
     abstract fun getImageId(): Int

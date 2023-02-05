@@ -44,10 +44,10 @@
     <string name="bottles">Şişeler</string>
     <string name="backgrounds">Arka Planlar</string>
     <string name="packages">Paketler</string>
-    <string name="original_background">Orjinal Arka Plan</string>
-    <string name="wood_light_background">Light Arka Plan</string>
-    <string name="wood_normal_background">Normal Arka Plan</string>
-    <string name="wood_texture_background">Yapı Arka Plan</string>
+    <string name="original_background">Orjinal</string>
+    <string name="wood_light_background">Light</string>
+    <string name="wood_normal_background">Normal</string>
+    <string name="wood_texture_background">Yapı</string>
     <string name="user_comment">Geri Bildirim</string>
     <string name="logout">Çıkış Yap</string>
     <string name="vote_for_us">Bizi Oyla!</string>
@@ -55,6 +55,14 @@
     <string name="play_bigger">OYNA</string>
     <string name="home_screen">Ana sayfa</string>
     <string name="log_out">Çıkış Yap</string>
+    <string name="stone_1_background">Taş 1</string>
+    <string name="stone_2_background">Taş 2</string>
+    <string name="stone_3_background">Taş 3</string>
+    <string name="stone_4_background">Taş 4</string>
+    <string name="stone_5_background">Taş 5</string>
+    <string name="marble_hard_background">Koyu Mermer</string>
+    <string name="marble_light_background">Açık Mermer</string>
+    <string name="brink_background">Tuğla</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>
