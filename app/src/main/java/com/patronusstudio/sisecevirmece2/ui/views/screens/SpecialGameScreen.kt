@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -69,14 +70,22 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
                     ?: R.drawable.background_original, contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.BottomCenter
+            AnimatedVisibility(
+                visible = viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.INIT ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
             ) {
-                BannerAdView(BuildConfig.in_game_special_banner)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent), contentAlignment = Alignment.BottomCenter
+                ) {
+                    BannerAdView(BuildConfig.in_game_special_banner)
+                }
             }
+
         },
         contentOnTitleBottom = {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -1,5 +1,6 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,7 +10,6 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -30,7 +30,6 @@ import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
-import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.TruthDareQuestionDialog
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.TruthDareSelectDialog
 import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
@@ -75,8 +74,20 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                     ?: R.drawable.background_original, contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
             )
-            Box(modifier = Modifier.fillMaxSize().background(Color.Transparent), contentAlignment = Alignment.BottomCenter) {
-                BannerAdView(BuildConfig.in_game_normal_banner)
+            AnimatedVisibility(
+                visible = viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.INIT ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent), contentAlignment = Alignment.BottomCenter
+                ) {
+                    BannerAdView(BuildConfig.in_game_normal_banner)
+                }
             }
         },
         contentOnTitleBottom = {
