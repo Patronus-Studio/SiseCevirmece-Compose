@@ -17,32 +17,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScreenViewModel) {
+fun TruthDareQuestionDialog(
+    mixpanelAPI: MixpanelAPI,
+    closeClicked: () -> Unit,
+    viewModel: NormalGameScreenViewModel
+) {
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
     val smallPaddingHeight = (height * 0.03).dp
     val changeQuestionStatus = remember { mutableStateOf(false) }
     val currentQuestion = remember { mutableStateOf<QuestionDbModel?>(null) }
-    val isClickable = remember {mutableStateOf(true)}
+    val isClickable = remember { mutableStateOf(true) }
     val localContext = LocalContext.current
     LaunchedEffect(key1 = Unit, block = {
-        val question= withContext(Dispatchers.IO){
+        val question = withContext(Dispatchers.IO) {
             viewModel.getRandomQuestion()
         }
         question?.let {
             viewModel.removeQuestionOnList(it)
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 viewModel.updateQuestionShowStatu(it.primaryId)
             }
             currentQuestion.value = it
@@ -53,22 +58,21 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
             isClickable.value = false
             var question = viewModel.getRandomQuestion()
             if (question == null) {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     viewModel.updateAllQuestionShowStatu()
                 }
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     viewModel.getTruthDareQuestions()
                 }
                 question = viewModel.getRandomQuestion()
 
-            }
-            else{
-                withContext(Dispatchers.IO){
+            } else {
+                withContext(Dispatchers.IO) {
                     viewModel.removeQuestionOnList(question)
                 }
             }
             currentQuestion.value = question
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 viewModel.updateQuestionShowStatu(currentQuestion.value!!.primaryId)
             }
             isClickable.value = true
@@ -78,7 +82,10 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(8.dp))
-        TitleCard((width * 0.9).dp,viewModel.truthDareSelected.collectAsState().value.getText(localContext))
+        TitleCard(
+            (width * 0.9).dp,
+            viewModel.truthDareSelected.collectAsState().value.getText(localContext)
+        )
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
@@ -98,14 +105,36 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
                         width = (width * 0.45).dp,
                         smallCardHeight,
                         text = stringResource(R.string.replied),
-                        clicked = closeClicked
+                        clicked = {
+                            val events = mapOf(
+                                Pair(
+                                    viewModel.truthDareSelected.value.getText(localContext),
+                                    localContext.getString(R.string.replied)
+                                )
+                            )
+                            mixpanelAPI.multiEventSend(
+                                localContext.getString(R.string.truth_dare_question_dialog),
+                                events
+                            )
+                            closeClicked()
+                        }
                     )
                     GeneralCard(
                         width = (width * 0.45).dp,
                         smallCardHeight,
                         text = stringResource(R.string.change_question),
                         clicked = {
-                            if(isClickable.value){
+                            val events = mapOf(
+                                Pair(
+                                    viewModel.truthDareSelected.value.getText(localContext),
+                                    localContext.getString(R.string.change_question)
+                                )
+                            )
+                            mixpanelAPI.multiEventSend(
+                                localContext.getString(R.string.truth_dare_question_dialog),
+                                events
+                            )
+                            if (isClickable.value) {
                                 changeQuestionStatus.value = true
                             }
                         })
@@ -115,7 +144,19 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
                     (width * 0.9).dp,
                     smallCardHeight,
                     text = stringResource(R.string.i_wil_ask_question),
-                    clicked = closeClicked
+                    clicked = {
+                        val events = mapOf(
+                            Pair(
+                                viewModel.truthDareSelected.value.getText(localContext),
+                                localContext.getString(R.string.i_wil_ask_question)
+                            )
+                        )
+                        mixpanelAPI.multiEventSend(
+                            localContext.getString(R.string.truth_dare_question_dialog),
+                            events
+                        )
+                        closeClicked()
+                    }
                 )
             }
         }
@@ -123,7 +164,7 @@ fun TruthDareQuestionDialog(closeClicked: () -> Unit, viewModel: NormalGameScree
 }
 
 @Composable
-private fun TitleCard(width: Dp,title:String) {
+private fun TitleCard(width: Dp, title: String) {
     Card(
         modifier = Modifier
             .width(width)

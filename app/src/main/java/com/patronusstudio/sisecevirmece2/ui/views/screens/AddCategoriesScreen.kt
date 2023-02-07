@@ -45,9 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.QuestionModel
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.resize
 import com.patronusstudio.sisecevirmece2.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
@@ -64,7 +66,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AddCategoriesScreen(back: () -> Unit) {
+fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.55
     val questionCardMaxWidth = width * 0.9
@@ -119,28 +121,31 @@ fun AddCategoriesScreen(back: () -> Unit) {
         },
         sheetState = sheetState
     ) {
-        BaseBackground(titleId = R.string.add_category, backClicked = { back() }, contentOnTitleBottom = {
-            CategoryCard(
-                questionCardMaxWidth,
-                viewModel.packageName.collectAsState().value,
-                viewModel.packageComment.collectAsState().value,
-                viewModel.selectedImage.collectAsState().value,
-                packageNameListener = {
-                    viewModel.setPackageName(it)
-                }, packageCommentListener = {
-                    viewModel.setPackageComment(it)
-                }, selectImageClicked = {
-                    galleryLauncher.launch("image/*")
+        BaseBackground(
+            titleId = R.string.add_category,
+            backClicked = { back() },
+            contentOnTitleBottom = {
+                CategoryCard(
+                    questionCardMaxWidth,
+                    viewModel.packageName.collectAsState().value,
+                    viewModel.packageComment.collectAsState().value,
+                    viewModel.selectedImage.collectAsState().value,
+                    packageNameListener = {
+                        viewModel.setPackageName(it)
+                    }, packageCommentListener = {
+                        viewModel.setPackageComment(it)
+                    }, selectImageClicked = {
+                        galleryLauncher.launch("image/*")
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
+                Spacer(modifier = Modifier.height(8.dp))
+                QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel, mixpanelAPI)
+                AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                    LoadingAnimation()
                 }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
-            Spacer(modifier = Modifier.height(8.dp))
-            QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
-            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-                LoadingAnimation()
-            }
-        })
+            })
     }
 }
 
@@ -224,7 +229,8 @@ private fun CategoryType(
 private fun QuestionsCard(
     questionCardMaxHeight: Double,
     questionCardMaxWidth: Double,
-    viewModel: AddCategoriesScreenViewModel
+    viewModel: AddCategoriesScreenViewModel,
+    mixpanelAPI: MixpanelAPI
 ) {
     val localFocus = LocalFocusManager.current
     val localContext = LocalContext.current
@@ -294,6 +300,14 @@ private fun QuestionsCard(
                     viewModel.saveQuestions(localContext)
                 }
                 localFocus.clearFocus()
+                val eventName = localContext.getString(R.string.add_category)
+                val events = mapOf(
+                    Pair(
+                        localContext.getString(R.string.selected_category),
+                        viewModel.packageCategoryModel.value?.name ?: ""
+                    )
+                )
+                mixpanelAPI.multiEventSend(eventName, events)
             }
         }
     })

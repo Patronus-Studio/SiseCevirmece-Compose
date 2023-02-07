@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.NavInAppScreens
 import com.patronusstudio.sisecevirmece2.data.enums.GameMode
@@ -12,7 +13,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece2.data.enums.LoginScreenNavEnums
 import com.patronusstudio.sisecevirmece2.ui.views.screens.*
 
-fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
+fun NavGraphBuilder.passToInAppRoute(navController: NavHostController,mixpanelAPI: MixpanelAPI) {
     navigation(
         startDestination = NavInAppScreens.LoginScreen.routeName,
         route = NavInAppScreens.RootNesned.routeName
@@ -48,7 +49,7 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
         composable(
             route = NavInAppScreens.HomeScreen.routeName
         ) { navBackStackEntry ->
-            HomeScreen {
+            HomeScreen(mixpanelAPI) {
                 when (it) {
                     InAppScreenNavEnums.LOGOUT -> {
                         MainApplication.authToken = ""
@@ -77,23 +78,24 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             }
         }
         composable(route = NavInAppScreens.AddCategoriesScreen.routeName) {
-            AddCategoriesScreen {
+            AddCategoriesScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.GameTypeSelection.routeName) {
-            GameTypeSelection(back = { navController.popBackStack() }, gameModeSelection = {
+            GameTypeSelection(mixpanelAPI,back = { navController.popBackStack() }, gameModeSelection = {
                 if (it == GameMode.NORMAL_MODE) navController.navigate(NavInAppScreens.NormalGameScreen.routeName)
                 if (it == GameMode.SPECIAL_MODE) navController.navigate(NavInAppScreens.SpecialGameCategorySelectScreen.routeName)
             })
         }
         composable(route = NavInAppScreens.NormalGameScreen.routeName) {
-            NormalGameScreen {
+            NormalGameScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.SpecialGameCategorySelectScreen.routeName) {
             SpecialGameCategorySelectScreen(
+                mixpanelAPI,
                 backClicked = {
                     navController.popBackStack()
                 }, passGameScreen = {
@@ -107,12 +109,12 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController) {
             val list =
                 navController.previousBackStackEntry?.savedStateHandle?.get<String>("selectedPackages")
             navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedPackages")
-            SpecialGameScreen(list ?: "") {
+            SpecialGameScreen(mixpanelAPI = mixpanelAPI,list ?: "") {
                 navController.popBackStack()
             }
         }
         composable(route = NavInAppScreens.ProfileScreen.routeName) {
-            ProfileScreen {
+            ProfileScreen(mixpanelAPI) {
                 navController.popBackStack()
             }
         }

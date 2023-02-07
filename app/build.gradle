@@ -22,7 +22,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "in_game_normal_banner", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "in_game_special_banner", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
+        }
         release {
+            buildConfigField "String", "in_game_normal_banner", "\"ca-app-pub-1818679104699845/5160700445\""
+            buildConfigField "String", "in_game_special_banner", "\"ca-app-pub-1818679104699845/6921338826\""
+            buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -84,6 +92,9 @@ dependencies {
     kapt "androidx.room:room-compiler:$room"
 
     implementation 'com.github.a914-gowtham:compose-ratingbar:1.2.4'
+    implementation 'com.google.android.gms:play-services-ads:21.5.0'
+    implementation 'com.mixpanel.android:mixpanel-android:7.+'
+
 
 }
 kapt {

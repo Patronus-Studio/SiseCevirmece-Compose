@@ -12,18 +12,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.GameMode
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.singleEventSend
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.CardTitle
 
 @Composable
-fun GameTypeSelection(back: () -> Unit, gameModeSelection: (GameMode) -> Unit) {
+fun GameTypeSelection(
+    mixpanelAPI: MixpanelAPI,
+    back: () -> Unit,
+    gameModeSelection: (GameMode) -> Unit
+) {
+    val localContext = LocalContext.current
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val cardWidth = (width * 0.9).dp
@@ -35,7 +45,7 @@ fun GameTypeSelection(back: () -> Unit, gameModeSelection: (GameMode) -> Unit) {
             .background(AppColor.BlueViolet)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        CardTitle(title = "Oyun Tipini Seçin") {
+        CardTitle(title = stringResource(R.string.select_game_type)) {
             back()
         }
         Box(modifier = Modifier.fillMaxSize()) {
@@ -44,13 +54,20 @@ fun GameTypeSelection(back: () -> Unit, gameModeSelection: (GameMode) -> Unit) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CardButton(cardWidth, cardHeight, GameMode.NORMAL_MODE, gameModeSelection)
+                CardButton(cardWidth, cardHeight, GameMode.NORMAL_MODE){
+                    val eventName = localContext.getString(R.string.play_normal_title)
+                    mixpanelAPI.singleEventSend(eventName)
+                    gameModeSelection(it)
+                }
                 Spacer(modifier = Modifier.height(spacerHeight))
-                CardButton(cardWidth, cardHeight, GameMode.SPECIAL_MODE, gameModeSelection)
+                CardButton(cardWidth, cardHeight, GameMode.SPECIAL_MODE){
+                    val eventName = localContext.getString(R.string.play_special_title)
+                    mixpanelAPI.singleEventSend(eventName)
+                    gameModeSelection(it)
+                }
             }
         }
     }
-
 }
 
 @Composable

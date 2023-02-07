@@ -1,7 +1,9 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.ContentScale
@@ -22,16 +25,19 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.SpecialQuestionDialog
+import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
+fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backClicked: () -> Unit) {
     val viewModel = hiltViewModel<SpecialGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val bottleSize = (screenWidth * 0.9).dp
@@ -65,6 +71,22 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
                     ?: R.drawable.background_original, contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()
             )
+            AnimatedVisibility(
+                visible = viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.INIT ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED ||
+                        viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_STARTED,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent), contentAlignment = Alignment.BottomCenter
+                ) {
+                    BannerAdView(BuildConfig.in_game_special_banner)
+                }
+            }
+
         },
         contentOnTitleBottom = {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -123,7 +145,7 @@ fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
         ) {
             SpecialQuestionDialog(closeClicked = {
                 viewModel.setBottleTouchListener(BottleTouchListener.INIT)
-            }, viewModel = viewModel)
+            }, viewModel = viewModel, mixpanelAPI = mixpanelAPI)
         }
 
     }

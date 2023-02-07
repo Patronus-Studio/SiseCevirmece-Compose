@@ -9,14 +9,26 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
+import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.nav.ScreenHost
 import com.patronusstudio.sisecevirmece2.ui.theme.SiseCevirmeceTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    val hello = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this)
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(Collections.singletonList("B843F895E94E5BEDEAD125878F53D9E6"))
+            .build()
+        MobileAds.setRequestConfiguration(configuration)
+        val mixpanel : MixpanelAPI =
+            MixpanelAPI.getInstance(this, BuildConfig.mix_panel_token, true)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, true)
             SiseCevirmeceTheme {
@@ -25,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    ScreenHost(navController = navController)
+                    ScreenHost(navController = navController,mixpanel)
                 }
             }
         }
