@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
@@ -147,7 +148,8 @@ fun TruthDareQuestionDialog(
                                 }
                                 else{
                                     viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
+                                        BuildConfig.normal_game_interstitial) { ad ->
                                         when (ad) {
                                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                                 viewModel.setLoadingStatus(false)

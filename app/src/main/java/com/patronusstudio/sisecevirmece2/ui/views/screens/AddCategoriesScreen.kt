@@ -46,6 +46,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
@@ -303,7 +304,8 @@ private fun QuestionsCard(
                 }
                 else{
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
+                        BuildConfig.add_package_interstitial) { ad ->
                         when (ad) {
                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                 viewModel.setLoadingStatus(false)

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
@@ -91,7 +92,8 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     viewModel.bottles.collectAsState().value, bottleCardSize
                 ) { bottleDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
+                        BuildConfig.package_download_interstitial) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
@@ -125,7 +127,7 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     packageCardHeight
                 ) { backgroundDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                    InterstitialAdView.loadInterstitial(localContext.getActivity(),BuildConfig.package_download_interstitial) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {

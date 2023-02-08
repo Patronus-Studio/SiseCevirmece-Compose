@@ -1,8 +1,5 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
-import android.app.Activity
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -30,6 +27,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
@@ -42,7 +40,9 @@ import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.*
+import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
+import com.patronusstudio.sisecevirmece2.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -95,17 +95,18 @@ fun StoreScreen(back: () -> Unit) {
                 popupStatu.value = popupStatu.value.not()
             }, clickedBtn = {
                 viewModel.setLoadingStatus(true)
-                InterstitialAdView.loadInterstitial(localContext.getActivity()){
-                    if(it == InterstitialAdViewLoadStatusEnum.SHOWED){
+                InterstitialAdView.loadInterstitial(
+                    localContext.getActivity(),
+                    BuildConfig.package_download_interstitial
+                ) {
+                    if (it == InterstitialAdViewLoadStatusEnum.SHOWED) {
                         viewModel.setLoadingStatus(false)
-                    }
-                    else if(it == InterstitialAdViewLoadStatusEnum.DISSMISSED){
+                    } else if (it == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
                         viewModel.setLoadingStatus(false)
                         coroutineScope.launch(Dispatchers.Main) {
                             packageStatus(viewModel)
                         }
-                    }
-                    else localContext.showSample()
+                    } else localContext.showSample()
                 }
             })
         }
@@ -265,19 +266,19 @@ fun PackagesCard(
     }
 }
 
-private suspend fun packageStatus(viewModel:PackageViewModel){
+private suspend fun packageStatus(viewModel: PackageViewModel) {
 
-        when (viewModel.currentPackage.value!!.packageStatu) {
-            PackageDetailCardBtnEnum.NEED_DOWNLOAD -> {
-                viewModel.downloadPackage()
-                viewModel.updateDownloadCountOnService()
-            }
-            PackageDetailCardBtnEnum.NEED_UPDATE -> {
-                viewModel.updatePackage()
-                viewModel.updateDownloadCountOnService()
-            }
-            PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
+    when (viewModel.currentPackage.value!!.packageStatu) {
+        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> {
+            viewModel.downloadPackage()
+            viewModel.updateDownloadCountOnService()
         }
+        PackageDetailCardBtnEnum.NEED_UPDATE -> {
+            viewModel.updatePackage()
+            viewModel.updateDownloadCountOnService()
+        }
+        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
+    }
 }
 
 

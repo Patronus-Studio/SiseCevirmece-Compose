@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
+import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
@@ -98,7 +99,7 @@ fun SpecialQuestionDialog(
                                     }
                                 } else {
                                     viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                                    InterstitialAdView.loadInterstitial(localContext.getActivity(),BuildConfig.special_game_interstitial) { ad ->
                                         when (ad) {
                                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                                 viewModel.setLoadingStatus(false)
