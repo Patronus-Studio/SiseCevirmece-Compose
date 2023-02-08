@@ -60,6 +60,7 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
     val popupIsVisible = remember { mutableStateOf(AnimStatus.INIT) }
     val destinationStatus = remember { mutableStateOf(InAppScreenNavEnums.INIT) }
     val context = LocalContext.current
+    throw RuntimeException("Test Crash") // Force a crash
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             viewModel.getUserGameInfo(MainApplication.authToken)

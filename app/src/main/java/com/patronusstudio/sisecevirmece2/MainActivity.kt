@@ -11,6 +11,9 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.nav.ScreenHost
 import com.patronusstudio.sisecevirmece2.ui.theme.SiseCevirmeceTheme
@@ -19,7 +22,7 @@ import java.util.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val hello = ""
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this)
@@ -29,6 +32,7 @@ class MainActivity : ComponentActivity() {
         MobileAds.setRequestConfiguration(configuration)
         val mixpanel : MixpanelAPI =
             MixpanelAPI.getInstance(this, BuildConfig.mix_panel_token, true)
+        firebaseAnalytics = Firebase.analytics
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, true)
             SiseCevirmeceTheme {

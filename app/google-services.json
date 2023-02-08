@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1007907475431",
+    "firebase_url": "https://sise-cevirmece-2-0-default-rtdb.firebaseio.com",
+    "project_id": "sise-cevirmece-2-0",
+    "storage_bucket": "sise-cevirmece-2-0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007907475431:android:9db475dad4bf5c91233742",
+        "android_client_info": {
+          "package_name": "com.patronusstudio.sisecevirmece2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007907475431-q5420k3hs6ho3v6cun14srb5pj9975co.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9HKbpeP_VdkRkrwcU4DSL-BRMp0d2SNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007907475431-q5420k3hs6ho3v6cun14srb5pj9975co.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
