@@ -47,17 +47,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.QuestionModel
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
-import com.patronusstudio.sisecevirmece2.data.utils.resize
+import com.patronusstudio.sisecevirmece2.data.utils.*
 import com.patronusstudio.sisecevirmece2.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
-import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithDot
-import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithPassive
-import com.patronusstudio.sisecevirmece2.ui.widgets.ErrorSheet
+import com.patronusstudio.sisecevirmece2.ui.widgets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -296,10 +293,32 @@ private fun QuestionsCard(
             modifier = Modifier.offset(x = offsetStateRemoveBtn.value)
         ) {
             CircleImageButton(id = R.drawable.save) {
-                coroutineScope.launch {
-                    viewModel.saveQuestions(localContext)
+                val random = (0..10).random()
+                showLog(random.toString())
+                if(random < 9){
+                    coroutineScope.launch {
+                        viewModel.saveQuestions(localContext)
+                    }
+                    localFocus.clearFocus()
                 }
-                localFocus.clearFocus()
+                else{
+                    viewModel.setLoadingStatus(true)
+                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                        when (ad) {
+                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
+                                viewModel.setLoadingStatus(false)
+                            }
+                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
+                                viewModel.setLoadingStatus(false)
+                                coroutineScope.launch {
+                                    viewModel.saveQuestions(localContext)
+                                }
+                                localFocus.clearFocus()
+                            }
+                            else -> localContext.showSample()
+                        }
+                    }
+                }
                 val eventName = localContext.getString(R.string.add_category)
                 val events = mapOf(
                     Pair(

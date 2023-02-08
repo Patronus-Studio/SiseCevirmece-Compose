@@ -30,7 +30,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
     private val networkRepository: NetworkRepository,
     private val packageNetworkRepository: PackageNetworkRepository,
     private val localRepository: LocalRepository,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _questionList = MutableStateFlow(
         mutableStateListOf(QuestionModel(1, ""))
@@ -51,9 +51,6 @@ class AddCategoriesScreenViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> get() = _errorMessage
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     private val _categories = MutableStateFlow<List<PackageCategoryModel>>(listOf())
     val categories: StateFlow<List<PackageCategoryModel>> get() = _categories
