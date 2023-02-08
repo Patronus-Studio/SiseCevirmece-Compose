@@ -36,14 +36,14 @@ import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
+import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
-import com.patronusstudio.sisecevirmece2.ui.widgets.SampleBackgroundCard
-import com.patronusstudio.sisecevirmece2.ui.widgets.SampleCard
-import com.patronusstudio.sisecevirmece2.ui.widgets.SampleTempCard
+import com.patronusstudio.sisecevirmece2.ui.widgets.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -87,14 +87,27 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 val bottleCardSize = (LocalConfiguration.current.screenWidthDp * 0.25).dp
                 Bottles(
                     viewModel.bottles.collectAsState().value, bottleCardSize
-                ) {
-                    coroutineScope.launch {
-                        viewModel.setBottleActiveStatuOnDb(it.primaryId)
-                        viewModel.setBottleActiveStatuOnLocal(it.primaryId)
+                ) { bottleDbModel ->
+                    viewModel.setLoadingStatus(true)
+                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                        if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
+                            viewModel.setLoadingStatus(false)
+                        } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
+                            viewModel.setLoadingStatus(false)
+                            coroutineScope.launch(Dispatchers.Main) {
+                                viewModel.setBottleActiveStatuOnDb(bottleDbModel.primaryId)
+                                viewModel.setBottleActiveStatuOnLocal(bottleDbModel.primaryId)
+                            }
+                        } else localContext.showSample()
                     }
+
                     val eventName = localContext.getString(R.string.bottles)
-                    val events =
-                        mapOf(Pair(localContext.getString(R.string.played_bottles), it.bottleName))
+                    val events = mapOf(
+                        Pair(
+                            localContext.getString(R.string.played_bottles),
+                            bottleDbModel.bottleName
+                        )
+                    )
                     mixpanelAPI.multiEventSend(eventName, events)
                 }
             }
@@ -108,12 +121,25 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     viewModel.backgrounds.collectAsState().value,
                     packageCardWidth,
                     packageCardHeight
-                ) {
-                    viewModel.setBackgroundActiveStatuOnDb(it)
-                    viewModel.setBackgroundActiveStatuOnLocal(it)
+                ) { backgroundDbModel ->
+                    viewModel.setLoadingStatus(true)
+                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                        if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
+                            viewModel.setLoadingStatus(false)
+                        } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
+                            viewModel.setLoadingStatus(false)
+                            viewModel.setBackgroundActiveStatuOnDb(backgroundDbModel)
+                            viewModel.setBackgroundActiveStatuOnLocal(backgroundDbModel)
+                        } else localContext.showSample()
+                    }
                     val eventName = localContext.getString(R.string.bottles)
                     val events =
-                        mapOf(Pair(localContext.getString(R.string.played_bottles), it.backgroundName))
+                        mapOf(
+                            Pair(
+                                localContext.getString(R.string.played_bottles),
+                                backgroundDbModel.backgroundName
+                            )
+                        )
                     mixpanelAPI.multiEventSend(eventName, events)
                 }
             }

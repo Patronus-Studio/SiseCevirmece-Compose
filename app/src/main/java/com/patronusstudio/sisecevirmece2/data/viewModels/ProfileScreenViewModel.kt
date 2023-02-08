@@ -24,10 +24,7 @@ class ProfileScreenViewModel @Inject constructor(
     private val packageLocalRepository: PackageLocalRepository,
     private val bottleLocalRepository: BottleLocalRepository,
     private val backgroundLocalRepository: BackgroundLocalRepository
-) : ViewModel() {
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+) : BaseViewModel() {
 
     private val _titles = MutableStateFlow<List<BaseCategoryModel>>(listOf())
     val titles: StateFlow<List<BaseCategoryModel>> get() = _titles

@@ -230,8 +230,4 @@ class PackageViewModel @Inject constructor(
         }
         _isLoading.value = false
     }
-
-    fun setLoadingStatus(status:Boolean){
-        _isLoading.value = status
-    }
 }
