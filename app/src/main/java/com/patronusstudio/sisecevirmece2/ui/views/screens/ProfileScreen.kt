@@ -68,6 +68,7 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     viewModel.getDatas(it)
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
             AnimatedVisibility(
                 visible = viewModel.packages.collectAsState().value.isNotEmpty(),
                 enter = fadeIn() + slideInVertically {
