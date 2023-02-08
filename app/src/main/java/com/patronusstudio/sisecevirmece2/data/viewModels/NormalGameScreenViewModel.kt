@@ -26,10 +26,7 @@ class NormalGameScreenViewModel @Inject constructor(
     private val questionLocalRepository: QuestionLocalRepository,
     private val bottleLocalRepository: BottleLocalRepository,
     private val backgroundLocalRepository: BackgroundLocalRepository
-) : ViewModel() {
-
-    val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+) : BaseViewModel() {
 
     private val _truthDareSelected = MutableStateFlow(TruthDareEnum.NOT_SELECTED)
     val truthDareSelected: StateFlow<TruthDareEnum> get() = _truthDareSelected

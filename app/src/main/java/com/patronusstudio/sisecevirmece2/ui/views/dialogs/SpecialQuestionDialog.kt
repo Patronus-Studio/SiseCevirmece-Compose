@@ -23,10 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
+import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.showLog
+import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
+import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import kotlinx.coroutines.launch
 
 @Composable
@@ -84,9 +89,30 @@ fun SpecialQuestionDialog(
                             smallCardHeight,
                             text = stringResource(R.string.change_question),
                             clicked = {
-                                coroutineScope.launch {
-                                    viewModel.getRandomPackage()
-                                    viewModel.getRandomQuestion()
+                                val random = (0..10).random()
+                                showLog(random.toString())
+                                if (random < 9) {
+                                    coroutineScope.launch {
+                                        viewModel.getRandomPackage()
+                                        viewModel.getRandomQuestion()
+                                    }
+                                } else {
+                                    viewModel.setLoadingStatus(true)
+                                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                                        when (ad) {
+                                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
+                                                viewModel.setLoadingStatus(false)
+                                            }
+                                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
+                                                viewModel.setLoadingStatus(false)
+                                                coroutineScope.launch {
+                                                    viewModel.getRandomPackage()
+                                                    viewModel.getRandomQuestion()
+                                                }
+                                            }
+                                            else -> localContext.showSample()
+                                        }
+                                    }
                                 }
                                 sendDataToMixApi(
                                     viewModel, localContext, mixpanelAPI,

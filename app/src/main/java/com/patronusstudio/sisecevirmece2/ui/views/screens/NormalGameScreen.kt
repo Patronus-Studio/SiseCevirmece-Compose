@@ -31,6 +31,7 @@ import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
+import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.TruthDareQuestionDialog
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.TruthDareSelectDialog
 import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
@@ -158,6 +159,9 @@ fun NormalGameScreen(mixpanelAPI:MixpanelAPI,backClicked: () -> Unit) {
                         mixpanelAPI = mixpanelAPI, viewModel = viewModel
                     )
                 }
+            }
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
             }
         })
 }

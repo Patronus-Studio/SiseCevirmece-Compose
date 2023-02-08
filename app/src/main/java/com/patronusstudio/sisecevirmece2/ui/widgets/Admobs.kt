@@ -10,6 +10,7 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.patronusstudio.sisecevirmece2.BuildConfig
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 
 @Composable
 fun BannerAdView(adValue: String) {
@@ -26,15 +27,9 @@ fun BannerAdView(adValue: String) {
     )
 }
 
-enum class InterstitialAdViewLoadStatusEnum{
-    FAILED,
-    DISSMISSED,
-    SHOWED
-}
 
 object InterstitialAdView{
     private var mInterstitialAd: InterstitialAd? = null
-
     fun loadInterstitial(activity:Activity,result:(InterstitialAdViewLoadStatusEnum) -> Unit) {
         InterstitialAd.load(activity.applicationContext,BuildConfig.package_download_interstitial,
             AdRequest.Builder().build(),
@@ -77,3 +72,5 @@ object InterstitialAdView{
         mInterstitialAd = null
     }
 }
+
+

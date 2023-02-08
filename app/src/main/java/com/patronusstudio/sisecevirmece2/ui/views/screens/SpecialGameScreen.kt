@@ -30,6 +30,7 @@ import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
+import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.SpecialQuestionDialog
 import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
@@ -147,7 +148,9 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backCli
                 viewModel.setBottleTouchListener(BottleTouchListener.INIT)
             }, viewModel = viewModel, mixpanelAPI = mixpanelAPI)
         }
-
+        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+            LoadingAnimation()
+        }
     }
 }
 

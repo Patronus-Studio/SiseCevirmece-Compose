@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel

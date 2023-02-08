@@ -31,10 +31,7 @@ class SpecialGameScreenViewModel @Inject constructor(
     private val questionLocalRepository: QuestionLocalRepository,
     private val bottleLocalRepository: BottleLocalRepository,
     private val backgroundLocalRepository: BackgroundLocalRepository
-) : ViewModel() {
-
-    val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+) : BaseViewModel() {
 
     private val _bottleTouchListener = MutableStateFlow(BottleTouchListener.INIT)
     val bottleTouchListener: StateFlow<BottleTouchListener> get() = _bottleTouchListener

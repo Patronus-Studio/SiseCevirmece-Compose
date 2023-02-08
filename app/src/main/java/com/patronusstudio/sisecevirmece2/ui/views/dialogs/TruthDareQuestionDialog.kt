@@ -19,11 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.showLog
+import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
+import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -134,8 +139,27 @@ fun TruthDareQuestionDialog(
                                 localContext.getString(R.string.truth_dare_question_dialog),
                                 events
                             )
+                            val random = (0..10).random()
+                            showLog(random.toString())
                             if (isClickable.value) {
-                                changeQuestionStatus.value = true
+                                if(random < 9){
+                                    changeQuestionStatus.value = true
+                                }
+                                else{
+                                    viewModel.setLoadingStatus(true)
+                                    InterstitialAdView.loadInterstitial(localContext.getActivity()) { ad ->
+                                        when (ad) {
+                                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
+                                                viewModel.setLoadingStatus(false)
+                                            }
+                                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
+                                                viewModel.setLoadingStatus(false)
+                                                changeQuestionStatus.value = true
+                                            }
+                                            else -> localContext.showSample()
+                                        }
+                                    }
+                                }
                             }
                         })
                 }

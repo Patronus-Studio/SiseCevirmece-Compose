@@ -31,6 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
