@@ -1,5 +1,8 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
+import android.app.Activity
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -33,11 +36,12 @@ import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
+import com.patronusstudio.sisecevirmece2.data.utils.getActivity
+import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
-import com.patronusstudio.sisecevirmece2.ui.widgets.PackageDetailCard
+import com.patronusstudio.sisecevirmece2.ui.widgets.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,21 +93,20 @@ fun StoreScreen(back: () -> Unit) {
             PackagePopup(viewModel.currentPackage.collectAsState().value!!, dismissListener = {
                 popupStatu.value = popupStatu.value.not()
             }, clickedBtn = {
-                coroutineScope.launch(Dispatchers.Main) {
-                    when (viewModel.currentPackage.value!!.packageStatu) {
-                        PackageDetailCardBtnEnum.NEED_DOWNLOAD -> {
-                            viewModel.downloadPackage()
-                            viewModel.updateDownloadCountOnService()
-                        }
-                        PackageDetailCardBtnEnum.NEED_UPDATE -> {
-                            viewModel.updatePackage()
-                            viewModel.updateDownloadCountOnService()
-                        }
-                        PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
+                viewModel.setLoadingStatus(true)
+                InterstitialAdView.loadInterstitial(localContext.getActivity()){
+                    if(it == InterstitialAdViewLoadStatusEnum.SHOWED){
+                        viewModel.setLoadingStatus(false)
                     }
+                    else if(it == InterstitialAdViewLoadStatusEnum.DISSMISSED){
+                        viewModel.setLoadingStatus(false)
+                        coroutineScope.launch(Dispatchers.Main) {
+                            packageStatus(viewModel)
+                        }
+                    }
+                    else localContext.showSample()
                 }
             })
-
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
@@ -261,8 +264,20 @@ fun PackagesCard(
     }
 }
 
+private suspend fun packageStatus(viewModel:PackageViewModel){
 
-
+        when (viewModel.currentPackage.value!!.packageStatu) {
+            PackageDetailCardBtnEnum.NEED_DOWNLOAD -> {
+                viewModel.downloadPackage()
+                viewModel.updateDownloadCountOnService()
+            }
+            PackageDetailCardBtnEnum.NEED_UPDATE -> {
+                viewModel.updatePackage()
+                viewModel.updateDownloadCountOnService()
+            }
+            PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
+        }
+}
 
 
 
