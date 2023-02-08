@@ -35,7 +35,7 @@ fun SplashScreen(isLogged: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White), contentAlignment = Alignment.Center
+            .background(Color.Transparent), contentAlignment = Alignment.Center
     ) {
         Text(text = "Splash Screen")
     }

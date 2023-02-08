@@ -16,13 +16,13 @@ import com.patronusstudio.sisecevirmece2.ui.views.screens.SplashScreen
 fun ScreenHost(navController: NavHostController,mixpanelAPI: MixpanelAPI) {
     NavHost(
         navController = navController,
-        startDestination = NavSplashScreen.SplashScreens.routeName
+        startDestination = NavInAppScreens.RootNesned.routeName
     ) {
-        composable(route = NavSplashScreen.SplashScreens.routeName) {
-            SplashScreen {
-                navController.navigate(NavInAppScreens.RootNesned.routeName)
-            }
-        }
+//        composable(route = NavSplashScreen.SplashScreens.routeName) {
+//            SplashScreen {
+//                navController.navigate(NavInAppScreens.RootNesned.routeName)
+//            }
+//        }
         //this.passToAppLandingRoute(navController)
         this.passToInAppRoute(navController,mixpanelAPI)
     }
