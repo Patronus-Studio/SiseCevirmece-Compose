@@ -1,9 +1,7 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,10 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -29,18 +24,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailButtonEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
@@ -51,6 +47,7 @@ import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.ProfilePackageCard
 import com.patronusstudio.sisecevirmece2.ui.widgets.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -83,7 +80,7 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 }, exit = fadeOut()
             ) {
                 Packages(
-                    packageCardWidth, packageCardHeight,viewModel
+                    packageCardWidth, packageCardHeight, viewModel
                 )
             }
             AnimatedVisibility(
@@ -205,6 +202,7 @@ private fun Packages(
 ) {
     val scroolState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    val packageDialogIsOpened = remember { mutableStateOf(false) }
     FlowRow(
         maxItemsInEachRow = 2,
         modifier = Modifier
@@ -218,22 +216,53 @@ private fun Packages(
                 height = packageCardHeight,
                 model = packageDbModel
             ) {
-                viewModel.setSelectedPackageModel(packageDbModel)
+                coroutineScope.launch {
+                    packageDialogIsOpened.value = true
+                    delay(AnimMillis.SHORT.millis.toLong())
+                    viewModel.setSelectedPackageModel(packageDbModel)
+                }
             }
             if (index == viewModel.packages.collectAsState().value.size - 1) {
                 SampleTempCard(packageCardWidth, packageCardHeight)
             }
         }
     }
-    AnimatedVisibility(visible = viewModel.selectedPackage.collectAsState().value != null) {
-        val popupProperties = DialogProperties(usePlatformDefaultWidth = false)
-        Dialog(onDismissRequest = { viewModel.setSelectedPackageModel(null) }, popupProperties) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                ProfilePackageCard(viewModel) {
-                    if (it == PackageDetailButtonEnum.REMOVE_PACKAGE) {
-                        coroutineScope.launch {
-                            viewModel.removePackage()
-                            viewModel.setSelectedPackageModel(null)
+    if (packageDialogIsOpened.value) {
+        Dialog(
+            onDismissRequest = {
+                coroutineScope.launch {
+                    viewModel.setSelectedPackageModel(null)
+                    delay(AnimMillis.SHORT.millis.toLong())
+                    packageDialogIsOpened.value = false
+                }
+            },
+            DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            AnimatedVisibility(
+                visible = viewModel.selectedPackage.collectAsState().value != null,
+                enter = slideInVertically(
+                    tween(AnimMillis.NORMAL.millis),
+                    initialOffsetY = { it / 2 }) + fadeIn(tween(AnimMillis.SHORT.millis)),
+                exit = slideOutVertically(
+                    tween(AnimMillis.NORMAL.millis),
+                    targetOffsetY = { it / 2 }) + fadeOut(tween(AnimMillis.SHORT.millis))
+            ) {
+                ConstraintLayout(Modifier.fillMaxSize()) {
+                    val (popupRef) = createRefs()
+                    Box(modifier = Modifier
+                        .wrapContentHeight()
+                        .constrainAs(popupRef) {
+                            this.bottom.linkTo(parent.bottom)
+                            this.start.linkTo(parent.start)
+                            this.end.linkTo(parent.end)
+                        }) {
+                        ProfilePackageCard(viewModel) {
+                            if (it == PackageDetailButtonEnum.REMOVE_PACKAGE) {
+                                coroutineScope.launch {
+                                    viewModel.removePackage()
+                                    viewModel.setSelectedPackageModel(null)
+                                }
+                            }
                         }
                     }
                 }
