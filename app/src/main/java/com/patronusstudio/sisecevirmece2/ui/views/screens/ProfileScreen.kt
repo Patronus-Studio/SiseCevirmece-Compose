@@ -262,6 +262,8 @@ private fun Packages(
                                 coroutineScope.launch {
                                     viewModel.removePackage()
                                     viewModel.setSelectedPackageModel(null)
+                                    delay(AnimMillis.NORMAL.millis.toLong())
+                                    packageDialogIsOpened.value = false
                                 }
                             }
                         }
