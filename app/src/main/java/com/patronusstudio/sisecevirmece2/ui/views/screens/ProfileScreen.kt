@@ -44,6 +44,7 @@ import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.views.dialogs.ProfilePackageCard
 import com.patronusstudio.sisecevirmece2.ui.widgets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
