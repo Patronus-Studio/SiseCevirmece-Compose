@@ -13,11 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,6 +24,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
@@ -92,8 +92,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     viewModel.bottles.collectAsState().value, bottleCardSize
                 ) { bottleDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
-                        BuildConfig.package_download_interstitial) { ad ->
+                    InterstitialAdView.loadInterstitial(
+                        localContext.getActivity(),
+                        BuildConfig.package_download_interstitial
+                    ) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
@@ -127,7 +129,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     packageCardHeight
                 ) { backgroundDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity(),BuildConfig.package_download_interstitial) { ad ->
+                    InterstitialAdView.loadInterstitial(
+                        localContext.getActivity(),
+                        BuildConfig.package_download_interstitial
+                    ) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
@@ -186,7 +191,7 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun Packages(
     packages: List<PackageDbModel>,
@@ -194,6 +199,9 @@ private fun Packages(
     packageCardHeight: Dp
 ) {
     val scroolState = rememberScrollState()
+    val selectedPackage = remember {
+        mutableStateOf<PackageDbModel?>(null)
+    }
     FlowRow(
         maxItemsInEachRow = 2,
         modifier = Modifier
@@ -206,14 +214,29 @@ private fun Packages(
                 width = packageCardWidth,
                 height = packageCardHeight,
                 model = packageDbModel
-            )
+            ) {
+                selectedPackage.value = packageDbModel
+            }
             if (index == packages.size - 1) {
                 SampleTempCard(packageCardWidth, packageCardHeight)
             }
         }
     }
-}
+    AnimatedVisibility(visible = selectedPackage.value != null) {
+        val popupProperties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+        Dialog(onDismissRequest = { selectedPackage.value = null }, popupProperties) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                ProfilePackageCard(packageDbModel = selectedPackage.value!!){
 
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -243,9 +266,14 @@ private fun Bottles(
 }
 
 @Composable
-private fun BottleCard(cardSize: Dp, model: BottleDbModel, clicked: (BottleDbModel) -> Unit) {
+private fun BottleCard(
+    cardSize: Dp,
+    model: BottleDbModel,
+    clicked: (BottleDbModel) -> Unit
+) {
     val shape = RoundedCornerShape(4.dp)
-    val backgroundColor = if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
+    val backgroundColor =
+        if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
     Box(modifier = Modifier.padding(top = 16.dp)) {
         Box(
             modifier = Modifier
