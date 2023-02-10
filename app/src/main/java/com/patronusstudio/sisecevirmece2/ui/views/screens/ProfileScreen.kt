@@ -1,9 +1,8 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,11 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,17 +23,21 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
+import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailButtonEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
@@ -44,8 +45,10 @@ import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.views.dialogs.ProfilePackageCard
 import com.patronusstudio.sisecevirmece2.ui.widgets.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,7 +81,7 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 }, exit = fadeOut()
             ) {
                 Packages(
-                    viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
+                    packageCardWidth, packageCardHeight, viewModel
                 )
             }
             AnimatedVisibility(
@@ -92,8 +95,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     viewModel.bottles.collectAsState().value, bottleCardSize
                 ) { bottleDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
-                        BuildConfig.package_download_interstitial) { ad ->
+                    InterstitialAdView.loadInterstitial(
+                        localContext.getActivity(),
+                        BuildConfig.package_download_interstitial
+                    ) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
@@ -127,7 +132,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     packageCardHeight
                 ) { backgroundDbModel ->
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity(),BuildConfig.package_download_interstitial) { ad ->
+                    InterstitialAdView.loadInterstitial(
+                        localContext.getActivity(),
+                        BuildConfig.package_download_interstitial
+                    ) { ad ->
                         if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
                             viewModel.setLoadingStatus(false)
                         } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
@@ -186,14 +194,16 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun Packages(
-    packages: List<PackageDbModel>,
     packageCardWidth: Dp,
-    packageCardHeight: Dp
+    packageCardHeight: Dp,
+    viewModel: ProfileScreenViewModel
 ) {
     val scroolState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val packageDialogIsOpened = remember { mutableStateOf(false) }
     FlowRow(
         maxItemsInEachRow = 2,
         modifier = Modifier
@@ -201,19 +211,68 @@ private fun Packages(
             .verticalScroll(scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        packages.forEachIndexed { index, packageDbModel ->
+        viewModel.packages.collectAsState().value.forEachIndexed { index, packageDbModel ->
             SampleCard(
                 width = packageCardWidth,
                 height = packageCardHeight,
                 model = packageDbModel
-            )
-            if (index == packages.size - 1) {
+            ) {
+                coroutineScope.launch {
+                    packageDialogIsOpened.value = true
+                    delay(AnimMillis.VERY_SHORT.millis.toLong())
+                    viewModel.setSelectedPackageModel(packageDbModel)
+                }
+            }
+            if (index == viewModel.packages.collectAsState().value.size - 1) {
                 SampleTempCard(packageCardWidth, packageCardHeight)
             }
         }
     }
+    if (packageDialogIsOpened.value) {
+        Dialog(
+            onDismissRequest = {
+                coroutineScope.launch {
+                    viewModel.setSelectedPackageModel(null)
+                    delay(AnimMillis.NORMAL.millis.toLong())
+                    packageDialogIsOpened.value = false
+                }
+            },
+            DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            AnimatedVisibility(
+                visible = viewModel.selectedPackage.collectAsState().value != null,
+                enter = slideInVertically(
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    initialOffsetY = { it / 2 }) + fadeIn(tween(AnimMillis.NORMAL.millis)),
+                exit = slideOutVertically(
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    targetOffsetY = { it / 2 }) + fadeOut(tween(AnimMillis.NORMAL.millis))
+            ) {
+                ConstraintLayout(Modifier.fillMaxSize()) {
+                    val (popupRef) = createRefs()
+                    Box(modifier = Modifier
+                        .wrapContentHeight()
+                        .constrainAs(popupRef) {
+                            this.bottom.linkTo(parent.bottom)
+                            this.start.linkTo(parent.start)
+                            this.end.linkTo(parent.end)
+                        }) {
+                        ProfilePackageCard(viewModel) {
+                            if (it == PackageDetailButtonEnum.REMOVE_PACKAGE) {
+                                coroutineScope.launch {
+                                    viewModel.removePackage()
+                                    viewModel.setSelectedPackageModel(null)
+                                    delay(AnimMillis.NORMAL.millis.toLong())
+                                    packageDialogIsOpened.value = false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
-
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -243,9 +302,14 @@ private fun Bottles(
 }
 
 @Composable
-private fun BottleCard(cardSize: Dp, model: BottleDbModel, clicked: (BottleDbModel) -> Unit) {
+private fun BottleCard(
+    cardSize: Dp,
+    model: BottleDbModel,
+    clicked: (BottleDbModel) -> Unit
+) {
     val shape = RoundedCornerShape(4.dp)
-    val backgroundColor = if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
+    val backgroundColor =
+        if (model.isActive) AppColor.GreenMalachite else AppColor.WhiteSoft
     Box(modifier = Modifier.padding(top = 16.dp)) {
         Box(
             modifier = Modifier
