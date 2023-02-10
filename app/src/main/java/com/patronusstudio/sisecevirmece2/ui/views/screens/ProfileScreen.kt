@@ -1,6 +1,7 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -218,7 +219,7 @@ private fun Packages(
             ) {
                 coroutineScope.launch {
                     packageDialogIsOpened.value = true
-                    delay(AnimMillis.SHORT.millis.toLong())
+                    delay(AnimMillis.VERY_SHORT.millis.toLong())
                     viewModel.setSelectedPackageModel(packageDbModel)
                 }
             }
@@ -232,7 +233,7 @@ private fun Packages(
             onDismissRequest = {
                 coroutineScope.launch {
                     viewModel.setSelectedPackageModel(null)
-                    delay(AnimMillis.SHORT.millis.toLong())
+                    delay(AnimMillis.NORMAL.millis.toLong())
                     packageDialogIsOpened.value = false
                 }
             },
@@ -241,11 +242,11 @@ private fun Packages(
             AnimatedVisibility(
                 visible = viewModel.selectedPackage.collectAsState().value != null,
                 enter = slideInVertically(
-                    tween(AnimMillis.NORMAL.millis),
-                    initialOffsetY = { it / 2 }) + fadeIn(tween(AnimMillis.SHORT.millis)),
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    initialOffsetY = { it / 2 }) + fadeIn(tween(AnimMillis.NORMAL.millis)),
                 exit = slideOutVertically(
-                    tween(AnimMillis.NORMAL.millis),
-                    targetOffsetY = { it / 2 }) + fadeOut(tween(AnimMillis.SHORT.millis))
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    targetOffsetY = { it / 2 }) + fadeOut(tween(AnimMillis.NORMAL.millis))
             ) {
                 ConstraintLayout(Modifier.fillMaxSize()) {
                     val (popupRef) = createRefs()
