@@ -13,7 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
+import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailButtonEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
@@ -79,7 +83,7 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 }, exit = fadeOut()
             ) {
                 Packages(
-                    viewModel.packages.collectAsState().value, packageCardWidth, packageCardHeight
+                    packageCardWidth, packageCardHeight,viewModel
                 )
             }
             AnimatedVisibility(
@@ -195,14 +199,12 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
 @OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun Packages(
-    packages: List<PackageDbModel>,
     packageCardWidth: Dp,
-    packageCardHeight: Dp
+    packageCardHeight: Dp,
+    viewModel: ProfileScreenViewModel
 ) {
     val scroolState = rememberScrollState()
-    val selectedPackage = remember {
-        mutableStateOf<PackageDbModel?>(null)
-    }
+    val coroutineScope = rememberCoroutineScope()
     FlowRow(
         maxItemsInEachRow = 2,
         modifier = Modifier
@@ -210,29 +212,30 @@ private fun Packages(
             .verticalScroll(scroolState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        packages.forEachIndexed { index, packageDbModel ->
+        viewModel.packages.collectAsState().value.forEachIndexed { index, packageDbModel ->
             SampleCard(
                 width = packageCardWidth,
                 height = packageCardHeight,
                 model = packageDbModel
             ) {
-                selectedPackage.value = packageDbModel
+                viewModel.setSelectedPackageModel(packageDbModel)
             }
-            if (index == packages.size - 1) {
+            if (index == viewModel.packages.collectAsState().value.size - 1) {
                 SampleTempCard(packageCardWidth, packageCardHeight)
             }
         }
     }
-    AnimatedVisibility(visible = selectedPackage.value != null) {
-        val popupProperties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
-        Dialog(onDismissRequest = { selectedPackage.value = null }, popupProperties) {
+    AnimatedVisibility(visible = viewModel.selectedPackage.collectAsState().value != null) {
+        val popupProperties = DialogProperties(usePlatformDefaultWidth = false)
+        Dialog(onDismissRequest = { viewModel.setSelectedPackageModel(null) }, popupProperties) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                ProfilePackageCard(packageDbModel = selectedPackage.value!!){
-
+                ProfilePackageCard(viewModel) {
+                    if (it == PackageDetailButtonEnum.REMOVE_PACKAGE) {
+                        coroutineScope.launch {
+                            viewModel.removePackage()
+                            viewModel.setSelectedPackageModel(null)
+                        }
+                    }
                 }
             }
         }

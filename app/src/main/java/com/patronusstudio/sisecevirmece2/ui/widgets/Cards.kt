@@ -372,6 +372,7 @@ fun SampleCard(
                         .width((width.value * 0.7).dp)
                         .height((height.value * 0.7).dp)
                         .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
                 Text(text = model.packageName)

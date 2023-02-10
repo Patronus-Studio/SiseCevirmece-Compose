@@ -8,6 +8,9 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,16 +23,26 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailButtonEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
+import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.widgets.SampleText
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun ProfilePackageCard(
-    packageDbModel: PackageDbModel,
+    viewModel: ProfileScreenViewModel,
     btnClickResult: (PackageDetailButtonEnum) -> Unit
 ) {
     val imageSize = 80.dp
     val buttonHeight = 50.dp
     val roundedCornerShape = RoundedCornerShape(16.dp)
+    val packageDbModel = remember { mutableStateOf<PackageDbModel?>(null) }
+    LaunchedEffect(key1 = viewModel.selectedPackage, block = {
+        viewModel.selectedPackage.collectLatest {
+            if (it != null) packageDbModel.value = it
+        }
+    })
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -46,10 +59,8 @@ fun ProfilePackageCard(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).data(
-                    packageDbModel.packageImage
-                )
-                    .crossfade(true)
-                    .build(), contentDescription = "",
+                    packageDbModel.value?.packageImage ?: ""
+                ).crossfade(true).build(), contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(imageSize)
@@ -60,11 +71,11 @@ fun ProfilePackageCard(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.height(imageSize)
             ) {
-                SampleText(content = packageDbModel.packageName, 1, 20)
                 SampleText(
-                    content = packageDbModel.packageComment,
-                    3,
-                    fontSize = 12
+                    content = packageDbModel.value?.packageName ?: "", 1, 20
+                )
+                SampleText(
+                    content = packageDbModel.value?.packageComment ?: "", 3, fontSize = 12
                 )
             }
         }
