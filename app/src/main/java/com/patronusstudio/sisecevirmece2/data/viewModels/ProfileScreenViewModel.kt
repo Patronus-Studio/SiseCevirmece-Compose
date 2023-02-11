@@ -4,13 +4,11 @@ import android.app.Application
 import com.patronusstudio.sisecevirmece2.data.enums.ProfileTitlesEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
+import com.patronusstudio.sisecevirmece2.data.model.dbmodel.*
 import com.patronusstudio.sisecevirmece2.data.repository.local.BackgroundLocalRepository
 import com.patronusstudio.sisecevirmece2.data.repository.local.BottleLocalRepository
 import com.patronusstudio.sisecevirmece2.data.repository.local.PackageLocalRepository
+import com.patronusstudio.sisecevirmece2.data.repository.local.QuestionLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +21,8 @@ class ProfileScreenViewModel @Inject constructor(
     private val application: Application,
     private val packageLocalRepository: PackageLocalRepository,
     private val bottleLocalRepository: BottleLocalRepository,
-    private val backgroundLocalRepository: BackgroundLocalRepository
+    private val backgroundLocalRepository: BackgroundLocalRepository,
+    private val questionLocalRepository: QuestionLocalRepository
 ) : BaseViewModel() {
 
     private val _titles = MutableStateFlow<List<BaseCategoryModel>>(listOf())
@@ -43,6 +42,9 @@ class ProfileScreenViewModel @Inject constructor(
 
     private val _selectedPackage = MutableStateFlow<PackageDbModel?>(null)
     val selectedPackage: StateFlow<PackageDbModel?> = _selectedPackage.asStateFlow()
+
+    private val _questions = MutableStateFlow<List<QuestionDbModel>>(listOf())
+    val questions: StateFlow<List<QuestionDbModel>> get() = _questions
 
     init {
         val list = List(3) {
@@ -207,7 +209,7 @@ class ProfileScreenViewModel @Inject constructor(
         _selectedPackage.value = packageDbModel
     }
 
-   suspend fun removePackage() {
+    suspend fun removePackage() {
         _isLoading.value = true
         _selectedPackage.value?.let { eachPackage ->
             packageLocalRepository.removePackage(eachPackage.primaryId)
@@ -217,6 +219,26 @@ class ProfileScreenViewModel @Inject constructor(
             }
             _packages.value = tempList
         }
+        _isLoading.value = false
+    }
+
+    suspend fun getQuestions() {
+        _isLoading.value = true
+        _selectedPackage.value?.let {
+            val fetchedQuestions = questionLocalRepository.getQuestionsWithPackageId(it.primaryId)
+            _questions.value = fetchedQuestions
+        }
+        _isLoading.value = false
+    }
+
+    suspend fun resetQuestions() {
+        _isLoading.value = true
+        _questions.value.firstOrNull()?.let {
+            questionLocalRepository.updateAllQuestionsShowStatus(it.localPackagePrimaryId, 0)
+        }
+        val tempList = _questions.value.subList(0, _questions.value.size).onEach { it.isShowed = 0 }
+        _questions.value = tempList
+        delay(300)
         _isLoading.value = false
     }
 }

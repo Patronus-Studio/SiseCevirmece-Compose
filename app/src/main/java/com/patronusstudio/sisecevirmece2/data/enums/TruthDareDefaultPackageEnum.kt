@@ -12,6 +12,7 @@ enum class TruthDareDefaultPackageEnum {
             context.resources.getStringArray(R.array.dogrulukListesi)
 
         override fun getImageId(): Int = R.drawable.truth
+        override fun getCloudPackageCategoryId(): Int = -50
         override fun getVersion(): Int = 1
     },
     DARE {
@@ -21,6 +22,7 @@ enum class TruthDareDefaultPackageEnum {
             context.resources.getStringArray(R.array.cesaretListesi)
 
         override fun getImageId(): Int = R.drawable.dare
+        override fun getCloudPackageCategoryId(): Int = -100
         override fun getVersion(): Int = 1
     };
 
@@ -28,6 +30,7 @@ enum class TruthDareDefaultPackageEnum {
     abstract fun getPackageComment(context: Context): String
     abstract fun getQuestions(context: Context): Array<String>
     abstract fun getImageId(): Int
+    abstract fun getCloudPackageCategoryId(): Int
     abstract fun getVersion(): Int
 
 }
