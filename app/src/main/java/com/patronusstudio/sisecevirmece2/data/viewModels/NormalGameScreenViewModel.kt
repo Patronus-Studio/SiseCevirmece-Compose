@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece2.data.viewModels
 
 import android.app.Application
-import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
 import com.patronusstudio.sisecevirmece2.data.enums.TruthDareDefaultPackageEnum
 import com.patronusstudio.sisecevirmece2.data.enums.TruthDareEnum
@@ -16,6 +15,7 @@ import com.patronusstudio.sisecevirmece2.data.repository.local.QuestionLocalRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
 import javax.inject.Inject
 
@@ -41,10 +41,16 @@ class NormalGameScreenViewModel @Inject constructor(
     val dareQuestions: StateFlow<List<QuestionDbModel>> get() = _dareQuestions
 
     private val _activeBottle = MutableStateFlow<BottleDbModel?>(null)
-    val activeBottle : StateFlow<BottleDbModel?> get() = _activeBottle
+    val activeBottle: StateFlow<BottleDbModel?> get() = _activeBottle
 
     private val _backgroundModel = MutableStateFlow<BackgroundDbModel?>(null)
     val backgroundModel: StateFlow<BackgroundDbModel?> get() = _backgroundModel
+
+    private val _truthPackageDbModel = MutableStateFlow<PackageDbModel?>(null)
+    val truthPackageDbModel: StateFlow<PackageDbModel?> get() = _truthPackageDbModel.asStateFlow()
+
+    private val _darePackageDbModel = MutableStateFlow<PackageDbModel?>(null)
+    val darePackageDbModel: StateFlow<PackageDbModel?> get() = _darePackageDbModel.asStateFlow()
 
     fun setTruthDareSelected(truthDareEnum: TruthDareEnum) {
         _truthDareSelected.value = truthDareEnum
@@ -54,13 +60,13 @@ class NormalGameScreenViewModel @Inject constructor(
         _bottleTouchListener.value = bottleTouchListener
     }
 
-    suspend fun getActiveBackground(){
+    suspend fun getActiveBackground() {
         _isLoading.value = true
         _backgroundModel.value = backgroundLocalRepository.getActiveBackground()
         _isLoading.value = false
     }
 
-    suspend fun getBottleOnDb(){
+    suspend fun getBottleOnDb() {
         _isLoading.value = true
         _activeBottle.value = bottleLocalRepository.getActiveBottle()
         _isLoading.value = false
@@ -71,20 +77,32 @@ class NormalGameScreenViewModel @Inject constructor(
         val truthDareDefaultPackageEnum =
             if (truthDareSelected.value == TruthDareEnum.TRUTH) TruthDareDefaultPackageEnum.TRUTH
             else TruthDareDefaultPackageEnum.DARE
+        val localPackageDbModel =
+            packageLocalRepository.getPackageByName(
+                truthDareDefaultPackageEnum.getPackageName(
+                    application.applicationContext
+                )
+            )
+        if (localPackageDbModel?.packageName == TruthDareEnum.TRUTH.getText(application.applicationContext)) {
+            _truthPackageDbModel.value = localPackageDbModel
+        } else if (localPackageDbModel?.packageName == TruthDareEnum.DARE.getText(application.applicationContext)) {
+            _darePackageDbModel.value = localPackageDbModel
+        }
+
         val questions = questionLocalRepository.getQuestionsWithPackageId(
-            truthDareDefaultPackageEnum.getPackageCategoryId()
+            localPackageDbModel!!.primaryId
         )
         if (questions.isNotEmpty()) {
             val notShowedQuestions = questions.filter {
-                !it.isShowed
+                it.isShowed == 0
             }
             if (notShowedQuestions.isEmpty()) {
                 questionLocalRepository.updateAllQuestionsShowStatus(
-                    truthDareDefaultPackageEnum.getPackageCategoryId(),
-                    false
+                    localPackageDbModel.primaryId,
+                    0
                 )
                 questions.forEach {
-                    it.isShowed = false
+                    it.isShowed = 0
                 }
                 if (truthDareDefaultPackageEnum == TruthDareDefaultPackageEnum.TRUTH) {
                     _truthQuestions.value = questions.shuffled()
@@ -110,11 +128,11 @@ class NormalGameScreenViewModel @Inject constructor(
                 truthDareDefaultPackageEnum.getPackageName(application.applicationContext)
             )
         if (findedPackage == null) {
-            packageLocalRepository.addPackages(
+            val packagePrimaryId = packageLocalRepository.addPackages(
                 getDbModel(truthDareDefaultPackageEnum)
             )
             val questionList =
-                questionListToDbModel(truthDareDefaultPackageEnum)
+                questionListToDbModel(truthDareDefaultPackageEnum, packagePrimaryId)
             questionLocalRepository.addQuestions(questionList)
         }
     }
@@ -123,7 +141,7 @@ class NormalGameScreenViewModel @Inject constructor(
         truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): PackageDbModel {
         return PackageDbModel(
-            cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+            cloudPackageCategoryId = truthDareDefaultPackageEnum.getCloudPackageCategoryId(),
             packageImage = truthDareDefaultPackageEnum.getPackageName(application.applicationContext)
                 .toByteArray(),
             version = truthDareDefaultPackageEnum.getVersion(),
@@ -135,15 +153,16 @@ class NormalGameScreenViewModel @Inject constructor(
     }
 
     private fun questionListToDbModel(
-        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
+        truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum,
+        packagePrimaryId: Long
     ): MutableList<QuestionDbModel> {
         val questions = mutableListOf<QuestionDbModel>()
         truthDareDefaultPackageEnum.getQuestions(application.applicationContext).forEach {
             questions.add(
                 QuestionDbModel(
-                    localPackagePrimaryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+                    localPackagePrimaryId = packagePrimaryId.toInt(),
                     question = it,
-                    isShowed = false
+                    isShowed = 0
                 )
             )
         }
@@ -169,9 +188,12 @@ class NormalGameScreenViewModel @Inject constructor(
         val truthDareDefaultPackageEnum =
             if (truthDareSelected.value == TruthDareEnum.DARE) TruthDareDefaultPackageEnum.DARE
             else TruthDareDefaultPackageEnum.TRUTH
+        val packagePrimaryId =
+            if (truthDareSelected.value == TruthDareEnum.DARE) _darePackageDbModel.value!!.primaryId
+            else _truthPackageDbModel.value!!.primaryId
         questionLocalRepository.updateAllQuestionsShowStatus(
-            truthDareDefaultPackageEnum.getPackageCategoryId(),
-            false
+            packagePrimaryId,
+            0
         )
     }
 

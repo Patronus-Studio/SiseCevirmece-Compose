@@ -94,19 +94,17 @@ class SpecialGameScreenViewModel @Inject constructor(
 
     private suspend fun getQuestions(packageDbModel: PackageDbModel) {
         val questions =
-            questionLocalRepository.getQuestionsWithPackageId(getPackageId(packageDbModel))
-        val filteredQuestions = questions.filter { it.isShowed.not() }
+            questionLocalRepository.getQuestionsWithPackageId(packageDbModel.primaryId)
+        val filteredQuestions = questions.filter { it.isShowed == 0 }
         if (filteredQuestions.isEmpty()) {
             withContext(Dispatchers.IO) {
                 questionLocalRepository.updateAllQuestionsShowStatus(
-                    packageDbModel.primaryId, false
+                    packageDbModel.primaryId, 0
                 )
             }
-            questions.forEach { it.isShowed = false }
-            Log.d("Sülo", "getQuestions: ${packageDbModel.packageName} ${questions.size}")
+            questions.forEach { it.isShowed = 0 }
         } else {
             _packagesAndQuestions.value[packageDbModel.primaryId] = filteredQuestions
-            Log.d("Sülo", "getQuestions: ${packageDbModel.packageName} ${filteredQuestions.size}")
         }
     }
 
@@ -116,11 +114,11 @@ class SpecialGameScreenViewModel @Inject constructor(
 
     suspend fun getRandomQuestion() {
         _isLoading.value = true
-        val packageId = getPackageId(_randomPackage.value!!)
+        val packageId = _randomPackage.value!!.primaryId
         val randomQst = _packagesAndQuestions.value[packageId]?.random()
         if (randomQst == null) {
             withContext(Dispatchers.IO) {
-                questionLocalRepository.updateAllQuestionsShowStatus(packageId, false)
+                questionLocalRepository.updateAllQuestionsShowStatus(packageId, 0)
             }
             val fetchedQuestions = withContext(Dispatchers.IO) {
                 questionLocalRepository.getQuestionsWithPackageId(packageId)
@@ -136,17 +134,4 @@ class SpecialGameScreenViewModel @Inject constructor(
         }
         _isLoading.value = false
     }
-
-    private fun getPackageId(packageDbModel: PackageDbModel): Int {
-        return when (packageDbModel.cloudPackageCategoryId) {
-            TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId() -> {
-                TruthDareDefaultPackageEnum.TRUTH.getPackageCategoryId()
-            }
-            TruthDareDefaultPackageEnum.DARE.getPackageCategoryId() -> {
-                TruthDareDefaultPackageEnum.DARE.getPackageCategoryId()
-            }
-            else -> packageDbModel.primaryId
-        }
-    }
-
 }

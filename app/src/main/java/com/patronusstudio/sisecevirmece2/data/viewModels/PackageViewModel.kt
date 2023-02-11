@@ -177,7 +177,7 @@ class PackageViewModel @Inject constructor(
                         QuestionDbModel(
                             localPackagePrimaryId = packagePrimaryId,
                             question = it,
-                            isShowed = false
+                            isShowed = 0
                         )
                     )
                 }

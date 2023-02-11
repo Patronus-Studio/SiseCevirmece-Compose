@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -204,6 +206,7 @@ private fun Packages(
     val scroolState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val packageDialogIsOpened = remember { mutableStateOf(false) }
+    val showQuestionDialogIsOpened = remember { mutableStateOf(false) }
     FlowRow(
         maxItemsInEachRow = 2,
         modifier = Modifier
@@ -231,8 +234,14 @@ private fun Packages(
     if (packageDialogIsOpened.value) {
         Dialog(
             onDismissRequest = {
+                if (viewModel.selectedPackage.value != null) {
+                    coroutineScope.launch {
+                        viewModel.setSelectedPackageModel(null)
+                    }
+                } else if (showQuestionDialogIsOpened.value) {
+                    showQuestionDialogIsOpened.value = false
+                }
                 coroutineScope.launch {
-                    viewModel.setSelectedPackageModel(null)
                     delay(AnimMillis.NORMAL.millis.toLong())
                     packageDialogIsOpened.value = false
                 }
@@ -265,8 +274,82 @@ private fun Packages(
                                     delay(AnimMillis.NORMAL.millis.toLong())
                                     packageDialogIsOpened.value = false
                                 }
+                            } else if (it == PackageDetailButtonEnum.SHOW_QUESTION) {
+                                coroutineScope.launch {
+                                    viewModel.getQuestions()
+                                    viewModel.setSelectedPackageModel(null)
+                                    delay(AnimMillis.NORMAL.millis.toLong())
+                                    showQuestionDialogIsOpened.value = true
+                                }
                             }
                         }
+                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = showQuestionDialogIsOpened.value,
+                enter = slideInVertically(
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    initialOffsetY = { it / 2 }) + fadeIn(tween(AnimMillis.NORMAL.millis)),
+                exit = slideOutVertically(
+                    tween(AnimMillis.NORMAL.millis, easing = FastOutLinearInEasing),
+                    targetOffsetY = { it / 2 }) + fadeOut(tween(AnimMillis.NORMAL.millis))
+            ) {
+                val localHeight = LocalConfiguration.current.screenHeightDp.dp
+                val questions = viewModel.questions.collectAsState().value
+                Box(
+                    modifier = Modifier
+                        .requiredHeightIn(max = (localHeight.value * 0.9).dp)
+                        .wrapContentHeight()
+                        .fillMaxWidth(0.9f)
+                        .background(AppColor.White, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .padding(top = 16.dp, end = 16.dp, start = 16.dp)
+                ) {
+                    Column {
+                        LazyColumn(modifier = Modifier
+                            .requiredHeightIn(max = (localHeight.value * 0.75).dp)
+                            .wrapContentHeight(), content = {
+                            items(questions) {
+                                Row(
+                                    Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = it.question, modifier = Modifier.weight(0.7f))
+                                    if (it.isShowed == 1) {
+                                        AsyncImage(
+                                            model = R.drawable.tick,
+                                            contentDescription = "",
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                                .weight(0.05f)
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        })
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .background(AppColor.BlueViolet, RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    coroutineScope.launch {
+                                        viewModel.resetQuestions()
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.reset_questions),
+                                color = AppColor.White,
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }

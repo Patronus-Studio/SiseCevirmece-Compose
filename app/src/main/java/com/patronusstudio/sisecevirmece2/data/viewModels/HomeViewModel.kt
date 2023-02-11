@@ -132,21 +132,21 @@ class HomeViewModel @Inject constructor(
                 TruthDareDefaultPackageEnum.TRUTH.getPackageName(application.applicationContext)
             )
         if (truthPackage == null) {
-            packageLocalRepository.addPackages(
+            val primaryId = packageLocalRepository.addPackages(
                 getDbModel(TruthDareDefaultPackageEnum.TRUTH)
             )
             val questionList =
-                questionListToDbModel(TruthDareDefaultPackageEnum.TRUTH)
+                questionListToDbModel(primaryId.toInt(), TruthDareDefaultPackageEnum.TRUTH)
             questionLocalRepository.addQuestions(questionList)
         }
         val darePackage =
             packageLocalRepository.getPackageByName(application.applicationContext.getString(R.string.dare))
         if (darePackage == null) {
-            packageLocalRepository.addPackages(
+            val primaryId = packageLocalRepository.addPackages(
                 getDbModel(TruthDareDefaultPackageEnum.DARE)
             )
             val questionList =
-                questionListToDbModel(TruthDareDefaultPackageEnum.DARE)
+                questionListToDbModel(primaryId.toInt(), TruthDareDefaultPackageEnum.DARE)
             questionLocalRepository.addQuestions(questionList)
         }
         _isLoading.value = false
@@ -170,15 +170,16 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun questionListToDbModel(
+        packagePrimaryId: Int,
         truthDareDefaultPackageEnum: TruthDareDefaultPackageEnum
     ): MutableList<QuestionDbModel> {
         val questions = mutableListOf<QuestionDbModel>()
         truthDareDefaultPackageEnum.getQuestions(application.applicationContext).forEach {
             questions.add(
                 QuestionDbModel(
-                    localPackagePrimaryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+                    localPackagePrimaryId = packagePrimaryId,
                     question = it,
-                    isShowed = false
+                    isShowed = 0
                 )
             )
         }
