@@ -130,7 +130,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
                 QuestionDbModel(
                     localPackagePrimaryId = packageId.toInt(),
                     question = it.question,
-                    isShowed = false
+                    isShowed = 0
                 )
             )
         }

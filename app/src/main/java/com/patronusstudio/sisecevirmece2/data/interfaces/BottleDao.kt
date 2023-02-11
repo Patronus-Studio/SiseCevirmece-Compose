@@ -52,7 +52,7 @@ interface BottleDao {
     suspend fun getQuestionsList(packagePrimaryId: Int): MutableList<QuestionDbModel>
 
     @Query("Update ${DbTables.questionTable} set isShowed= :isShowed where localPackagePrimaryId= :packagePrimaryId")
-    suspend fun updateAllQuestionsShowStatus(isShowed: Boolean, packagePrimaryId: Int)
+    suspend fun updateAllQuestionsShowStatus(isShowed: Int, packagePrimaryId: Int)
 
     @Query("Update ${DbTables.questionTable} set isShowed= :isShowed where primaryId= :questionPrimaryId")
     suspend fun updateSingleQuestionShowStatus(isShowed: Boolean, questionPrimaryId: Int)

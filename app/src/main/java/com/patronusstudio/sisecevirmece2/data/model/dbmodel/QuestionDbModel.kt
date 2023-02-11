@@ -10,5 +10,5 @@ data class QuestionDbModel(
     val primaryId: Int = 0,
     val localPackagePrimaryId: Int,
     val question: String,
-    var isShowed: Boolean = false
+    var isShowed: Int
 )
