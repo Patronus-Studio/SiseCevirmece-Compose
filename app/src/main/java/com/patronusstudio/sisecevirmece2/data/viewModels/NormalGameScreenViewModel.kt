@@ -76,7 +76,7 @@ class NormalGameScreenViewModel @Inject constructor(
         )
         if (questions.isNotEmpty()) {
             val notShowedQuestions = questions.filter {
-                !it.isShowed
+                it.isShowed == 0
             }
             if (notShowedQuestions.isEmpty()) {
                 questionLocalRepository.updateAllQuestionsShowStatus(
@@ -84,7 +84,7 @@ class NormalGameScreenViewModel @Inject constructor(
                     false
                 )
                 questions.forEach {
-                    it.isShowed = false
+                    it.isShowed = 0
                 }
                 if (truthDareDefaultPackageEnum == TruthDareDefaultPackageEnum.TRUTH) {
                     _truthQuestions.value = questions.shuffled()
@@ -143,7 +143,7 @@ class NormalGameScreenViewModel @Inject constructor(
                 QuestionDbModel(
                     localPackagePrimaryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
                     question = it,
-                    isShowed = false
+                    isShowed = 0
                 )
             )
         }
