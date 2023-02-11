@@ -159,7 +159,7 @@ class HomeViewModel @Inject constructor(
             truthDareDefaultPackageEnum.getImageId().toBitmapArray(application.applicationContext)
         }
         return PackageDbModel(
-            cloudPackageCategoryId = truthDareDefaultPackageEnum.getPackageCategoryId(),
+            cloudPackageCategoryId = truthDareDefaultPackageEnum.getCloudPackageCategoryId(),
             packageImage = image,
             version = truthDareDefaultPackageEnum.getVersion(),
             packageName = truthDareDefaultPackageEnum.getPackageName(application.applicationContext),
