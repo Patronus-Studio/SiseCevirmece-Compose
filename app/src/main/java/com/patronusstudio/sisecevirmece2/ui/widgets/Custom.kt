@@ -1,6 +1,8 @@
 package com.patronusstudio.sisecevirmece2.ui.widgets
 
 import android.content.res.Resources
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,28 +15,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece2.R
-import com.patronusstudio.sisecevirmece2.data.AvatarStatu
+import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 
@@ -129,6 +127,7 @@ fun LevelBar(currentStar: Int = 35, nextLevelNeedStar: Int = 40, currentLevel: S
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun UserPic(
     ratio: Double = 0.25,
@@ -137,41 +136,40 @@ fun UserPic(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val imageSize = (screenWidth * ratio).dp
-    //val bitmapImage = ImageBitmap.imageResource(id = R.drawable.lock)
-    val isLoading = remember { mutableStateOf(true) }
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Box {
-            if (isLoading.value) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            Box(
+    val image = remember { mutableStateOf<Any?>(null) }
+
+    val imageLoader = ImageLoader(LocalContext.current)
+    val imageRequest = ImageRequest.Builder(LocalContext.current).data(avatar.imageUrl)
+        .listener(
+            onSuccess = { req, suc ->
+                image.value = req.data
+            }).target {
+            image.value = it
+        }.build()
+    imageLoader.enqueue(imageRequest)
+
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        AnimatedVisibility(
+            visible = image.value != null,
+            enter = scaleIn(
+                transformOrigin = TransformOrigin(0.5f, 0.5f),
+                animationSpec = tween(AnimMillis.NORMAL.millis)
+            ) + fadeIn() + expandIn(expandFrom = Alignment.Center)
+        ) {
+            AsyncImage(
+                model = image.value, contentDescription = "",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(imageSize)
                     .clip(CircleShape)
                     .clickable {
-                        //if (avatar.buyedStatu == AvatarStatu.BUYED) {
-                        // clickedImage!!(avatar)
-                        //}
                         clickedImage!!(avatar)
                     }
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(avatar.imageUrl)
-                        .crossfade(true)
-                        .build(), contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    onLoading = {
-                        isLoading.value = true
-                    }, onSuccess = {
-                        isLoading.value = false
-                    },
-                    onError = {
-                        isLoading.value = false
-                    }
-                )
+            )
+        }
+        if(image.value == null){
+            CircularProgressIndicator()
+        }
 //                if (avatar.buyedStatu == AvatarStatu.NON_BUYED) {
 //                    Box(
 //                        modifier = Modifier
@@ -211,8 +209,5 @@ fun UserPic(
 //                        )
 //                    })
 //                }
-            }
-        }
     }
-
 }

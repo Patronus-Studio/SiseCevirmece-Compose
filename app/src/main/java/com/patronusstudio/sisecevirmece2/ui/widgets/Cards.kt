@@ -285,7 +285,7 @@ fun BaseBackground(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SampleError(closeClicked: () -> Unit) {
+fun SampleError(text:String,closeClicked: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
     Dialog(
         onDismissRequest = {},
@@ -303,7 +303,7 @@ fun SampleError(closeClicked: () -> Unit) {
         ) {
             Column(
                 modifier = Modifier
-                    .height(250.dp)
+                    .wrapContentHeight()
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(0.dp))
                     .background(
@@ -312,6 +312,7 @@ fun SampleError(closeClicked: () -> Unit) {
                     ),
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
+                Spacer(modifier = Modifier.height(12.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -333,9 +334,12 @@ fun SampleError(closeClicked: () -> Unit) {
                         modifier = Modifier.size(150.dp),
                     )
                 }
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(text = "Hata")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                    Text(text = text, color = AppColor.DavysGrey)
                 }
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }

@@ -152,7 +152,7 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
                 })
         }
         if(viewModel.errorMessage.collectAsState().value.isNotBlank()){
-            SampleError {
+            SampleError(viewModel.errorMessage.collectAsState().value) {
                 destinationStatus.value = InAppScreenNavEnums.LOGOUT
             }
         }

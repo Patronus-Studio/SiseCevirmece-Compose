@@ -43,10 +43,6 @@ class HomeViewModel @Inject constructor(
     private val bottleLocalRepository: BottleLocalRepository,
     private val backgroundLocalRepository: BackgroundLocalRepository
 ) : ViewModel() {
-
-    private val _loginError = MutableStateFlow("")
-    val loginError = _loginError.asStateFlow()
-
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
@@ -67,7 +63,7 @@ class HomeViewModel @Inject constructor(
         val result = networkRepository.getUserGameInfo(authToken)
         if (result.body() == null || result.body()!!.status != HttpStatusEnum.OK) {
             _isLoading.value = false
-            _loginError.value = result.body()?.message
+            _errorMessage.value = result.body()?.message
                 ?: "Kullanıcı bilgisi çekilirken bir hata oluştu. Tekrar giriş yapın."
             return
         }
