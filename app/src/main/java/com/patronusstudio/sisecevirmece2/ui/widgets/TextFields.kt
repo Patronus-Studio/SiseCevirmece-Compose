@@ -65,7 +65,7 @@ fun CustomTextField(
         modifier = Modifier
             .width(widthSize)
             .clip(RoundedCornerShape(20.dp))
-            .border(1.dp,AppColor.Beaver, RoundedCornerShape(20.dp)),
+            .border(1.dp,AppColor.Beaver, RoundedCornerShape(20.dp)).imePadding(),
         colors = textFieldColors,
         visualTransformation = visualTransformation,
         isError = isError,
@@ -78,8 +78,8 @@ fun CustomTextField(
 fun getTextFieldColor(): TextFieldColors {
     return TextFieldDefaults.outlinedTextFieldColors(
         backgroundColor = AppColor.White,
-        focusedBorderColor = AppColor.Beaver,
-        unfocusedBorderColor = AppColor.Purple700,
+        focusedBorderColor = Color.Transparent,
+        unfocusedBorderColor =  Color.Transparent,
         errorBorderColor = AppColor.Red,
         textColor = AppColor.DavysGrey
     )

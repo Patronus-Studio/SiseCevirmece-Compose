@@ -163,7 +163,7 @@ fun UsernameView(
     val userEmailTrailIcon = remember { mutableStateOf(R.drawable.user) }
     Column {
         Box(
-            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth().imePadding(), contentAlignment = Alignment.Center
         ) {
             CustomTextField(
                 widthSize = widthSize,
