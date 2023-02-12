@@ -29,7 +29,7 @@
     <string name="not_selected">Seçilmedi</string>
     <string name="select_game_category">Oynamak İstediğiniz Kategorileri Seçin</string>
     <string name="paket_doesnt_find_to_play">Seçilebilecek paket bulunamadı.</string>
-    <string name="at_least_5_package_add_to_play">Oynamak için en az 3 paket yükleyin.</string>
+    <string name="at_least_5_package_add_to_play">Oynamak için en az 3 paket indirin.</string>
     <string name="username">Kullanıcı Adı</string>
     <string name="register">Kayıt Ol</string>
     <string name="entried_email_is_not_correct">Girilen email adresi hatalı</string>

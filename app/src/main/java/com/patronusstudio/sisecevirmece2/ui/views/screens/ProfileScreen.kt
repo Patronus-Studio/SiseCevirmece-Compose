@@ -321,7 +321,7 @@ private fun Packages(
                                     Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = it.question, modifier = Modifier.weight(0.7f))
+                                    Text(text = it.question, modifier = Modifier.weight(0.7f), color = AppColor.DavysGrey)
                                     if (it.isShowed == 1) {
                                         AsyncImage(
                                             model = R.drawable.tick,
