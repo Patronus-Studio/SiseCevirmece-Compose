@@ -36,7 +36,6 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backClicked: () -> Unit) {
     val viewModel = hiltViewModel<SpecialGameScreenViewModel>()
@@ -136,6 +135,9 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backCli
                             }
                         }
                 )
+            }
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
             }
         })
     if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_ENDED) {

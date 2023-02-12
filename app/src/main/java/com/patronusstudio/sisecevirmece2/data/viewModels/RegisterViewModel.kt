@@ -87,7 +87,7 @@ class RegisterViewModel @Inject  constructor(
             }
             val userModelRegister = UserModelRegister(
                 username.value,
-                userEmail.value,
+                userEmail.value.replace(" ",""),
                 userPassword.value,
                 selectedGender.value.enumType
             )
@@ -101,9 +101,9 @@ class RegisterViewModel @Inject  constructor(
                         ?: mContext.getString(R.string.getting_some_error)
                 return@finish
             }
-            writeUserTokenOnLocalStorage(mContext,registerResult.body()!!.token!!)
+            writeUserTokenOnLocalStorage(mContext,registerResult.body()?.message!!)
             _isLoading.value = false
-            _userToken.value = registerResult.body()!!.token
+            _userToken.value = registerResult.body()!!.message
         }
 
     }
@@ -114,7 +114,7 @@ class RegisterViewModel @Inject  constructor(
 
     private suspend fun isEmailUsable(mContext: Context): Boolean {
         val controlResponse = withContext(Dispatchers.IO) {
-            networkRepository.emailControl(userEmail.value)
+            networkRepository.emailControl(userEmail.value.replace(" ",""))
         }
         if (controlResponse.body() == null || controlResponse.body()!!.status != HttpStatusEnum.OK) {
             _errorMessage.value = controlResponse.body()?.message ?: mContext.getString(R.string.getting_some_error)

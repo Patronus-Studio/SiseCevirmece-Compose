@@ -158,7 +158,10 @@ fun TruthDareQuestionDialog(
                                                 viewModel.setLoadingStatus(false)
                                                 changeQuestionStatus.value = true
                                             }
-                                            else -> localContext.showSample()
+                                            else -> {
+                                                localContext.showSample()
+                                                viewModel.setLoadingStatus(false)
+                                            }
                                         }
                                     }
                                 }

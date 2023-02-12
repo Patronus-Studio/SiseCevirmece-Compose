@@ -162,7 +162,7 @@ class NormalGameScreenViewModel @Inject constructor(
                 QuestionDbModel(
                     localPackagePrimaryId = packagePrimaryId.toInt(),
                     question = it,
-                    isShowed = 0
+                    isShowed = 0, punishment = null, correctAnswer = null
                 )
             )
         }

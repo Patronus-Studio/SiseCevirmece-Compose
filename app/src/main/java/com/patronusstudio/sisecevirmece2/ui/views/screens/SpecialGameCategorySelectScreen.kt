@@ -166,7 +166,6 @@ private fun PlayButton(selectedPackageSize: Int, playButtonWidth: Dp, clicked: (
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun AnimationDialog(
     packageSize: Int,
@@ -175,7 +174,7 @@ private fun AnimationDialog(
     dissmisRequest: () -> Unit
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.package_empty))
-    if (packageSize <= 0 && !isFirstInit) {
+    if (packageSize <= 3 && !isFirstInit) {
         Dialog(
             onDismissRequest = dissmisRequest,
             properties = DialogProperties(usePlatformDefaultWidth = false)

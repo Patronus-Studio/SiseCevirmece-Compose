@@ -3,7 +3,6 @@ package com.patronusstudio.sisecevirmece2.data.viewModels
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.abstarcts.BottleRoomDb
 import com.patronusstudio.sisecevirmece2.data.enums.HttpStatusEnum
@@ -33,7 +32,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _questionList = MutableStateFlow(
-        mutableStateListOf(QuestionModel(1, ""))
+        mutableStateListOf(QuestionModel(1, "", "", null))
     )
     val questionList: StateFlow<List<QuestionModel>> get() = _questionList
 
@@ -67,7 +66,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
     }
 
     fun addNewQuestionModel() {
-        _questionList.value.add(QuestionModel(_questionList.value.last().id + 1, ""))
+        _questionList.value.add(QuestionModel(_questionList.value.last().id + 1, "", "", null))
     }
 
     fun setPackageName(name: String) {
@@ -130,7 +129,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
                 QuestionDbModel(
                     localPackagePrimaryId = packageId.toInt(),
                     question = it.question,
-                    isShowed = 0
+                    isShowed = 0, correctAnswer = it.correctAnswer, punishment = it.punishment
                 )
             )
         }
@@ -145,7 +144,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
         _packageName.value = ""
         _packageCategoryModel.value = null
         _selectedImage.value = null
-        _questionList.value = mutableStateListOf(QuestionModel(1, "asdasd"))
+        _questionList.value = mutableStateListOf(QuestionModel(1, "asdasd", "", null))
     }
 
     private fun listEmptyControl(): Boolean {
