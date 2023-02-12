@@ -42,6 +42,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
+import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 
 @Composable
@@ -442,5 +443,23 @@ fun SampleTempCard(
                 .height(height)
                 .background(Color.Transparent)
         )
+    }
+}
+
+@Composable
+fun AnswerCard(questionDbModel: QuestionDbModel) {
+    val shape = RoundedCornerShape(12.dp)
+    Box(modifier = Modifier.padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(400.dp)
+                .background(
+                    AppColor.White, shape
+                )
+                .clip(shape), contentAlignment = Alignment.Center
+        ) {
+            Text(text = questionDbModel.question)
+        }
     }
 }

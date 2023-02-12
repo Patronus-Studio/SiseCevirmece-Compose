@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
@@ -31,6 +33,7 @@ import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.widgets.AnswerCard
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import com.wajahatkarim.flippable.Flippable
@@ -68,7 +71,6 @@ fun SpecialQuestionDialog(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     GeneralCard(
                         (width * 0.9).dp, (height * 0.2).dp,
                         text = viewModel.randomQuestion.value?.question ?: "",
@@ -144,15 +146,12 @@ fun SpecialQuestionDialog(
                                 viewModel, localContext, mixpanelAPI,
                                 localContext.getString(R.string.show_answer)
                             )
-                            closeClicked()
-                        }
+                        }, image = R.drawable.confused
                     )
                 }
             },
             backSide = {
-                Box(modifier = Modifier
-                    .size(400.dp)
-                    .background(AppColor.White).clickable {  })
+                AnswerCard(viewModel.randomQuestion.collectAsState().value!!)
             },
             flipController = flipController,
             flipOnTouch = false,
@@ -188,7 +187,8 @@ private fun GeneralCard(
     height: Dp,
     text: String,
     clicked: (() -> Unit)? = null,
-    cardPadding: PaddingValues = PaddingValues(0.dp)
+    cardPadding: PaddingValues = PaddingValues(0.dp),
+    image:Any? = null
 ) {
     val modifier = if (clicked == null) Modifier
         .width(width)
@@ -206,17 +206,35 @@ private fun GeneralCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues = cardPadding),
-            contentAlignment = Alignment.Center
+            contentAlignment = if(image != null) Alignment.CenterStart else Alignment.Center
         ) {
-            AutoTextSize(
-                text = text,
-                textStyle = TextStyle.Default.copy(
-                    color = AppColor.SunsetOrange,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center
-                ), maxLines = 10
-            )
+            if(image != null){
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    AsyncImage(model = image, contentDescription = "", modifier = Modifier.size(32.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    AutoTextSize(
+                        text = text,
+                        textStyle = TextStyle.Default.copy(
+                            color = AppColor.SunsetOrange,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        ), maxLines = 10
+                    )
+                }
+            }
+            else{
+                AutoTextSize(
+                    text = text,
+                    textStyle = TextStyle.Default.copy(
+                        color = AppColor.SunsetOrange,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center
+                    ), maxLines = 10
+                )
+
+            }
         }
     }
 }
