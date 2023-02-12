@@ -446,20 +446,3 @@ fun SampleTempCard(
     }
 }
 
-@Composable
-fun AnswerCard(questionDbModel: QuestionDbModel) {
-    val shape = RoundedCornerShape(12.dp)
-    Box(modifier = Modifier.padding(16.dp)) {
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(400.dp)
-                .background(
-                    AppColor.White, shape
-                )
-                .clip(shape), contentAlignment = Alignment.Center
-        ) {
-            Text(text = questionDbModel.question)
-        }
-    }
-}
