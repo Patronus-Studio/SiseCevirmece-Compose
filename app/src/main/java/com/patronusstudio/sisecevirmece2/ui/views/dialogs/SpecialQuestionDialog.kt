@@ -1,14 +1,13 @@
 package com.patronusstudio.sisecevirmece2.ui.views.dialogs
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
@@ -33,36 +33,43 @@ import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewMo
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
+import com.wajahatkarim.flippable.Flippable
+import com.wajahatkarim.flippable.rememberFlipController
 import kotlinx.coroutines.launch
 
 @Composable
 fun SpecialQuestionDialog(
     mixpanelAPI: MixpanelAPI,
     closeClicked: () -> Unit,
-    viewModel: SpecialGameScreenViewModel
-) {
+    viewModel: SpecialGameScreenViewModel,
+
+    ) {
     val localContext = LocalContext.current
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
     val smallPaddingHeight = (height * 0.03).dp
     val coroutineScope = rememberCoroutineScope()
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            TitleCard(
-                (width * 0.9).dp, viewModel.randomPackage.value?.packageName ?: stringResource(
-                    id = R.string.play_special_title
-                )
+    val flipController = rememberFlipController()
+    Column(
+        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        TitleCard(
+            (width * 0.9).dp, viewModel.randomPackage.value?.packageName ?: stringResource(
+                id = R.string.play_special_title
             )
-            Box(modifier = Modifier.fillMaxSize()) {
+        )
+        Flippable(modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+            frontSide = {
                 Column(
-                    Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+
                     GeneralCard(
                         (width * 0.9).dp, (height * 0.2).dp,
                         text = viewModel.randomQuestion.value?.question ?: "",
@@ -99,7 +106,10 @@ fun SpecialQuestionDialog(
                                     }
                                 } else {
                                     viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(localContext.getActivity(),BuildConfig.special_game_interstitial) { ad ->
+                                    InterstitialAdView.loadInterstitial(
+                                        localContext.getActivity(),
+                                        BuildConfig.special_game_interstitial
+                                    ) { ad ->
                                         when (ad) {
                                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                                 viewModel.setLoadingStatus(false)
@@ -125,21 +135,27 @@ fun SpecialQuestionDialog(
                     GeneralCard(
                         (width * 0.9).dp,
                         smallCardHeight,
-                        text = stringResource(R.string.i_wil_ask_question),
+                        text = stringResource(R.string.show_answer),
                         clicked = {
+                            flipController.flip()
                             sendDataToMixApi(
                                 viewModel, localContext, mixpanelAPI,
-                                localContext.getString(R.string.i_wil_ask_question)
+                                localContext.getString(R.string.show_answer)
                             )
                             closeClicked()
                         }
                     )
                 }
-            }
-        }
-        if (viewModel.isLoading.collectAsState().value) {
-            CircularProgressIndicator()
-        }
+            },
+            backSide = {
+                Box(modifier = Modifier
+                    .size(400.dp)
+                    .background(AppColor.White).clickable {  })
+            },
+            flipController = flipController,
+            flipOnTouch = false,
+            flipDurationMs = AnimMillis.NORMAL.millis
+        )
     }
 }
 
