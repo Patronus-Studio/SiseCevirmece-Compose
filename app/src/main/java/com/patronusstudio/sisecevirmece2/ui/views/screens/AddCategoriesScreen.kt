@@ -317,7 +317,10 @@ private fun QuestionsCard(
                                 }
                                 localFocus.clearFocus()
                             }
-                            else -> localContext.showSample()
+                            else -> {
+                                localContext.showSample()
+                                viewModel.setLoadingStatus(false)
+                            }
                         }
                     }
                 }

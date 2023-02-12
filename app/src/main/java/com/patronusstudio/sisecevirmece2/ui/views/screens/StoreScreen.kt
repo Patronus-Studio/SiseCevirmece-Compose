@@ -106,7 +106,10 @@ fun StoreScreen(back: () -> Unit) {
                         coroutineScope.launch(Dispatchers.Main) {
                             packageStatus(viewModel)
                         }
-                    } else localContext.showSample()
+                    } else {
+                        localContext.showSample()
+                        viewModel.setLoadingStatus(false)
+                    }
                 }
             })
         }
@@ -116,7 +119,6 @@ fun StoreScreen(back: () -> Unit) {
     })
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit, clickedBtn: () -> Unit) {
     val popupProperties = DialogProperties(

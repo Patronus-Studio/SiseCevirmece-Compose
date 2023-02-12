@@ -211,7 +211,7 @@ fun PackageDetailCard(
                     }
                     .fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                SampleText(content = "Soru Sayısı : ${packageModel.questions.split(";").size}")
+                SampleText(content = "Soru Sayısı : ${packageModel.questionList.size}")
                 SampleText(content = "Version Numarası : ${packageModel.version}")
             }
             Column(
@@ -285,7 +285,7 @@ fun BaseBackground(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SampleError(text:String,closeClicked: () -> Unit) {
+fun SampleError(text: String, closeClicked: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
     Dialog(
         onDismissRequest = {},
@@ -334,9 +334,13 @@ fun SampleError(text:String,closeClicked: () -> Unit) {
                         modifier = Modifier.size(150.dp),
                     )
                 }
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(text = text, color = AppColor.DavysGrey)
                 }
                 Spacer(modifier = Modifier.height(12.dp))

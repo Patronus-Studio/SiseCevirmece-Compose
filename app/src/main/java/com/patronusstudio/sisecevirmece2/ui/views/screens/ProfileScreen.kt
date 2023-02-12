@@ -109,7 +109,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                                 viewModel.setBottleActiveStatuOnDb(bottleDbModel.primaryId)
                                 viewModel.setBottleActiveStatuOnLocal(bottleDbModel.primaryId)
                             }
-                        } else localContext.showSample()
+                        } else {
+                            localContext.showSample()
+                            viewModel.setLoadingStatus(false)
+                        }
                     }
 
                     val eventName = localContext.getString(R.string.bottles)
@@ -144,7 +147,10 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                             viewModel.setLoadingStatus(false)
                             viewModel.setBackgroundActiveStatuOnDb(backgroundDbModel)
                             viewModel.setBackgroundActiveStatuOnLocal(backgroundDbModel)
-                        } else localContext.showSample()
+                        } else {
+                            localContext.showSample()
+                            viewModel.setLoadingStatus(false)
+                        }
                     }
                     val eventName = localContext.getString(R.string.bottles)
                     val events =

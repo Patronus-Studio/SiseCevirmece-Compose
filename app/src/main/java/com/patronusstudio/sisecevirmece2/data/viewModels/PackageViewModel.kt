@@ -45,7 +45,7 @@ class PackageViewModel @Inject constructor(
         _currentPackage.value = packageModel
     }
 
-    suspend fun getPackageCategories():Int{
+    suspend fun getPackageCategories(): Int {
         _isLoading.value = true
         val categories = packageNetworkRepository.getPackageCategories()
         if (categories.isSuccessful.not() || categories.body() == null || categories.body()?.status != HttpStatusEnum.OK) {
@@ -169,19 +169,17 @@ class PackageViewModel @Inject constructor(
     }
 
     private suspend fun insertQuestions(packagePrimaryId: Int) {
-
-        val questions = mutableListOf<QuestionDbModel>().apply {
-            _currentPackage.value!!.questions.split(";").forEach {
-                if (it.isNotEmpty() && it.isNotBlank()) {
-                    this.add(
-                        QuestionDbModel(
-                            localPackagePrimaryId = packagePrimaryId,
-                            question = it,
-                            isShowed = 0
-                        )
-                    )
-                }
-            }
+        val questions = mutableListOf<QuestionDbModel>()
+        _currentPackage.value?.questionList?.onEach {
+            questions.add(
+                QuestionDbModel(
+                    localPackagePrimaryId = packagePrimaryId,
+                    question = it.question,
+                    correctAnswer = it.correctAnswer,
+                    punishment = it.punishment,
+                    isShowed = 0
+                )
+            )
         }
         questionLocalRepository.addQuestions(questions)
     }

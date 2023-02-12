@@ -175,7 +175,8 @@ class HomeViewModel @Inject constructor(
                 QuestionDbModel(
                     localPackagePrimaryId = packagePrimaryId,
                     question = it,
-                    isShowed = 0
+                    isShowed = 0,
+                    correctAnswer = null, punishment = null
                 )
             )
         }

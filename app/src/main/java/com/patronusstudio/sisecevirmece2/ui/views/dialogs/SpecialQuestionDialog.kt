@@ -121,7 +121,10 @@ fun SpecialQuestionDialog(
                                                     viewModel.getRandomQuestion()
                                                 }
                                             }
-                                            else -> localContext.showSample()
+                                            else -> {
+                                                localContext.showSample()
+                                                viewModel.setLoadingStatus(false)
+                                            }
                                         }
                                     }
                                 }
