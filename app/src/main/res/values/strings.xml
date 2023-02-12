@@ -74,6 +74,7 @@
     <string name="show_question">Soruları Görüntüle</string>
     <string name="remove_package">Paketi Sil</string>
     <string name="reset_questions">Soruları Sıfırla</string>
+    <string name="show_answer">Cevabı Göster</string>
 
     <string-array name="cesaretListesi">
         <item>Alfabeyi tersten oku\.</item>

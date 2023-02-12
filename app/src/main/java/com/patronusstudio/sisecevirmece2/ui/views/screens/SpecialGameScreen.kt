@@ -137,6 +137,9 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backCli
                         }
                 )
             }
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
+            }
         })
     if (viewModel.bottleTouchListener.collectAsState().value == BottleTouchListener.ANIM_ENDED) {
         Dialog(
