@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
+import com.patronusstudio.sisecevirmece2.data.enums.TruthDareEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.repository.local.PackageLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,8 +35,12 @@ class SpecialGameCategorySelectViewModel @Inject constructor(
 
     suspend fun getAllPackages() {
         val fetchedPackages = packageLocalRepository.getPackages()
+        val filteredList = fetchedPackages.filter {
+            it.packageName != TruthDareEnum.TRUTH.getText(application.applicationContext) &&
+                    it.packageName != TruthDareEnum.DARE.getText(application.applicationContext)
+        }
         _packages.clear()
-        _packages.addAll(fetchedPackages)
+        _packages.addAll(filteredList)
     }
 
     fun setShowStatu(packageDbModel: PackageDbModel) {
