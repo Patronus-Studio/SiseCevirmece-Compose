@@ -10,5 +10,7 @@ data class QuestionDbModel(
     val primaryId: Int = 0,
     val localPackagePrimaryId: Int,
     val question: String,
+    var correctAnswer: String?,
+    var punishment: String?,
     var isShowed: Int
 )

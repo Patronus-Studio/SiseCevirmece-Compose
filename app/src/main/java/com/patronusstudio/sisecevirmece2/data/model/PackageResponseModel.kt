@@ -19,14 +19,14 @@ data class PackageModel(
     val imageUrl: String,
     @SerializedName("name")
     override val packageName: String,
-    val numberOfDownload: Double,
-    val numberOfLike: Double,
-    val numberOfUnlike: Double,
-    val packageCategory: Double,
-    val questions: String,
+    val numberOfDownload: Int,
+    val numberOfLike: Int,
+    val numberOfUnlike: Int,
+    val packageCategory: Int,
     override val updatedTime: String,
     val username: String,
     override val version: Int,
+    val questionList:List<QuestionModel>,
     //for local control
     var imageId: Int? = null,
     var packageStatu: PackageDetailCardBtnEnum
