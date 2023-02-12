@@ -36,7 +36,6 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SpecialGameScreen(mixpanelAPI: MixpanelAPI,selectedPackages: String, backClicked: () -> Unit) {
     val viewModel = hiltViewModel<SpecialGameScreenViewModel>()

@@ -19,9 +19,9 @@ fun NavGraphBuilder.passToInAppRoute(navController: NavHostController,mixpanelAP
         route = NavInAppScreens.RootNesned.routeName
     ) {
         composable(route = NavInAppScreens.RegisterScreen.routeName) {
-            RegisterScreen { userToken ->
+            RegisterScreen {
                 navController.navigate(
-                    NavInAppScreens.HomeScreen.routeName + "/{$userToken}", navOptions {
+                    NavInAppScreens.HomeScreen.routeName , navOptions {
                         popUpTo(0)
                     }
                 )

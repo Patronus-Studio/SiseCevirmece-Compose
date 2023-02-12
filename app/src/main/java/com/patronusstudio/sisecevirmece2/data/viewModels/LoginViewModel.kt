@@ -2,6 +2,7 @@ package com.patronusstudio.sisecevirmece2.data.viewModels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.data.enums.HttpStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.LoginRequestModel
 import com.patronusstudio.sisecevirmece2.data.repository.LocalRepository
@@ -53,6 +54,7 @@ class LoginViewModel @Inject constructor(
             user_token.firstOrNull()?.let {
                 _token.value = it
             }
+            MainApplication.authToken = _token.value
             isAnimationShow.value = false
         }
     }

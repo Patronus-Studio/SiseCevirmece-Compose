@@ -69,7 +69,6 @@ fun SpecialQuestionDialog(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-
                     GeneralCard(
                         (width * 0.9).dp, (height * 0.2).dp,
                         text = viewModel.randomQuestion.value?.question ?: "",

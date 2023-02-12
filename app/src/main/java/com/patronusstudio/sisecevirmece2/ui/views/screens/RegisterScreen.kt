@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.GenderEnum
 import com.patronusstudio.sisecevirmece2.data.utils.checkEmailCorrect
@@ -37,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun RegisterScreen(passToHome: (String) -> Unit) {
+fun RegisterScreen(passToHome: () -> Unit) {
     val viewModel = hiltViewModel<RegisterViewModel>()
     val mContext = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
@@ -63,7 +64,8 @@ fun RegisterScreen(passToHome: (String) -> Unit) {
     }
     LaunchedEffect(key1 = viewModel.userToken.collectAsState().value) {
         if (viewModel.userToken.value != null) {
-            passToHome(viewModel.userToken.value!!)
+            MainApplication.authToken = viewModel.userToken.value!!
+            passToHome()
         }
     }
 

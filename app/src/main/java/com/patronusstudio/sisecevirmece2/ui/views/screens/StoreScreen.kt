@@ -14,7 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -225,13 +228,20 @@ fun PackagesCard(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val colorList = mutableListOf<Color>().apply {
+                    this.add(Color(0xFFf09433))
+                    this.add(Color(0xFFe6683c))
+                    this.add(Color(0xffdc2743))
+                    this.add(Color(0xFFcc2366))
+                    this.add(Color(0xFFbc1888))
+                }
                 AsyncImage(
                     model = packageModel.imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .border(BorderStroke(2.dp, Color.Green), CircleShape)
+                        .border(BorderStroke(2.dp, Brush.verticalGradient(colorList, tileMode = TileMode.Mirror)), CircleShape)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(
@@ -263,7 +273,7 @@ fun PackagesCard(
                         this.top.linkTo(cardReference.top, margin = 16.dp)
                         this.end.linkTo(cardReference.end, margin = 8.dp)
                         this.bottom.linkTo(cardReference.top)
-                    })
+                    }, contentScale = ContentScale.Crop)
         }
     }
 }
