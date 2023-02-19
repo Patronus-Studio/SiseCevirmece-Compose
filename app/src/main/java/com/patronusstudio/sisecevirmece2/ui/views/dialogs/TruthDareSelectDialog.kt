@@ -18,17 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.ViewModel
 import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.enums.TruthDareEnum
-import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import kotlinx.coroutines.delay
 
@@ -143,11 +141,10 @@ private fun TDCard(
                 )
                 Text(
                     text = truthDareEnum.getText(LocalContext.current),
-                    style = TextStyle.Default.copy(
-                        color = AppColor.SunsetOrange,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    color = AppColor.SunsetOrange,
+                    fontSize = 32.sp,
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

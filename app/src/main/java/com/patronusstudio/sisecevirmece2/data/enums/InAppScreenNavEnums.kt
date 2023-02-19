@@ -11,7 +11,7 @@ enum class InAppScreenNavEnums {
         override fun getText(context: Context): String = context.getString(R.string.play_bigger)
     },
     LOGOUT {
-        override fun getText(context: Context): String = context.getString(R.string.log_out)
+        override fun getText(context: Context): String = context.getString(R.string.logout)
     },
     STORES{
         override fun getText(context: Context): String = context.getString(R.string.store)

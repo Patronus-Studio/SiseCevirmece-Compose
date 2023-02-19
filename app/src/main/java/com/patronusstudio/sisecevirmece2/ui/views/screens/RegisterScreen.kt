@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.GenderEnum
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.checkEmailCorrect
 import com.patronusstudio.sisecevirmece2.data.viewModels.RegisterViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
@@ -247,7 +248,9 @@ fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
             Text(
                 text = stringResource(R.string.register), style = TextStyle(
                     fontSize = 24.sp,
-                    textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                    textAlign = TextAlign.Center,
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.SemiBold
                 ), color = AppColor.SunsetOrange,
                 modifier = Modifier.padding(vertical = 12.dp)
             )

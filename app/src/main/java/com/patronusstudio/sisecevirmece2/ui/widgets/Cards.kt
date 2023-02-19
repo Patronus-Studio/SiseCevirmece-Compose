@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,7 +42,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
-import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 
 @Composable
@@ -87,6 +87,7 @@ fun CardImageWithText(
             Text(
                 text = text,
                 fontSize = 12.sp,
+                fontFamily = BetmRounded, fontWeight = FontWeight.Normal,
                 style = TextStyle(color = textColor, textAlign = TextAlign.Center)
             )
         }
@@ -133,7 +134,8 @@ fun CardTitle(title: String, clickedBackButton: () -> Unit) {
                         modifier = Modifier.width((cardWidth * 0.7).dp),
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
-                        fontFamily = FontFamily.SansSerif,
+                        fontFamily = BetmRounded,
+                        fontWeight = FontWeight.Normal,
                         color = AppColor.DavysGrey
                     )
                     Spacer(modifier = Modifier.width((cardWidth * 0.15).dp))
@@ -241,7 +243,11 @@ fun PackageDetailCard(
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = packageDetailCardBtnEnum.butonColor())
             ) {
-                Text(text = stringResource(id = packageDetailCardBtnEnum.butonText()))
+                Text(
+                    text = stringResource(id = packageDetailCardBtnEnum.butonText()),
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal
+                )
             }
         }
     }
@@ -252,7 +258,9 @@ fun SampleText(content: String, maxLines: Int = 1, fontSize: Int = 10) {
     Text(
         text = content, maxLines = maxLines,
         fontSize = fontSize.sp,
-        style = TextStyle(color = AppColor.DavysGrey)
+        color = AppColor.DavysGrey,
+        fontFamily = BetmRounded,
+        fontWeight = FontWeight.Normal
     )
 }
 
@@ -384,7 +392,8 @@ fun SampleCard(
                         .clip(RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
-                Text(text = model.packageName)
+                Text(text = model.packageName,fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal)
             }
         }
     }
@@ -424,7 +433,8 @@ fun SampleBackgroundCard(
                         .clip(RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
-                Text(text = model.backgroundName)
+                Text(text = model.backgroundName,fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal)
             }
         }
     }

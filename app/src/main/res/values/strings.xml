@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SiseCevirmece2</string>
     <string name="add_category">Kategori Ekle</string>
-    <string name="store">Mağaza</string>
+    <string name="store">Market</string>
     <string name="my_profile">Profilim</string>
     <string name="play">OYNA</string>
     <string name="level">Level</string>
@@ -54,7 +54,6 @@
     <string name="suggestion_comment_hint">Öneri/şikayet</string>
     <string name="play_bigger">OYNA</string>
     <string name="home_screen">Ana sayfa</string>
-    <string name="log_out">Çıkış Yap</string>
     <string name="stone_1_background">Taş 1</string>
     <string name="stone_2_background">Taş 2</string>
     <string name="stone_3_background">Taş 3</string>

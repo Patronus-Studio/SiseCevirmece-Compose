@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.GameMode
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.singleEventSend
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
@@ -88,8 +89,9 @@ private fun CardButton(width: Dp, height: Dp, gameMode: GameMode, clicked: (Game
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle.Default.copy(
                     color = AppColor.SunsetOrange,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = BetmRounded
                 )
             )
             Text(
@@ -99,7 +101,8 @@ private fun CardButton(width: Dp, height: Dp, gameMode: GameMode, clicked: (Game
                 style = TextStyle.Default.copy(
                     color = Color.White,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = BetmRounded
                 )
             )
         }

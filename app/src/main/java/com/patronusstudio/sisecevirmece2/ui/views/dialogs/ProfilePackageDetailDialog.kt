@@ -17,18 +17,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailButtonEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.widgets.SampleText
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun ProfilePackageCard(
     viewModel: ProfileScreenViewModel,
@@ -110,7 +110,11 @@ private fun ProfilePackageCardBtn(
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = packageDetailButtonEnum.getBackgroundColor())
         ) {
-            Text(text = packageDetailButtonEnum.getContent(LocalContext.current))
+            Text(
+                text = packageDetailButtonEnum.getContent(LocalContext.current),
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Normal
+            )
         }
     }
 }

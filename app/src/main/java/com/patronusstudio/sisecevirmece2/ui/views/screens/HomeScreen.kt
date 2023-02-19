@@ -2,7 +2,9 @@ package com.patronusstudio.sisecevirmece2.ui.views.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -14,7 +16,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -25,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -43,6 +43,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.enums.AnimStatus
 import com.patronusstudio.sisecevirmece2.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece2.data.model.AvatarModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.singleEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
@@ -129,6 +130,7 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
             mixpanelAPI.singleEventSend(context.getString(R.string.play_bigger))
             destinationStatus.value = it
         }
+        Space(0.05)
         TwoButtons(exitClicked = {
             destinationStatus.value = InAppScreenNavEnums.LOGOUT
         }, dialogClicked = {
@@ -151,7 +153,7 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
                     }
                 })
         }
-        if(viewModel.errorMessage.collectAsState().value.isNotBlank()){
+        if (viewModel.errorMessage.collectAsState().value.isNotBlank()) {
             SampleError(viewModel.errorMessage.collectAsState().value) {
                 destinationStatus.value = InAppScreenNavEnums.LOGOUT
             }
@@ -171,7 +173,7 @@ private fun Title() {
                     AppColor.DavysGrey, offset = Offset(0f, 0f), blurRadius = 16f
                 )
             ),
-            fontSize = 24.sp, fontWeight = FontWeight.Bold
+            fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = BetmRounded
         )
     }
 }
@@ -212,7 +214,10 @@ private fun UserPicHousting(viewModel: HomeViewModel, mixpanelAPI: MixpanelAPI) 
 @Composable
 private fun Username(username: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Text(text = username, fontSize = 16.sp, style = TextStyle(color = AppColor.Mustard))
+        Text(
+            text = username, fontSize = 16.sp, style = TextStyle(color = AppColor.Mustard),
+            fontFamily = BetmRounded, fontWeight = FontWeight.Normal
+        )
     }
 }
 
@@ -266,25 +271,33 @@ private fun HomeCards(destination: (InAppScreenNavEnums) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PlayButton(playGame: (InAppScreenNavEnums) -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Card(
+            backgroundColor = AppColor.Mustard,
+            shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .width(width = (width * 0.8).dp)
-                .padding(bottom = 16.dp)
-                .combinedClickable(onClick = {
+                .clickable {
                     playGame(InAppScreenNavEnums.PLAY_GAME)
-                }),
-            backgroundColor = AppColor.Mustard,
-            shape = RoundedCornerShape(16.dp)
+                },
         ) {
-            Text(
-                text = stringResource(id = R.string.play), fontSize = 64.sp,
-                style = TextStyle(color = AppColor.SunsetOrange), textAlign = TextAlign.Center
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.play),
+                    fontSize = 48.sp,
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.SemiBold,
+                    color = AppColor.SunsetOrange
+                )
+            }
         }
     }
 }
@@ -380,7 +393,6 @@ private fun TwoButtons(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun UserComment(
     animStatus: AnimStatus,
@@ -453,7 +465,8 @@ private fun UserComment(
                         )
                         Text(
                             text = stringResource(R.string.vote_for_us),
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = BetmRounded,
                             fontSize = 24.sp,
                             color = AppColor.White
                         )
@@ -482,7 +495,9 @@ private fun UserComment(
                                     ) {
                                         Text(
                                             text = stringResource(R.string.suggestion_comment_hint),
-                                            color = AppColor.WhiteSoft
+                                            color = AppColor.WhiteSoft,
+                                            fontFamily = BetmRounded,
+                                            fontWeight = FontWeight.Normal
                                         )
                                     }
                                 }
@@ -495,6 +510,10 @@ private fun UserComment(
                                 focusedBorderColor = AppColor.WhiteSoftPlus,
                                 textColor = AppColor.White,
                                 cursorColor = AppColor.White
+                            ),
+                            textStyle = TextStyle(
+                                fontFamily = BetmRounded,
+                                fontWeight = FontWeight.Normal
                             )
                         )
                     }
@@ -519,8 +538,8 @@ private fun UserComment(
                     Text(
                         text = "Gönder",
                         color = AppColor.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 24.sp, fontFamily = BetmRounded,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
 

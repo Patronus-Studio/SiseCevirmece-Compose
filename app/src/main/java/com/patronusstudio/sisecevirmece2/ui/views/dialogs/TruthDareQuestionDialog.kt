@@ -22,10 +22,7 @@ import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
-import com.patronusstudio.sisecevirmece2.data.utils.getActivity
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
-import com.patronusstudio.sisecevirmece2.data.utils.showLog
-import com.patronusstudio.sisecevirmece2.data.utils.showSample
+import com.patronusstudio.sisecevirmece2.data.utils.*
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
@@ -143,13 +140,14 @@ fun TruthDareQuestionDialog(
                             val random = (0..10).random()
                             showLog(random.toString())
                             if (isClickable.value) {
-                                if(random < 9){
+                                if (random < 9) {
                                     changeQuestionStatus.value = true
-                                }
-                                else{
+                                } else {
                                     viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
-                                        BuildConfig.normal_game_interstitial) { ad ->
+                                    InterstitialAdView.loadInterstitial(
+                                        localContext.getActivity(),
+                                        BuildConfig.normal_game_interstitial
+                                    ) { ad ->
                                         when (ad) {
                                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                                 viewModel.setLoadingStatus(false)
@@ -205,8 +203,10 @@ private fun TitleCard(width: Dp, title: String) {
             style = TextStyle.Default.copy(
                 color = AppColor.SunsetOrange,
                 fontSize = 24.sp,
+                fontFamily = BetmRounded,
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Center
-            ), modifier = Modifier
+            ),
+            modifier = Modifier
                 .padding(vertical = 8.dp)
                 .fillMaxWidth()
         )
@@ -245,7 +245,8 @@ private fun GeneralCard(
                     color = AppColor.SunsetOrange,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = BetmRounded
                 ), maxLines = 10
             )
         }

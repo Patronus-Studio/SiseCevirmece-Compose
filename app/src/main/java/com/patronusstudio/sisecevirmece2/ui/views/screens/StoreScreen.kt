@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -21,7 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +37,7 @@ import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.PackageViewModel
@@ -155,7 +155,12 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
                             else item.passiveTextColor
                         )
                     )
-                    Text(text = item.name, color = textColor)
+                    Text(
+                        text = item.name,
+                        color = textColor,
+                        fontFamily = BetmRounded,
+                        fontWeight = FontWeight.Normal
+                    )
                 }, clicked = {
                     clicked((item.id).toInt())
                 })
@@ -241,7 +246,12 @@ fun PackagesCard(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .border(BorderStroke(2.dp, Brush.verticalGradient(colorList, tileMode = TileMode.Mirror)), CircleShape)
+                        .border(
+                            BorderStroke(
+                                2.dp,
+                                Brush.verticalGradient(colorList, tileMode = TileMode.Mirror)
+                            ), CircleShape
+                        )
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(
@@ -252,20 +262,24 @@ fun PackagesCard(
                     Text(
                         text = packageModel.packageName,
                         fontSize = 16.sp,
-                        color = Color.Black,
-                        maxLines = 1
+                        color = AppColor.Black,
+                        maxLines = 1, fontFamily = BetmRounded,
+                        fontWeight = FontWeight.Normal
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = packageModel.username,
                         fontSize = 10.sp,
-                        maxLines = 1,
-                        style = TextStyle(color = AppColor.DavysGrey)
+                        maxLines = 1, color = AppColor.DavysGrey,
+                        fontFamily = BetmRounded,
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
         }
         packageModel.imageId?.let {
-            Image(painter = painterResource(id = it),
+            Image(
+                painter = painterResource(id = it),
                 contentDescription = null,
                 modifier = Modifier
                     .size(24.dp)
@@ -273,7 +287,8 @@ fun PackagesCard(
                         this.top.linkTo(cardReference.top, margin = 16.dp)
                         this.end.linkTo(cardReference.end, margin = 8.dp)
                         this.bottom.linkTo(cardReference.top)
-                    }, contentScale = ContentScale.Crop)
+                    }, contentScale = ContentScale.Crop
+            )
         }
     }
 }

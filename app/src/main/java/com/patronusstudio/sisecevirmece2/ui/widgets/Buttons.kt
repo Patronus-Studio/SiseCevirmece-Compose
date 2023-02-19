@@ -17,8 +17,10 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.patronusstudio.sisecevirmece2.R
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 
 
 @Composable
@@ -76,7 +78,12 @@ fun ButtonWithDot(
                 .padding(horizontal = (height / 4).dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = text, color = textColor)
+            Text(
+                text = text,
+                color = textColor,
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Normal
+            )
         }
     }
 }
@@ -109,7 +116,12 @@ fun ButtonWithPassive(
                 .padding(horizontal = (height / 4).dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = text, color = textColor)
+            Text(
+                text = text,
+                color = textColor,
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Normal
+            )
         }
     }
 }

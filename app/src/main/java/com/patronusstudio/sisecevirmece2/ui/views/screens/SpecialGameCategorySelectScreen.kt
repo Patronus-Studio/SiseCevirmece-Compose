@@ -28,6 +28,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameCategorySelectViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
@@ -157,9 +158,9 @@ private fun PlayButton(selectedPackageSize: Int, playButtonWidth: Dp, clicked: (
                 Text(
                     text = stringResource(R.string.play_bigger),
                     textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        color = AppColor.White, fontSize = 24.sp, fontWeight = FontWeight.Bold
-                    )
+                    color = AppColor.White,
+                    fontSize = 24.sp,fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -196,8 +197,8 @@ private fun AnimationDialog(
                     ),
                     color = AppColor.White,
                     fontSize = 22.sp,
-                    fontWeight = FontWeight.Normal,
-                )
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal                )
             }
         }
     }

@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -41,6 +42,7 @@ import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
@@ -190,7 +192,10 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
                                 else item.passiveTextColor
                             )
                         )
-                        Text(text = item.name, color = textColor)
+                        Text(
+                            text = item.name, color = textColor, fontFamily = BetmRounded,
+                            fontWeight = FontWeight.Normal
+                        )
                     })
 
                 }
@@ -321,7 +326,12 @@ private fun Packages(
                                     Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = it.question, modifier = Modifier.weight(0.7f), color = AppColor.DavysGrey)
+                                    Text(
+                                        text = it.question,
+                                        modifier = Modifier.weight(0.7f),
+                                        color = AppColor.DavysGrey,fontFamily = BetmRounded,
+                                        fontWeight = FontWeight.Normal
+                                    )
                                     if (it.isShowed == 1) {
                                         AsyncImage(
                                             model = R.drawable.tick,
@@ -352,6 +362,8 @@ private fun Packages(
                             Text(
                                 text = stringResource(R.string.reset_questions),
                                 color = AppColor.White,
+                                fontFamily = BetmRounded,
+                                fontWeight = FontWeight.Normal,
                                 modifier = Modifier.padding(vertical = 12.dp)
                             )
                         }

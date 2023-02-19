@@ -10,9 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -33,6 +30,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.LoginScreenNavEnums
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.hasInternet
 import com.patronusstudio.sisecevirmece2.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
@@ -106,7 +104,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 .background(AppColor.BlueViolet),
             verticalArrangement = Arrangement.Center
         ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 LottieAnimation(
                     composition = lottiAnim,
                     iterations = LottieConstants.IterateForever,
@@ -163,7 +161,9 @@ fun UsernameView(
     val userEmailTrailIcon = remember { mutableStateOf(R.drawable.user) }
     Column {
         Box(
-            modifier = Modifier.fillMaxWidth().imePadding(), contentAlignment = Alignment.Center
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding(), contentAlignment = Alignment.Center
         ) {
             CustomTextField(
                 widthSize = widthSize,
@@ -208,15 +208,20 @@ fun Password(
 @Composable
 fun LoginButton(widthSize: Dp, clicked: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Card(backgroundColor = AppColor.Mustard, modifier = Modifier
-            .width(widthSize)
-            .clickable {
-                clicked()
-            }, shape = RoundedCornerShape(16.dp)) {
+        Card(
+            backgroundColor = AppColor.Mustard, modifier = Modifier
+                .width(widthSize)
+                .clickable {
+                    clicked()
+                }, shape = RoundedCornerShape(16.dp)
+        ) {
             Text(
-                text = "Giriş Yap", style = TextStyle(
+                text = "Giris Yap",
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Medium,
+                style = TextStyle(
                     fontSize = 24.sp,
-                    textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                    textAlign = TextAlign.Center
                 ), color = AppColor.SunsetOrange,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
@@ -229,10 +234,13 @@ fun SignInText(widthSize: Dp, spaceSize: Dp, clicked: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.width(spaceSize))
         Box(modifier = Modifier.width(widthSize), contentAlignment = Alignment.CenterEnd) {
-            Text(text = "Yeni misin? Aramıza katıl.", style = TextStyle(
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal
-            ), color = AppColor.Mustard,
+            Text(text = "Yeni misin? Aramıza katıl.",
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Light,
+                style = TextStyle(
+                    fontSize = 12.sp
+                ),
+                color = AppColor.Mustard,
                 modifier = Modifier.clickable { clicked() })
         }
         Spacer(modifier = Modifier.width(spaceSize))
@@ -242,7 +250,7 @@ fun SignInText(widthSize: Dp, spaceSize: Dp, clicked: () -> Unit) {
 @Composable
 fun PatronusStudio() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val buttonSize = (screenWidth * 0.4).dp
+    val buttonSize = (screenWidth * 0.35).dp
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Image(
             painter = painterResource(id = R.drawable.patronus_studio),

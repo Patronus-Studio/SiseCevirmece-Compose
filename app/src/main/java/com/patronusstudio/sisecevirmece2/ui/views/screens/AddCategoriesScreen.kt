@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -296,16 +297,17 @@ private fun QuestionsCard(
             CircleImageButton(id = R.drawable.save) {
                 val random = (0..10).random()
                 showLog(random.toString())
-                if(random < 9){
+                if (random < 9) {
                     coroutineScope.launch {
                         viewModel.saveQuestions(localContext)
                     }
                     localFocus.clearFocus()
-                }
-                else{
+                } else {
                     viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(localContext.getActivity(),
-                        BuildConfig.add_package_interstitial) { ad ->
+                    InterstitialAdView.loadInterstitial(
+                        localContext.getActivity(),
+                        BuildConfig.add_package_interstitial
+                    ) { ad ->
                         when (ad) {
                             InterstitialAdViewLoadStatusEnum.SHOWED -> {
                                 viewModel.setLoadingStatus(false)
@@ -397,7 +399,11 @@ fun CategoryTextField(text: String, placeText: String, valueChange: (String) -> 
             valueChange(it)
         },
         placeholder = {
-            Text(text = placeText, color = AppColor.DavysGrey)
+            Text(
+                text = placeText, color = AppColor.DavysGrey,
+                fontFamily = BetmRounded,
+                fontWeight = FontWeight.Normal
+            )
         },
         colors = textFieldColors,
         modifier = Modifier.padding(end = 16.dp, start = 8.dp)
@@ -425,7 +431,7 @@ fun QuestionViewItem(
             text = questionModel.id.toString(),
             modifier = modifier.fillMaxWidth(0.05f),
             style = TextStyle().copy(textAlign = TextAlign.Center),
-            color = AppColor.DavysGrey
+            color = AppColor.DavysGrey, fontFamily = BetmRounded, fontWeight = FontWeight.Normal
         )
         TextField(
             value = questionModel.question,
@@ -435,7 +441,9 @@ fun QuestionViewItem(
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.enter_question),
-                    color = AppColor.DavysGrey
+                    color = AppColor.DavysGrey,
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal
                 )
             },
             colors = textFieldColors,
