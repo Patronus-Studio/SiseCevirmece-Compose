@@ -1,5 +1,7 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
+import android.media.MediaPlayer
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -38,9 +40,9 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NormalGameScreen(mixpanelAPI:MixpanelAPI,backClicked: () -> Unit) {
+fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
+    val bottleSoundPlayer = MediaPlayer.create(LocalContext.current, R.raw.bottle_sound_1)
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val bottleSize = (screenWidth * 0.9).dp
@@ -58,6 +60,11 @@ fun NormalGameScreen(mixpanelAPI:MixpanelAPI,backClicked: () -> Unit) {
             animFinished()
         }
     )
+    BackHandler {
+        bottleSoundPlayer.stop()
+        backClicked()
+    }
+
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getActiveBackground()
         viewModel.getBottleOnDb()
@@ -67,9 +74,19 @@ fun NormalGameScreen(mixpanelAPI:MixpanelAPI,backClicked: () -> Unit) {
         viewModel.getTruthDareQuestions()
         isSpinning.value = false
     })
+    LaunchedEffect(key1 = viewModel.bottleTouchListener.collectAsState().value, block = {
+        if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_STARTED) {
+            bottleSoundPlayer.start()
+        } else if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_ENDED) {
+            bottleSoundPlayer.release()
+        }
+    })
     BaseBackground(
         titleId = R.string.play_normal_title,
-        backClicked = { backClicked() },
+        backClicked = {
+            bottleSoundPlayer.stop()
+            backClicked()
+        },
         contentOnFullScreen = {
             AsyncImage(
                 model = viewModel.backgroundModel.collectAsState().value?.packageImage

@@ -146,7 +146,7 @@ private fun PlayButton(selectedPackageSize: Int, playButtonWidth: Dp, clicked: (
             .padding(bottom = 16.dp), contentAlignment = Alignment.BottomCenter
     ) {
         AnimatedVisibility(
-            visible = selectedPackageSize > 0,
+            visible = selectedPackageSize > 2,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
             exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
         ) {
@@ -175,7 +175,7 @@ private fun AnimationDialog(
     dissmisRequest: () -> Unit
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.package_empty))
-    if (packageSize <= 3 && !isFirstInit) {
+    if (packageSize < 3 && !isFirstInit) {
         Dialog(
             onDismissRequest = dissmisRequest,
             properties = DialogProperties(usePlatformDefaultWidth = false)
