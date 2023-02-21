@@ -140,7 +140,7 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
                                     val canceled =
                                         event.changes.any { it.isConsumed && it.positionChanged() }
                                 } while (!canceled && event.changes.any { it.pressed })
-                                if (isSpinning.value.not()) {
+                                if (isSpinning.value.not() && degree.value != 0f) {
                                     viewModel.setBottleTouchListener(BottleTouchListener.ANIM_STARTED)
                                     val result = degree.value % 100
                                     degree.value = if (result < 50)
