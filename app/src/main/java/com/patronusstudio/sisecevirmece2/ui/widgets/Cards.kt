@@ -292,7 +292,6 @@ fun BaseBackground(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SampleError(text: String, closeClicked: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
@@ -358,6 +357,59 @@ fun SampleError(text: String, closeClicked: () -> Unit) {
     }
 
 }
+
+@Composable
+fun SampleErrorNotClosable(text: String) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.error))
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(0.dp))
+                    .background(
+                        AppColor.White,
+                        RoundedCornerShape(16.dp)
+                    ),
+                verticalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.size(150.dp),
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = text, color = AppColor.DavysGrey)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+    }
+
+}
+
 
 @Composable
 fun SampleCard(
