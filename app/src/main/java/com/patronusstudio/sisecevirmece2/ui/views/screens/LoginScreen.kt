@@ -6,7 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +42,6 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.getTextFieldColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<LoginViewModel>()
@@ -51,7 +51,6 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
     val widthRatio10 = (widthSize * 0.1).dp
-
     val heightRatio40 = (heightSize * 0.35).dp
     val heightRatio04 = (heightSize * 0.04).dp
     val heightRatio10 = (heightSize * 0.1).dp
@@ -70,15 +69,18 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                 viewModel.userTokenControl(context)
             }
         } else {
-            viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
+            viewModel.isThereError.value =
+                Pair(true, context.getString(R.string.internet_connection_control))
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColor.BlueViolet),
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.height(heightRatio04))
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             LottieAnimation(
                 composition = lottiAnim,
@@ -106,12 +108,13 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
                     viewModel.setTrailIconClicked(true)
                 }
             })
-        Spacer(modifier = Modifier.height(heightRatio10))
+        Spacer(modifier = Modifier.height(heightRatio04))
         LoginButton(widthRatio80) {
             if (hasInternet(context) == true) {
                 viewModel.loginWithEmailPass()
             } else {
-                viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
+                viewModel.isThereError.value =
+                    Pair(true, context.getString(R.string.internet_connection_control))
             }
         }
         Spacer(modifier = Modifier.height(heightRatio02))
@@ -119,10 +122,10 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
             goToAnotherScreen(LoginScreenNavEnums.REGISTER)
         }
         Spacer(modifier = Modifier.height(heightRatio04))
+        PatronusStudio()
         AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
             LoadingAnimation()
         }
-        PatronusStudio()
     }
     if (isThereError.first) {
         SampleError(isThereError.second) {

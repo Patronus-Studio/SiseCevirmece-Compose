@@ -13,7 +13,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -267,7 +266,7 @@ fun SampleText(content: String, maxLines: Int = 1, fontSize: Int = 10) {
 @Composable
 fun BaseBackground(
     modifier: Modifier = Modifier,
-    @StringRes titleId: Int,
+    @StringRes titleId: Int?,
     backClicked: () -> Unit,
     contentOnTitleBottom: (@Composable () -> Unit)? = null,
     contentOnFullScreen: (@Composable () -> Unit)? = null
@@ -286,7 +285,7 @@ fun BaseBackground(
             .background(AppColor.BlueViolet)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        CardTitle(title = stringResource(id = titleId), backClicked)
+        if (titleId != null) CardTitle(title = stringResource(id = titleId), backClicked)
         Spacer(modifier = Modifier.height(16.dp))
         if (contentOnTitleBottom != null) contentOnTitleBottom()
     }
@@ -444,8 +443,10 @@ fun SampleCard(
                         .clip(RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
-                Text(text = model.packageName,fontFamily = BetmRounded,
-                    fontWeight = FontWeight.Normal)
+                Text(
+                    text = model.packageName, fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal
+                )
             }
         }
     }
@@ -485,8 +486,10 @@ fun SampleBackgroundCard(
                         .clip(RoundedCornerShape(8.dp))
                 )
                 // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
-                Text(text = model.backgroundName,fontFamily = BetmRounded,
-                    fontWeight = FontWeight.Normal)
+                Text(
+                    text = model.backgroundName, fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal
+                )
             }
         }
     }
