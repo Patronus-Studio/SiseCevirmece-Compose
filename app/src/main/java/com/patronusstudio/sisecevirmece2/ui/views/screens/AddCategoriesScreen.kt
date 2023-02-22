@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -298,8 +299,9 @@ private fun QuestionsCard(
                 val random = (0..10).random()
                 showLog(random.toString())
                 if (random < 9) {
-                    coroutineScope.launch {
+                    coroutineScope.launch(Dispatchers.Main) {
                         viewModel.saveQuestions(localContext)
+                        Toast.makeText(localContext, "Kategori Eklendi.", Toast.LENGTH_SHORT).show()
                     }
                     localFocus.clearFocus()
                 } else {
@@ -314,8 +316,13 @@ private fun QuestionsCard(
                             }
                             InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
                                 viewModel.setLoadingStatus(false)
-                                coroutineScope.launch {
+                                coroutineScope.launch(Dispatchers.Main) {
                                     viewModel.saveQuestions(localContext)
+                                    Toast.makeText(
+                                        localContext,
+                                        "Kategori Eklendi.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                                 localFocus.clearFocus()
                             }

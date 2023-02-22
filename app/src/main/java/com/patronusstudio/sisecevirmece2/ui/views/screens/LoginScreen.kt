@@ -216,7 +216,7 @@ fun LoginButton(widthSize: Dp, clicked: () -> Unit) {
                 }, shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                text = "Giris Yap",
+                text = "Giriş Yap",
                 fontFamily = BetmRounded,
                 fontWeight = FontWeight.Medium,
                 style = TextStyle(
