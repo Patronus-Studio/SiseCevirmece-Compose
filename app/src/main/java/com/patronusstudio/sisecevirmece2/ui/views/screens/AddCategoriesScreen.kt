@@ -5,7 +5,6 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -26,7 +25,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +66,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
@@ -74,7 +75,6 @@ fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
     val dotButtonHeight = LocalConfiguration.current.screenHeightDp * 0.07
     val viewModel = hiltViewModel<AddCategoriesScreenViewModel>()
     val localContext = LocalContext.current
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { result ->
             if (Build.VERSION.SDK_INT < 28) {
@@ -91,61 +91,41 @@ fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
                 )
             }
         }
-    BackHandler {
-        if (sheetState.isVisible) {
-            viewModel.clearErrorMessage()
-        } else {
-            back()
-        }
-    }
-    LaunchedEffect(key1 = viewModel.errorMessage.collectAsState().value) {
-        if (viewModel.errorMessage.value.isNotEmpty()) {
-            sheetState.show()
-        } else {
-            sheetState.hide()
-        }
-    }
-
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             viewModel.getPackageCategories()
         }
     }
 
-    ModalBottomSheetLayout(
-        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetContent = {
-            ErrorSheet(message = viewModel.errorMessage.collectAsState().value) {
-                viewModel.clearErrorMessage()
-            }
-        },
-        sheetState = sheetState
-    ) {
-        BaseBackground(
-            titleId = R.string.add_category,
-            backClicked = { back() },
-            contentOnTitleBottom = {
-                CategoryCard(
-                    questionCardMaxWidth,
-                    viewModel.packageName.collectAsState().value,
-                    viewModel.packageComment.collectAsState().value,
-                    viewModel.selectedImage.collectAsState().value,
-                    packageNameListener = {
-                        viewModel.setPackageName(it)
-                    }, packageCommentListener = {
-                        viewModel.setPackageComment(it)
-                    }, selectImageClicked = {
-                        galleryLauncher.launch("image/*")
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
-                Spacer(modifier = Modifier.height(8.dp))
-                QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel, mixpanelAPI)
-                AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-                    LoadingAnimation()
+    BaseBackground(
+        titleId = R.string.add_category,
+        backClicked = { back() },
+        contentOnTitleBottom = {
+            CategoryCard(
+                questionCardMaxWidth,
+                viewModel.packageName.collectAsState().value,
+                viewModel.packageComment.collectAsState().value,
+                viewModel.selectedImage.collectAsState().value,
+                packageNameListener = {
+                    viewModel.setPackageName(it)
+                }, packageCommentListener = {
+                    viewModel.setPackageComment(it)
+                }, selectImageClicked = {
+                    galleryLauncher.launch("image/*")
                 }
-            })
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
+            Spacer(modifier = Modifier.height(8.dp))
+            QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel, mixpanelAPI)
+            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+                LoadingAnimation()
+            }
+        })
+    if (viewModel.errorMessage.collectAsState().value.isNotEmpty()) {
+        SampleError(text = viewModel.errorMessage.collectAsState().value) {
+            viewModel.clearErrorMessage()
+        }
     }
 }
 

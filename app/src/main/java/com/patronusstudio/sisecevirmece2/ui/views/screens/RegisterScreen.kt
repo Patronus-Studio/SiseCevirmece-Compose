@@ -1,11 +1,12 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,11 +34,9 @@ import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.screens.SampleAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.CustomTextField
-import com.patronusstudio.sisecevirmece2.ui.widgets.ErrorSheet
+import com.patronusstudio.sisecevirmece2.ui.widgets.SampleError
 import com.patronusstudio.sisecevirmece2.ui.widgets.getTextFieldColor
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RegisterScreen(passToHome: () -> Unit) {
     val viewModel = hiltViewModel<RegisterViewModel>()
@@ -45,24 +44,7 @@ fun RegisterScreen(passToHome: () -> Unit) {
     val widthSize = LocalConfiguration.current.screenWidthDp
     val heightSize = LocalConfiguration.current.screenHeightDp
     val widthRatio80 = (widthSize * 0.8).dp
-
     val heightRatio04 = (heightSize * 0.04).dp
-
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val coroutineScope = rememberCoroutineScope()
-
-    BackHandler(sheetState.isVisible) {
-        coroutineScope.launch { sheetState.hide() }
-    }
-
-    LaunchedEffect(key1 = viewModel.errorMessage.collectAsState().value) {
-        if (viewModel.errorMessage.value != null) {
-            if (sheetState.isVisible.not()) sheetState.show()
-        } else sheetState.hide()
-    }
-    LaunchedEffect(key1 = sheetState.currentValue) {
-        if (sheetState.currentValue == ModalBottomSheetValue.Hidden) viewModel.clearErrorMessage()
-    }
     LaunchedEffect(key1 = viewModel.userToken.collectAsState().value) {
         if (viewModel.userToken.value != null) {
             MainApplication.authToken = viewModel.userToken.value!!
@@ -70,65 +52,65 @@ fun RegisterScreen(passToHome: () -> Unit) {
         }
     }
 
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetContent = {
-            ErrorSheet(message = viewModel.errorMessage.collectAsState().value.toString()) {
-                viewModel.clearErrorMessage()
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(AppColor.BlueViolet)
-            ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp), contentAlignment = Alignment.Center) {
-                    SampleAnimation(R.raw.register)
-                }
-                EmailView(viewModel.emailError.collectAsState().value,
-                    viewModel.userEmail.collectAsState().value, widthRatio80, { email ->
-                        viewModel.setUserEmail(email)
-                    }, {
-                        val result = viewModel.userEmail.value.checkEmailCorrect()
-                        viewModel.setUserEmailError(result.not())
-                    })
-                Spacer(modifier = Modifier.height(heightRatio04))
-
-                UsernameView(username = viewModel.username.collectAsState().value,
-                    widthSize = widthRatio80, usernameChanged = {
-                        viewModel.setUsername(it)
-                    })
-                Spacer(modifier = Modifier.height(heightRatio04))
-                Password(
-                    userPassword = viewModel.userPassword.collectAsState().value,
-                    isLocked = viewModel.isLockedPassword.collectAsState().value,
-                    widthSize = widthRatio80,
-                    passwordChanged = {
-                        viewModel.setUserPassword(it)
-                    },
-                    trailClicked = {
-                        viewModel.setIsLockedPassword(viewModel.isLockedPassword.value.not())
-                    }
-                )
-                Spacer(modifier = Modifier.height(heightRatio04))
-                GenderPicker(viewModel.selectedGender.collectAsState().value) {
-                    viewModel.setSelectedGender(it)
-                }
-                Spacer(modifier = Modifier.height(heightRatio04))
-                RegisterButton(widthRatio80) {
-                    viewModel.register(mContext)
-                }
-                AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
-                    LoadingAnimation()
-                }
-            }
-            PatronusStudio()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.BlueViolet)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp), contentAlignment = Alignment.Center
+        ) {
+            SampleAnimation(R.raw.register)
         }
-    )
+        EmailView(viewModel.emailError.collectAsState().value,
+            viewModel.userEmail.collectAsState().value, widthRatio80, { email ->
+                viewModel.setUserEmail(email)
+            }, {
+                val result = viewModel.userEmail.value.checkEmailCorrect()
+                viewModel.setUserEmailError(result.not())
+            })
+        Spacer(modifier = Modifier.height(heightRatio04))
+
+        UsernameView(username = viewModel.username.collectAsState().value,
+            widthSize = widthRatio80, usernameChanged = {
+                viewModel.setUsername(it)
+            })
+        Spacer(modifier = Modifier.height(heightRatio04))
+        Password(
+            userPassword = viewModel.userPassword.collectAsState().value,
+            isLocked = viewModel.isLockedPassword.collectAsState().value,
+            widthSize = widthRatio80,
+            passwordChanged = {
+                viewModel.setUserPassword(it)
+            },
+            trailClicked = {
+                viewModel.setIsLockedPassword(viewModel.isLockedPassword.value.not())
+            }
+        )
+        Spacer(modifier = Modifier.height(heightRatio04))
+        GenderPicker(viewModel.selectedGender.collectAsState().value) {
+            viewModel.setSelectedGender(it)
+        }
+        Spacer(modifier = Modifier.height(heightRatio04))
+        RegisterButton(widthRatio80) {
+            viewModel.register(mContext)
+        }
+        AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+            LoadingAnimation()
+        }
+        PatronusStudio()
+    }
+    if (viewModel.errorMessage.collectAsState().value.isNullOrEmpty().not()) {
+        SampleError(
+            text = viewModel.errorMessage.collectAsState().value
+                ?: LocalContext.current.getString(R.string.getting_some_error)
+        ) {
+            viewModel.clearErrorMessage()
+        }
+    }
+
 }
 
 @Composable
@@ -170,7 +152,8 @@ fun EmailView(
                 Spacer(modifier = Modifier.width((screenWidth * 0.11).dp))
                 Box(modifier = Modifier.width(widthSize)) {
                     Text(
-                        text = stringResource(R.string.entried_email_is_not_correct), style = TextStyle(
+                        text = stringResource(R.string.entried_email_is_not_correct),
+                        style = TextStyle(
                             color = Color.Red, fontSize =
                             14.sp
                         )
@@ -240,11 +223,13 @@ fun GenderPicker(selectedGender: GenderEnum, clicked: (GenderEnum) -> Unit) {
 @Composable
 fun RegisterButton(widthSize: Dp, clicked: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Card(backgroundColor = AppColor.Mustard, modifier = Modifier
-            .width(widthSize)
-            .clickable {
-                clicked()
-            }, shape = RoundedCornerShape(16.dp)) {
+        Card(
+            backgroundColor = AppColor.Mustard, modifier = Modifier
+                .width(widthSize)
+                .clickable {
+                    clicked()
+                }, shape = RoundedCornerShape(16.dp)
+        ) {
             Text(
                 text = stringResource(R.string.register), style = TextStyle(
                     fontSize = 24.sp,

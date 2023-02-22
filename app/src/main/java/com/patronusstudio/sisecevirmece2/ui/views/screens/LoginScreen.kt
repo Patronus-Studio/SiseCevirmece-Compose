@@ -36,7 +36,7 @@ import com.patronusstudio.sisecevirmece2.data.viewModels.LoginViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.CustomTextField
-import com.patronusstudio.sisecevirmece2.ui.widgets.ErrorSheet
+import com.patronusstudio.sisecevirmece2.ui.widgets.SampleError
 import com.patronusstudio.sisecevirmece2.ui.widgets.getTextFieldColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,10 +45,6 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<LoginViewModel>()
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val sheet = remember {
-        mutableStateOf(false)
-    }
     val lottiAnim by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.register_animation))
     val context = LocalContext.current
     val widthSize = LocalConfiguration.current.screenWidthDp
@@ -60,19 +56,7 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
     val heightRatio04 = (heightSize * 0.04).dp
     val heightRatio10 = (heightSize * 0.1).dp
     val heightRatio02 = (heightSize * 0.02).dp
-
-    LaunchedEffect(key1 = sheet.value, block = {
-        if (sheet.value) sheetState.show()
-        else sheetState.hide()
-    })
-
     val isThereError = viewModel.isThereError.collectAsState().value
-    LaunchedEffect(key1 = isThereError) {
-        if (isThereError.first) {
-            sheet.value = true
-        }
-    }
-
     val state = viewModel.token.collectAsState().value
     LaunchedEffect(key1 = state) {
         if (hasInternet(context) == true) {
@@ -89,66 +73,61 @@ fun LoginScreen(goToAnotherScreen: (LoginScreenNavEnums) -> Unit) {
             viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
         }
     }
-
-    ModalBottomSheetLayout(
-        sheetContent = {
-            ErrorSheet(message = isThereError.second) {
-                sheet.value = false
-                viewModel.isThereError.value = Pair(false, "")
-            }
-        }, sheetState = sheetState
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.BlueViolet),
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(AppColor.BlueViolet),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                LottieAnimation(
-                    composition = lottiAnim,
-                    iterations = LottieConstants.IterateForever,
-                    modifier = Modifier
-                        .width(widthRatio80)
-                        .height(heightRatio40),
-                )
-            }
-            UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
-                viewModel.setUsername(username)
-            }
-            Spacer(modifier = Modifier.height(heightRatio04))
-            Password(
-                viewModel.userPassword.collectAsState().value,
-                viewModel.isPasswordTrailLocked.collectAsState().value,
-                widthRatio80,
-                {
-                    viewModel.setUserPassword(it)
-                },
-                {
-                    if (viewModel.isPasswordTrailLocked.value) {
-                        viewModel.setTrailIconClicked(false)
-                    } else {
-                        viewModel.setTrailIconClicked(true)
-                    }
-                })
-            Spacer(modifier = Modifier.height(heightRatio10))
-            LoginButton(widthRatio80) {
-                if (hasInternet(context) == true) {
-                    viewModel.loginWithEmailPass()
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            LottieAnimation(
+                composition = lottiAnim,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier
+                    .width(widthRatio80)
+                    .height(heightRatio40),
+            )
+        }
+        UsernameView(viewModel.username.collectAsState().value, widthRatio80) { username ->
+            viewModel.setUsername(username)
+        }
+        Spacer(modifier = Modifier.height(heightRatio04))
+        Password(
+            viewModel.userPassword.collectAsState().value,
+            viewModel.isPasswordTrailLocked.collectAsState().value,
+            widthRatio80,
+            {
+                viewModel.setUserPassword(it)
+            },
+            {
+                if (viewModel.isPasswordTrailLocked.value) {
+                    viewModel.setTrailIconClicked(false)
                 } else {
-                    viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
+                    viewModel.setTrailIconClicked(true)
                 }
-            }
-            Spacer(modifier = Modifier.height(heightRatio02))
-            SignInText(widthRatio80, widthRatio10) {
-                goToAnotherScreen(LoginScreenNavEnums.REGISTER)
-            }
-            Spacer(modifier = Modifier.height(heightRatio04))
-            AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
-                LoadingAnimation()
+            })
+        Spacer(modifier = Modifier.height(heightRatio10))
+        LoginButton(widthRatio80) {
+            if (hasInternet(context) == true) {
+                viewModel.loginWithEmailPass()
+            } else {
+                viewModel.isThereError.value = Pair(true, "İnternet bağlantısı mevcut değil.")
             }
         }
+        Spacer(modifier = Modifier.height(heightRatio02))
+        SignInText(widthRatio80, widthRatio10) {
+            goToAnotherScreen(LoginScreenNavEnums.REGISTER)
+        }
+        Spacer(modifier = Modifier.height(heightRatio04))
+        AnimatedVisibility(visible = viewModel.isAnimationShow.collectAsState().value) {
+            LoadingAnimation()
+        }
         PatronusStudio()
+    }
+    if (isThereError.first) {
+        SampleError(isThereError.second) {
+            viewModel.isThereError.value = Pair(false, "")
+        }
     }
 }
 
