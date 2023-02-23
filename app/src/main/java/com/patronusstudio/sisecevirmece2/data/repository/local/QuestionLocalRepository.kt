@@ -12,7 +12,7 @@ class QuestionLocalRepository @Inject constructor(private val application: Appli
 
     suspend fun addQuestions(list: MutableList<QuestionDbModel>) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().addQuestions(list)
+            BottleRoomDb.getInstance(application.applicationContext).getQuestionRoomDao().addQuestions(list)
         }
     }
 
@@ -20,13 +20,13 @@ class QuestionLocalRepository @Inject constructor(private val application: Appli
         localPackageId: Int
     ): List<QuestionDbModel> {
         return withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().getQuestionsList(localPackageId)
+            BottleRoomDb.getInstance(application.applicationContext).getQuestionRoomDao().getQuestionsList(localPackageId)
         }
     }
 
     suspend fun removeQuestions(packageId: Int) {
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(application.applicationContext).getBottleDao().removeQuestions(packageId)
+            BottleRoomDb.getInstance(application.applicationContext).getQuestionRoomDao().removeQuestions(packageId)
         }
     }
 
@@ -34,12 +34,12 @@ class QuestionLocalRepository @Inject constructor(private val application: Appli
         localPackageId: Int,
         isShowed: Int
     ) {
-        BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+        BottleRoomDb.getInstance(application.applicationContext).getQuestionRoomDao()
             .updateAllQuestionsShowStatus(isShowed, localPackageId)
     }
 
     suspend fun updateQuestionShowStatu(showStatu: Boolean,questionId:Int) {
-        BottleRoomDb.getInstance(application.applicationContext).getBottleDao()
+        BottleRoomDb.getInstance(application.applicationContext).getQuestionRoomDao()
             .updateSingleQuestionShowStatus(showStatu, questionId)
     }
 

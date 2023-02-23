@@ -121,7 +121,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
             updatedTime = getCurrentTime()
         )
         val packageId = withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao().insertPackage(packageModel)
+            BottleRoomDb.getInstance(context).getPackageRoomDao().insertPackage(packageModel)
         }
         val tempQuestionList = mutableListOf<QuestionDbModel>()
         _questionList.value.forEach {
@@ -134,7 +134,7 @@ class AddCategoriesScreenViewModel @Inject constructor(
             )
         }
         withContext(Dispatchers.IO) {
-            BottleRoomDb.getInstance(context).getBottleDao()
+            BottleRoomDb.getInstance(context).getQuestionRoomDao()
                 .insertQuestions(tempQuestionList.toList())
         }
     }

@@ -80,9 +80,10 @@ fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
     })
     LaunchedEffect(key1 = viewModel.bottleTouchListener.collectAsState().value, block = {
         if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_STARTED) {
+            bottleSoundPlayer.seekTo(0);
             bottleSoundPlayer.start()
         } else if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_ENDED) {
-            bottleSoundPlayer.release()
+            bottleSoundPlayer.pause()
         }
     })
     BaseBackground(

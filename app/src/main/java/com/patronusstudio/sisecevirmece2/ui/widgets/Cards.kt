@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -442,10 +443,16 @@ fun SampleCard(
                         .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
                         .clip(RoundedCornerShape(8.dp))
                 )
-                // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
                 Text(
-                    text = model.packageName, fontFamily = BetmRounded,
-                    fontWeight = FontWeight.Normal
+                    text = model.packageName,
+                    fontFamily = BetmRounded,
+                    fontWeight = FontWeight.Normal,
+                    style = TextStyle(textAlign = TextAlign.Center),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -485,10 +492,15 @@ fun SampleBackgroundCard(
                         .border(1.dp, AppColor.GreenMalachite, shape = RoundedCornerShape(8.dp))
                         .clip(RoundedCornerShape(8.dp))
                 )
-                // TODO: paket ismi uzunsa kesme yap ve tek satır gözükecek şekilde olsun
                 Text(
                     text = model.backgroundName, fontFamily = BetmRounded,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.Normal,
+                    style = TextStyle(textAlign = TextAlign.Center),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

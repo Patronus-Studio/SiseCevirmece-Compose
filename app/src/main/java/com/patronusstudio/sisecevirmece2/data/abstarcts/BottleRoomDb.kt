@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.patronusstudio.sisecevirmece2.data.interfaces.BackgroundRoom
-import com.patronusstudio.sisecevirmece2.data.interfaces.BottleDao
-import com.patronusstudio.sisecevirmece2.data.interfaces.BottleRoom
+import com.patronusstudio.sisecevirmece2.data.interfaces.*
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BackgroundDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
@@ -18,7 +16,9 @@ import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
 )
 abstract class BottleRoomDb : RoomDatabase() {
 
-    abstract fun getBottleDao(): BottleDao
+    abstract fun getPackageRoomDao(): PackageRoom
+
+    abstract fun getQuestionRoomDao(): QuestionRoom
 
     abstract fun getBottleRoomDao(): BottleRoom
 

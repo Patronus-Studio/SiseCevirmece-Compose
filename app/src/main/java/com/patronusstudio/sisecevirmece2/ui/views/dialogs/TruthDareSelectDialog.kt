@@ -62,7 +62,7 @@ fun TruthDareSelectDialog(
         )
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center
         ) {
             AnimatedCard(
                 isVisible.value, cardWidth, cardHeight, true, TruthDareEnum.TRUTH
@@ -70,6 +70,7 @@ fun TruthDareSelectDialog(
                 selectedTruthDareEnum.value = it
                 isVisible.value = false
             }
+            Spacer(modifier = Modifier.height(32.dp))
             AnimatedCard(
                 isVisible.value, cardWidth, cardHeight, false, TruthDareEnum.DARE
             ) {
