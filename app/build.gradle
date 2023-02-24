@@ -42,8 +42,17 @@ android {
             buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-1818679104699845/2097818178\""
             buildConfigField "String", "special_game_interstitial", "\"ca-app-pub-1818679104699845/6304091848\""
             buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile file("$projectDir/dummy.keystore")
+            keyAlias 'patronusstudio'
+            storePassword 'patronusstudio'
+            keyPassword 'patronusstudio'
         }
     }
     compileOptions {

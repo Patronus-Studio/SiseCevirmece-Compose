@@ -77,14 +77,21 @@ class MainActivity : ComponentActivity() {
         }
         val networkCallback: NetworkCallback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
-                if (connectionIsOk.value.not()) {
-                    connectionIsOk.value = true
+                try {
+                    if (connectionIsOk.value.not()) {
+                        connectionIsOk.value = true
+                    }
+                }catch (_:java.lang.Exception){
+
                 }
             }
 
             override fun onLost(network: Network) {
-                if (connectionIsOk.value) {
-                    connectionIsOk.value = false
+                try {
+                    if (connectionIsOk.value) {
+                        connectionIsOk.value = false
+                    }
+                }catch (_:java.lang.Exception){
                 }
             }
         }
