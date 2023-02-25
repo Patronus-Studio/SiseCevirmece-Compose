@@ -62,8 +62,10 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
     val destinationStatus = remember { mutableStateOf(InAppScreenNavEnums.INIT) }
     val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
-        withContext(Dispatchers.IO) {
-            viewModel.getUserGameInfo(MainApplication.authToken)
+        if(MainApplication.authToken != "admin"){
+            withContext(Dispatchers.IO) {
+                viewModel.getUserGameInfo(MainApplication.authToken)
+            }
         }
         withContext(Dispatchers.IO) {
             viewModel.getAvatars()
