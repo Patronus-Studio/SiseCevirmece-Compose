@@ -74,7 +74,7 @@ fun StoreScreen(back: () -> Unit) {
             PackageTitles(titles) {
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.clickedBtn(it)
-                    viewModel.getPackageFromCategory(it)
+                    viewModel.getPackageFromCategory(it.id.toInt())
                 }
             }
             LazyColumn(
@@ -141,7 +141,7 @@ fun PackagePopup(packageModel: PackageModel, dismissListener: () -> Unit, clicke
 }
 
 @Composable
-fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
+fun PackageTitles(list: List<PackageCategoryModel>, clicked: (PackageCategoryModel) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyRow(content = {
             items(
@@ -162,7 +162,7 @@ fun PackageTitles(list: List<PackageCategoryModel>, clicked: (Int) -> Unit) {
                         fontWeight = FontWeight.Normal
                     )
                 }, clicked = {
-                    clicked((item.id).toInt())
+                    clicked(item)
                 })
             }
             item {

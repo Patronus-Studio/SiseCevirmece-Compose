@@ -61,16 +61,15 @@ class PackageViewModel @Inject constructor(
         return findSelected?.id?.toInt() ?: 0
     }
 
-    fun clickedBtn(clickedItemId: Int) {
-        var findedActiveBtnIndex = _categories.value.indexOfFirst {
+    fun clickedBtn(clickedModel: PackageCategoryModel) {
+        val findedActiveCategories = _categories.value.first {
             it.isSelected == SelectableEnum.YES
         }
-        findedActiveBtnIndex += 1
-        if (findedActiveBtnIndex == -1 || findedActiveBtnIndex == clickedItemId) return
+        if (findedActiveCategories.id == clickedModel.id) return
         val tempList = mutableListOf<PackageCategoryModel>()
         _categories.value.forEach {
-            if (findedActiveBtnIndex.toDouble() == it.id) tempList.add(it.copy(isSelected = SelectableEnum.NO))
-            else if (clickedItemId.toDouble() == it.id) tempList.add(it.copy(isSelected = SelectableEnum.YES))
+            if (findedActiveCategories.id == it.id) tempList.add(it.copy(isSelected = SelectableEnum.NO))
+            else if (clickedModel.id == it.id) tempList.add(it.copy(isSelected = SelectableEnum.YES))
             else tempList.add(it.copy())
         }
         _categories.value = tempList

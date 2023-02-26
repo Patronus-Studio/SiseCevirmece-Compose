@@ -36,6 +36,10 @@ import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.views.dialogs.SpecialQuestionDialog
 import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @Composable
@@ -50,6 +54,10 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
     val isSpinning = remember { mutableStateOf(false) }
     val animFinished = {
         viewModel.setBottleTouchListener(BottleTouchListener.ANIM_ENDED)
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.getRandomPackage()
+            viewModel.getRandomQuestion()
+        }
         isSpinning.value = false
     }
     val bottleFlipAnim = animateFloatAsState(
