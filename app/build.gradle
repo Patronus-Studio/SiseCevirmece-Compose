@@ -14,8 +14,8 @@ android {
         applicationId 'com.patronusstudio.sisecevirmece2'
         minSdk 21
         targetSdk 33
-        versionCode 9
-        versionName "1.0.5"
+        versionCode 10
+        versionName "1.0.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,6 +28,8 @@ android {
             keyAlias 'patronusstudio'
             storePassword 'patronusstudio'
             keyPassword 'patronusstudio'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     buildTypes {
@@ -51,9 +53,9 @@ android {
             buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-1818679104699845/2097818178\""
             buildConfigField "String", "special_game_interstitial", "\"ca-app-pub-1818679104699845/6304091848\""
             buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
-            minifyEnabled true
-            shrinkResources true
-            debuggable true
+            minifyEnabled false
+            //hilt view model ekliyken shrinkResources true olursa retrofit istekleri atılmıyor
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.SiseV2Compose
         }
