@@ -16,11 +16,11 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
+import com.applovin.sdk.AppLovinSdk
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -29,11 +29,8 @@ import com.google.firebase.ktx.Firebase
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.nav.ScreenHost
 import com.patronusstudio.sisecevirmece2.ui.theme.SiseCevirmeceTheme
-import com.patronusstudio.sisecevirmece2.ui.widgets.SampleError
 import com.patronusstudio.sisecevirmece2.ui.widgets.SampleErrorNotClosable
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -44,6 +41,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLovinSdk.getInstance(this).mediationProvider = "max"
+        AppLovinSdk.getInstance(this).initializeSdk()
         MobileAds.initialize(this)
         val configuration = RequestConfiguration.Builder()
             .setTestDeviceIds(Collections.singletonList("B843F895E94E5BEDEAD125878F53D9E6"))
@@ -81,7 +80,7 @@ class MainActivity : ComponentActivity() {
                     if (connectionIsOk.value.not()) {
                         connectionIsOk.value = true
                     }
-                }catch (_:java.lang.Exception){
+                } catch (_: java.lang.Exception) {
 
                 }
             }
@@ -91,7 +90,7 @@ class MainActivity : ComponentActivity() {
                     if (connectionIsOk.value) {
                         connectionIsOk.value = false
                     }
-                }catch (_:java.lang.Exception){
+                } catch (_: java.lang.Exception) {
                 }
             }
         }

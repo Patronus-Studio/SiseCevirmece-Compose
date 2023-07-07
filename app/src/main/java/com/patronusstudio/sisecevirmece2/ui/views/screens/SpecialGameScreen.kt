@@ -109,7 +109,7 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
                         .fillMaxSize()
                         .background(Color.Transparent), contentAlignment = Alignment.BottomCenter
                 ) {
-                    BannerAdView(BuildConfig.in_game_special_banner)
+                    BannerAdView(BuildConfig.in_game_special_banner, LocalContext.current)
                 }
             }
 

@@ -34,8 +34,8 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "in_game_normal_banner", "\"ca-app-pub-3940256099942544/6300978111\""
-            buildConfigField "String", "in_game_special_banner", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "in_game_normal_banner", "\"90acfa8937cf609c\""
+            buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
             buildConfigField "String", "package_download_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
             buildConfigField "String", "add_package_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
             buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
@@ -46,8 +46,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
-            buildConfigField "String", "in_game_normal_banner", "\"ca-app-pub-1818679104699845/5160700445\""
-            buildConfigField "String", "in_game_special_banner", "\"ca-app-pub-1818679104699845/6921338826\""
+            buildConfigField "String", "in_game_normal_banner", "\"90acfa8937cf609c\""
+            buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
             buildConfigField "String", "package_download_interstitial", "\"ca-app-pub-1818679104699845/6435684286\""
             buildConfigField "String", "add_package_interstitial", "\"ca-app-pub-1818679104699845/7739358793\""
             buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-1818679104699845/2097818178\""
@@ -124,7 +124,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.wajahatkarim:flippable:1.0.6'
-
+    implementation("com.applovin:applovin-sdk:+")
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
