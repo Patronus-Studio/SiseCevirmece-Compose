@@ -46,7 +46,6 @@ import kotlin.random.Random
 
 @Composable
 fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
-    val context = LocalContext.current
     val bottleSoundPlayer = MediaPlayer.create(LocalContext.current, R.raw.bottle_sound_1)
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -106,13 +105,7 @@ fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent), contentAlignment = Alignment.BottomCenter
-                ) {
-                    BannerAdView(BuildConfig.in_game_normal_banner, context = context)
-                }
+                BannerAdView(BuildConfig.in_game_normal_banner)
             }
         },
         contentOnTitleBottom = {

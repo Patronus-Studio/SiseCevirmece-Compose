@@ -2,26 +2,37 @@ package com.patronusstudio.sisecevirmece2.ui.widgets
 
 import android.app.Activity
 import android.content.Context
-import androidx.compose.foundation.layout.Box
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
 import com.applovin.mediation.MaxAdFormat
 import com.applovin.mediation.ads.MaxAdView
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 
 // TODO: banner da sorun olabilir eski android viewine bir bak
 @Composable
-fun BannerAdView(adUnitId: String,context:Context) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter){
-        MaxAdView(adUnitId, MaxAdFormat.BANNER, context).also {
-            it.loadAd()
+fun BannerAdView(adUnitId: String) {
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            val bannerView = MaxAdView(adUnitId, MaxAdFormat.BANNER, context).apply {
+                this.loadAd()
+                this.gravity = Gravity.BOTTOM
+            }
+            FrameLayout(context).apply {
+                this.addView(bannerView)
+            }
         }
-    }
+    )
 }
 
 
