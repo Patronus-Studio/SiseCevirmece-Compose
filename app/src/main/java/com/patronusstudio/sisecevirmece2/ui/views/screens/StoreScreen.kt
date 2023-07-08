@@ -1,15 +1,34 @@
 package com.patronusstudio.sisecevirmece2.ui.views.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,20 +50,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
-import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.enums.PackageDetailCardBtnEnum
 import com.patronusstudio.sisecevirmece2.data.enums.SelectableEnum
 import com.patronusstudio.sisecevirmece2.data.model.BaseCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.PackageModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.getActivity
-import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
-import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,27 +108,12 @@ fun StoreScreen(back: () -> Unit) {
                 }
             }
         }
-
         if (popupStatu.value) {
-            PackagePopup(viewModel.currentPackage.collectAsState().value!!, dismissListener = {
+            PackagePopupControl(viewModel, popupDissmissed = {
                 popupStatu.value = popupStatu.value.not()
-            }, clickedBtn = {
-                viewModel.setLoadingStatus(true)
-                InterstitialAdView.loadInterstitial(
-                    localContext.getActivity(),
-                    BuildConfig.package_download_interstitial
-                ) {
-                    if (it == InterstitialAdViewLoadStatusEnum.SHOWED) {
-                        viewModel.setLoadingStatus(false)
-                    } else if (it == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
-                        viewModel.setLoadingStatus(false)
-                        coroutineScope.launch(Dispatchers.Main) {
-                            packageStatus(viewModel)
-                        }
-                    } else {
-                        localContext.showSample()
-                        viewModel.setLoadingStatus(false)
-                    }
+            }, closedAd = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    packageStatus(viewModel)
                 }
             })
         }
@@ -120,6 +121,30 @@ fun StoreScreen(back: () -> Unit) {
             LoadingAnimation()
         }
     })
+}
+
+@Composable
+private fun PackagePopupControl(viewModel: PackageViewModel, closedAd: () -> Unit,popupDissmissed:()->Unit) {
+    val isLoading = remember {
+        mutableStateOf(false)
+    }
+    PackagePopup(viewModel.currentPackage.collectAsState().value!!,
+        dismissListener = {
+            popupDissmissed()
+        }, clickedBtn = {
+            viewModel.setLoadingStatus(true)
+            isLoading.value = true
+        })
+    if (isLoading.value) {
+        ApplovinUtils.CreateInterstitialAd(
+            adUnitId = BuildConfig.package_download_interstitial,
+            onAdClosed = {
+                viewModel.setLoadingStatus(false)
+                closedAd()
+            }, onAdShowed = {
+                viewModel.setLoadingStatus(false)
+            })
+    }
 }
 
 @Composable
@@ -300,10 +325,12 @@ private suspend fun packageStatus(viewModel: PackageViewModel) {
             viewModel.downloadPackage()
             viewModel.updateDownloadCountOnService()
         }
+
         PackageDetailCardBtnEnum.NEED_UPDATE -> {
             viewModel.updatePackage()
             viewModel.updateDownloadCountOnService()
         }
+
         PackageDetailCardBtnEnum.REMOVABLE -> viewModel.removePackage()
     }
 }
