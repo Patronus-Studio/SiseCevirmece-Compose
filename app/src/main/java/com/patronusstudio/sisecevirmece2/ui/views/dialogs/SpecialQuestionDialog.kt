@@ -1,16 +1,35 @@
 package com.patronusstudio.sisecevirmece2.ui.views.dialogs
 
 import android.content.Context
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,27 +52,24 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
-import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
-import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
-import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
-import kotlinx.coroutines.launch
 
 @Composable
 fun SpecialQuestionDialog(
     mixpanelAPI: MixpanelAPI,
     closeClicked: () -> Unit,
     viewModel: SpecialGameScreenViewModel,
-
     ) {
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
     val localContext = LocalContext.current
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
@@ -61,6 +77,32 @@ fun SpecialQuestionDialog(
     val smallPaddingHeight = (height * 0.03).dp
     val coroutineScope = rememberCoroutineScope()
     val flipController = rememberFlipController()
+    val adsIsLoading = remember {
+        mutableStateOf(false)
+    }
+    val changeQuestion = remember {
+        mutableStateOf(false)
+    }
+    DisposableEffect(key1 = true) {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                viewModel.setLoadingStatus(false)
+            }
+        }
+        onDispose {
+            callback.remove()
+        }
+    }
+    LaunchedEffect(key1 = changeQuestion.value, block = {
+        if (changeQuestion.value) {
+            viewModel.setLoadingStatus(true)
+            viewModel.getRandomPackage()
+            viewModel.getRandomQuestion()
+            viewModel.setLoadingStatus(false)
+            changeQuestion.value = false
+            adsIsLoading.value = false
+        }
+    })
     Column(
         modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -106,41 +148,7 @@ fun SpecialQuestionDialog(
                             smallCardHeight,
                             text = stringResource(R.string.change_question),
                             clicked = {
-                                val random = (0..10).random()
-                                showLog(random.toString())
-                                if (random < 9) {
-                                    coroutineScope.launch {
-                                        viewModel.getRandomPackage()
-                                        viewModel.getRandomQuestion()
-                                    }
-                                } else {
-                                    viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(
-                                        localContext.getActivity(),
-                                        BuildConfig.special_game_interstitial
-                                    ) { ad ->
-                                        when (ad) {
-                                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
-                                                viewModel.setLoadingStatus(false)
-                                            }
-                                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
-                                                viewModel.setLoadingStatus(false)
-                                                coroutineScope.launch {
-                                                    viewModel.getRandomPackage()
-                                                    viewModel.getRandomQuestion()
-                                                }
-                                            }
-                                            else -> {
-                                                localContext.showSample()
-                                                viewModel.setLoadingStatus(false)
-                                            }
-                                        }
-                                    }
-                                }
-                                sendDataToMixApi(
-                                    viewModel, localContext, mixpanelAPI,
-                                    localContext.getString(R.string.change_question)
-                                )
+                                adsIsLoading.value = true
                             })
                     }
                     Spacer(modifier = Modifier.height(smallPaddingHeight))
@@ -167,6 +175,31 @@ fun SpecialQuestionDialog(
             flipOnTouch = false,
             flipDurationMs = AnimMillis.NORMAL.millis
         )
+    }
+
+    if (adsIsLoading.value) {
+        adsIsLoading.value = false
+        val random = (0..100).random()
+        showLog(random.toString())
+        if (random < 85) {
+            changeQuestion.value = true
+        } else {
+            viewModel.setLoadingStatus(true)
+            ApplovinUtils.CreateInterstitialAd(adUnitId = BuildConfig.special_game_interstitial,
+                onAdShowed = {
+                    viewModel.setLoadingStatus(false)
+                }, onAdLoadFailed = {
+                    localContext.showSample()
+                    changeQuestion.value = true
+                }, onAdClosed = {
+                    changeQuestion.value = true
+                })
+        }
+        sendDataToMixApi(
+            viewModel, localContext, mixpanelAPI,
+            localContext.getString(R.string.change_question)
+        )
+
     }
 }
 
@@ -300,7 +333,7 @@ private fun AnswerCard(questionDbModel: QuestionDbModel, clicked: () -> Unit) {
                     modifier = Modifier.size(64.dp),
                 )
             }
-            Box(modifier = Modifier.fillMaxSize(),contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = questionDbModel.correctAnswer
                         ?: "Doğru cevap eklenmemiş ve gözümüzden kaçmış :) " +
