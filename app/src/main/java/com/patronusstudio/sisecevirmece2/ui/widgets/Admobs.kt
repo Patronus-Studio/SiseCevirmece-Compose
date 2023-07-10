@@ -1,7 +1,6 @@
 package com.patronusstudio.sisecevirmece2.ui.widgets
 
 import android.app.Activity
-import android.os.Handler
 import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +21,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
-import java.util.concurrent.TimeUnit
-import kotlin.math.pow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 // TODO: banner da sorun olabilir eski android viewine bir bak
 @Composable
@@ -100,15 +99,16 @@ object InterstitialAdView {
 object ApplovinUtils {
 
     private lateinit var interstitialAd: MaxInterstitialAd
+    private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
 
     @Composable
     fun CreateInterstitialAd(
         adUnitId: String,
         onAdShowed: (() -> Unit)? = null,
-        onAdClosed: (() -> Unit)? = null
+        onAdClosed: (() -> Unit)? = null,
+        onAdLoadFailed: (() -> Unit)? = null,
     ) {
         var retryAttempt = 0.0
-
         AndroidView(factory = { context ->
             if (this::interstitialAd.isInitialized.not()) {
                 interstitialAd = MaxInterstitialAd(adUnitId, context.getActivity())
@@ -148,14 +148,7 @@ object ApplovinUtils {
                     }
 
                     override fun onAdLoadFailed(p0: String?, p1: MaxError?) {
-                        // Interstitial ad failed to load
-                        // AppLovin recommends that you retry with exponentially higher delays up to a maximum delay (in this case 64 seconds)
-                        retryAttempt++
-                        val delayMillis =
-                            TimeUnit.SECONDS.toMillis(
-                                2.0.pow(6.0.coerceAtMost(retryAttempt)).toLong()
-                            )
-                        Handler().postDelayed({ interstitialAd.loadAd() }, delayMillis)
+                        onAdLoadFailed?.let { it1 -> it1() }
                     }
 
                     override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {

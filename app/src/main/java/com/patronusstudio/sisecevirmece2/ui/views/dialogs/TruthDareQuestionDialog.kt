@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -35,21 +34,16 @@ import androidx.compose.ui.unit.sp
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
-import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.getActivity
 import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showLog
-import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
-import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -65,6 +59,7 @@ fun TruthDareQuestionDialog(
     val currentQuestion = remember { mutableStateOf<QuestionDbModel?>(null) }
     val questionChangeClicked = remember { mutableStateOf(false) }
     val questionChangeListener = remember { mutableStateOf(false) }
+    val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
     val localContext = LocalContext.current
     LaunchedEffect(key1 = Unit, block = {
         val question = withContext(Dispatchers.IO) {
@@ -187,7 +182,7 @@ fun TruthDareQuestionDialog(
         questionChangeClicked.value = false
         val random = (0..10).random()
         showLog(random.toString())
-        if (random < 8) {
+        if (random < 1) {
             questionChangeListener.value = true
         } else {
             viewModel.setLoadingStatus(true)
@@ -196,6 +191,9 @@ fun TruthDareQuestionDialog(
                 onAdShowed = {
                     viewModel.setLoadingStatus(false)
                 }, onAdClosed = {
+                    questionChangeListener.value = true
+                    viewModel.setLoadingStatus(false)
+                }, onAdLoadFailed = {
                     questionChangeListener.value = true
                     viewModel.setLoadingStatus(false)
                 })
