@@ -38,7 +38,7 @@ android {
             buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
             buildConfigField "String", "package_download_interstitial", "\"e9965e4c6cc8f2eb\""
             buildConfigField "String", "add_package_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
-            buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
+            buildConfigField "String", "normal_game_interstitial", "\"ced2b7938574262f\""
             buildConfigField "String", "special_game_interstitial", "\"ca-app-pub-3940256099942544/1033173712\""
             buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
             minifyEnabled true
@@ -50,7 +50,7 @@ android {
             buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
             buildConfigField "String", "package_download_interstitial", "\"e9965e4c6cc8f2eb\""
             buildConfigField "String", "add_package_interstitial", "\"ca-app-pub-1818679104699845/7739358793\""
-            buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-1818679104699845/2097818178\""
+            buildConfigField "String", "normal_game_interstitial", "\"ced2b7938574262f\""
             buildConfigField "String", "special_game_interstitial", "\"ca-app-pub-1818679104699845/6304091848\""
             buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
             minifyEnabled false

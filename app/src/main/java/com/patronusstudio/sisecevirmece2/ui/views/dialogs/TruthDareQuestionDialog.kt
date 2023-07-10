@@ -1,11 +1,26 @@
 package com.patronusstudio.sisecevirmece2.ui.views.dialogs
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,12 +37,19 @@ import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
-import com.patronusstudio.sisecevirmece2.data.utils.*
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
+import com.patronusstudio.sisecevirmece2.data.utils.getActivity
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.showLog
+import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
+import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import com.patronusstudio.sisecevirmece2.ui.widgets.InterstitialAdView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -40,9 +62,9 @@ fun TruthDareQuestionDialog(
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
     val smallPaddingHeight = (height * 0.03).dp
-    val changeQuestionStatus = remember { mutableStateOf(false) }
     val currentQuestion = remember { mutableStateOf<QuestionDbModel?>(null) }
-    val isClickable = remember { mutableStateOf(true) }
+    val questionChangeClicked = remember { mutableStateOf(false) }
+    val questionChangeListener = remember { mutableStateOf(false) }
     val localContext = LocalContext.current
     LaunchedEffect(key1 = Unit, block = {
         val question = withContext(Dispatchers.IO) {
@@ -56,9 +78,10 @@ fun TruthDareQuestionDialog(
             currentQuestion.value = it
         }
     })
-    LaunchedEffect(key1 = changeQuestionStatus.value, block = {
-        if (isClickable.value) {
-            isClickable.value = false
+    LaunchedEffect(key1 = questionChangeListener.value, block = {
+        if (questionChangeListener.value) {
+            questionChangeListener.value = false
+            viewModel.setLoadingStatus(true)
             var question = viewModel.getRandomQuestion()
             if (question == null) {
                 withContext(Dispatchers.IO) {
@@ -68,7 +91,6 @@ fun TruthDareQuestionDialog(
                     viewModel.getTruthDareQuestions()
                 }
                 question = viewModel.getRandomQuestion()
-
             } else {
                 withContext(Dispatchers.IO) {
                     viewModel.removeQuestionOnList(question)
@@ -78,8 +100,7 @@ fun TruthDareQuestionDialog(
             withContext(Dispatchers.IO) {
                 viewModel.updateQuestionShowStatu(currentQuestion.value!!.primaryId)
             }
-            isClickable.value = true
-            changeQuestionStatus.value = false
+            viewModel.setLoadingStatus(false)
         }
     })
 
@@ -137,33 +158,7 @@ fun TruthDareQuestionDialog(
                                 localContext.getString(R.string.truth_dare_question_dialog),
                                 events
                             )
-                            val random = (0..10).random()
-                            showLog(random.toString())
-                            if (isClickable.value) {
-                                if (random < 9) {
-                                    changeQuestionStatus.value = true
-                                } else {
-                                    viewModel.setLoadingStatus(true)
-                                    InterstitialAdView.loadInterstitial(
-                                        localContext.getActivity(),
-                                        BuildConfig.normal_game_interstitial
-                                    ) { ad ->
-                                        when (ad) {
-                                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
-                                                viewModel.setLoadingStatus(false)
-                                            }
-                                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
-                                                viewModel.setLoadingStatus(false)
-                                                changeQuestionStatus.value = true
-                                            }
-                                            else -> {
-                                                localContext.showSample()
-                                                viewModel.setLoadingStatus(false)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            questionChangeClicked.value = true
                         })
                 }
                 Spacer(modifier = Modifier.height(smallPaddingHeight))
@@ -187,6 +182,25 @@ fun TruthDareQuestionDialog(
                 )
             }
         }
+    }
+    if (questionChangeClicked.value) {
+        questionChangeClicked.value = false
+        val random = (0..10).random()
+        showLog(random.toString())
+        if (random < 8) {
+            questionChangeListener.value = true
+        } else {
+            viewModel.setLoadingStatus(true)
+            ApplovinUtils.CreateInterstitialAd(
+                adUnitId = BuildConfig.normal_game_interstitial,
+                onAdShowed = {
+                    viewModel.setLoadingStatus(false)
+                }, onAdClosed = {
+                    questionChangeListener.value = true
+                    viewModel.setLoadingStatus(false)
+                })
+        }
+
     }
 }
 
