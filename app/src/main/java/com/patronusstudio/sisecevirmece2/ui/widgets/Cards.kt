@@ -349,7 +349,7 @@ fun SampleError(text: String, closeClicked: () -> Unit) {
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = text, color = AppColor.DavysGrey)
+                    Text(text = text, color = AppColor.DavysGrey, textAlign = TextAlign.Center)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }

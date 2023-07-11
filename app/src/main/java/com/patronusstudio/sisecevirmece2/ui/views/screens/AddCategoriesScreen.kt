@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -18,18 +17,39 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,14 +72,20 @@ import coil.compose.rememberAsyncImagePainter
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
-import com.patronusstudio.sisecevirmece2.data.enums.InterstitialAdViewLoadStatusEnum
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.QuestionModel
-import com.patronusstudio.sisecevirmece2.data.utils.*
+import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
+import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
+import com.patronusstudio.sisecevirmece2.data.utils.resize
+import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.*
+import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
+import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
+import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithDot
+import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithPassive
+import com.patronusstudio.sisecevirmece2.ui.widgets.SampleError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -223,6 +249,9 @@ private fun QuestionsCard(
     val list = viewModel.questionList.collectAsState().value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val saveQuestionClicked = remember {
+        mutableStateOf(false)
+    }
     GetCardWithConstraint(questionCardMaxHeight, questionCardMaxWidth, questions = {
         LazyColumn(content = {
             this.items(list) { item ->
@@ -278,40 +307,13 @@ private fun QuestionsCard(
             CircleImageButton(id = R.drawable.save) {
                 val random = (0..10).random()
                 showLog(random.toString())
-                if (random < 9) {
+                if (random < 3) {
                     coroutineScope.launch(Dispatchers.Main) {
                         viewModel.saveQuestions(localContext)
-                        Toast.makeText(localContext, "Kategori Eklendi.", Toast.LENGTH_SHORT).show()
+                        localFocus.clearFocus()
                     }
-                    localFocus.clearFocus()
                 } else {
-                    viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(
-                        localContext.getActivity(),
-                        BuildConfig.add_package_interstitial
-                    ) { ad ->
-                        when (ad) {
-                            InterstitialAdViewLoadStatusEnum.SHOWED -> {
-                                viewModel.setLoadingStatus(false)
-                            }
-                            InterstitialAdViewLoadStatusEnum.DISSMISSED -> {
-                                viewModel.setLoadingStatus(false)
-                                coroutineScope.launch(Dispatchers.Main) {
-                                    viewModel.saveQuestions(localContext)
-                                    Toast.makeText(
-                                        localContext,
-                                        "Kategori Eklendi.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                localFocus.clearFocus()
-                            }
-                            else -> {
-                                localContext.showSample()
-                                viewModel.setLoadingStatus(false)
-                            }
-                        }
-                    }
+                    saveQuestionClicked.value = true
                 }
                 val eventName = localContext.getString(R.string.add_category)
                 val events = mapOf(
@@ -324,6 +326,30 @@ private fun QuestionsCard(
             }
         }
     })
+    if (saveQuestionClicked.value) {
+        viewModel.setLoadingStatus(true)
+        ApplovinUtils.CreateInterstitialAd(adUnitId = BuildConfig.add_package_interstitial,
+            onAdClosed = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    viewModel.saveQuestions(localContext)
+                    localFocus.clearFocus()
+                    viewModel.setLoadingStatus(false)
+                    saveQuestionClicked.value = false
+                }
+            },
+            onAdLoadFailed = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    viewModel.saveQuestions(localContext)
+                    localFocus.clearFocus()
+                    viewModel.setLoadingStatus(false)
+                    saveQuestionClicked.value = false
+                }
+            },
+            onAdShowed = {
+                viewModel.setLoadingStatus(false)
+                saveQuestionClicked.value = false
+            })
+    }
 }
 
 @Composable
