@@ -12,6 +12,7 @@
 - Dependency Injection olarak Hilt, kullanıcı verileri için saklamak için Room ve Datastore, thread işlemleri için Coroutines ve glide,coil,lottie,retrofit(REST) gibi popüler kütüphaneler kullanılmıştır.
 - Kullanıcı analitiği ve crashler için Firebase kullanılmıştır.(crashlytics,analytics)
 - Reklam ve ekstra analitik için google ads ve mixpanel eklenmiştir.
+- Ui tasarımları Adobe Xd kullanılarak yapılmıştır.
 
 
 <a href="https://play.google.com/store/apps/details?id=com.patronusstudio.sisecevirmece2&hl=tr&gl=TR" target="_blank">
