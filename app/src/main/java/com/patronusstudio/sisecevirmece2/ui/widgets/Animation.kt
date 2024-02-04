@@ -1,6 +1,5 @@
 package com.patronusstudio.sisecevirmece2.ui.screens
 
-import androidx.annotation.IntegerRes
 import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -39,7 +38,7 @@ fun LoadingAnimation() {
 }
 
 @Composable
-fun SampleAnimation(@RawRes animationRes:Int) {
+fun SampleAnimation(@RawRes animationRes: Int) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationRes))
     LottieAnimation(
         composition = composition,
