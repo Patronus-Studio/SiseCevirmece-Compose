@@ -77,6 +77,9 @@ fun StoreScreen(back: () -> Unit) {
     val popupStatu = remember {
         mutableStateOf(false)
     }
+    val isAdsShowing = remember {
+        mutableStateOf(false)
+    }
     LaunchedEffect(Unit) {
         val itemId = viewModel.getPackageCategories()
         viewModel.getPackageFromCategory(itemId)
@@ -111,46 +114,46 @@ fun StoreScreen(back: () -> Unit) {
         if (popupStatu.value) {
             PackagePopupControl(viewModel, popupDissmissed = {
                 popupStatu.value = popupStatu.value.not()
-            }, closedAd = {
-                coroutineScope.launch(Dispatchers.Main) {
-                    packageStatus(viewModel)
-                }
+            }, adsLoaded = {
+                isAdsShowing.value = true
             })
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()
         }
     })
+    if(isAdsShowing.value){
+        AdmobInterstialAd(context = localContext,
+            addUnitId = BuildConfig.package_download_interstitial,
+            failedLoad = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    packageStatus(viewModel)
+                    viewModel.setLoadingStatus(false)
+                    isAdsShowing.value = false
+                }
+            }, adClosed = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    packageStatus(viewModel)
+                    viewModel.setLoadingStatus(false)
+                    isAdsShowing.value = false
+                }
+            })
+    }
 }
 
 @Composable
 private fun PackagePopupControl(
     viewModel: PackageViewModel,
-    closedAd: () -> Unit,
+    adsLoaded: () -> Unit,
     popupDissmissed: () -> Unit
 ) {
-    val isLoading = remember {
-        mutableStateOf(false)
-    }
-    val localContext = LocalContext.current
     PackagePopup(viewModel.currentPackage.collectAsState().value!!,
         dismissListener = {
             popupDissmissed()
         }, clickedBtn = {
             viewModel.setLoadingStatus(true)
-            isLoading.value = true
+            adsLoaded()
         })
-    if (isLoading.value) {
-        AdmobInterstialAd(context = localContext,
-            addUnitId = BuildConfig.package_download_interstitial,
-            failedLoad = {
-                viewModel.setLoadingStatus(false)
-                closedAd()
-            }) {
-            viewModel.setLoadingStatus(false)
-            closedAd()
-        }
-    }
 }
 
 @Composable

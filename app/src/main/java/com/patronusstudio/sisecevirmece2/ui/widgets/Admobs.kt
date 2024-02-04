@@ -40,19 +40,11 @@ fun AdmobInterstialAd(
             }
 
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                interstitialAd.fullScreenContentCallback = object : FullScreenContentCallback() {
-                    override fun onAdDismissedFullScreenContent() {
-                        adClosed()
-                    }
-
-                    override fun onAdShowedFullScreenContent() {
-                        failedLoad()
-                    }
-                }
                 try {
                     context.findActivity().let {
                         interstitialAd.show(it)
                     }
+                    adClosed()
                 } catch (e: Exception) {
                     failedLoad()
                 }

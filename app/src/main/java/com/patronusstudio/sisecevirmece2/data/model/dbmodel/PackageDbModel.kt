@@ -10,7 +10,7 @@ import com.patronusstudio.sisecevirmece2.data.model.BasePackageModel
 
 @Entity(tableName = DbTables.packageTable)
 data class PackageDbModel(
-    @NonNull @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     val primaryId: Int = 0,
     val cloudPackageCategoryId: Int,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
