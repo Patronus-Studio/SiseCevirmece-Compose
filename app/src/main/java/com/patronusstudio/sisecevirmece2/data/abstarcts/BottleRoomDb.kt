@@ -12,7 +12,7 @@ import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
 
 @Database(
     entities = [QuestionDbModel::class, PackageDbModel::class, BottleDbModel::class,BackgroundDbModel::class],
-    version = 1
+    version = 2
 )
 abstract class BottleRoomDb : RoomDatabase() {
 
