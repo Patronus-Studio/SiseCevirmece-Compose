@@ -27,7 +27,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
@@ -38,12 +37,11 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.BannerAdView
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @Composable
-fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backClicked: () -> Unit) {
+fun SpecialGameScreen(selectedPackages: String, backClicked: () -> Unit) {
     val bottleSoundPlayer = MediaPlayer.create(LocalContext.current, R.raw.bottle_sound_2)
     val viewModel = hiltViewModel<SpecialGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -78,7 +76,7 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
     })
     LaunchedEffect(key1 = viewModel.bottleTouchListener.collectAsState().value, block = {
         if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_STARTED) {
-            bottleSoundPlayer.seekTo(0);
+            bottleSoundPlayer.seekTo(0)
             bottleSoundPlayer.start()
         } else if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_ENDED) {
             bottleSoundPlayer.pause()
@@ -127,6 +125,7 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
                                 BottleTouchListener.ANIM_STARTED -> {
                                     bottleFlipAnim.value
                                 }
+
                                 else -> degree.value
                             }
                         )
@@ -174,7 +173,7 @@ fun SpecialGameScreen(mixpanelAPI: MixpanelAPI, selectedPackages: String, backCl
         ) {
             SpecialQuestionDialog(closeClicked = {
                 viewModel.setBottleTouchListener(BottleTouchListener.INIT)
-            }, viewModel = viewModel, mixpanelAPI = mixpanelAPI)
+            }, viewModel = viewModel)
         }
         AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
             LoadingAnimation()

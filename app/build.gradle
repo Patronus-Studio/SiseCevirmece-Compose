@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId 'com.patronusstudio.sisecevirmece2'
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 11
         versionName "1.0.7"
 
@@ -32,27 +32,27 @@ android {
             v2SigningEnabled true
         }
     }
+    def testBannerId = "ca-app-pub-3940256099942544/6300978111"
+    def testInterstitialId = "ca-app-pub-3940256099942544/1033173712"
     buildTypes {
         debug {
-            buildConfigField "String", "in_game_normal_banner", "\"90acfa8937cf609c\""
-            buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
-            buildConfigField "String", "package_download_interstitial", "\"e9965e4c6cc8f2eb\""
-            buildConfigField "String", "add_package_interstitial", "\"a046c2a494ee8547\""
-            buildConfigField "String", "normal_game_interstitial", "\"ced2b7938574262f\""
-            buildConfigField "String", "special_game_interstitial", "\"2af2f6418beb276c\""
-            buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
+            buildConfigField "String", "in_game_normal_banner", "\"$testBannerId\""
+            buildConfigField "String", "in_game_special_banner", "\"$testBannerId\""
+            buildConfigField "String", "package_download_interstitial", "\"$testInterstitialId\""
+            buildConfigField "String", "add_package_interstitial", "\"$testInterstitialId\""
+            buildConfigField "String", "normal_game_interstitial", "\"$testInterstitialId\""
+            buildConfigField "String", "special_game_interstitial", "\"$testInterstitialId\""
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
-            buildConfigField "String", "in_game_normal_banner", "\"90acfa8937cf609c\""
-            buildConfigField "String", "in_game_special_banner", "\"b11771dcb6da9058\""
-            buildConfigField "String", "package_download_interstitial", "\"e9965e4c6cc8f2eb\""
-            buildConfigField "String", "add_package_interstitial", "\"a046c2a494ee8547\""
-            buildConfigField "String", "normal_game_interstitial", "\"ced2b7938574262f\""
-            buildConfigField "String", "special_game_interstitial", "\"2af2f6418beb276c\""
-            buildConfigField "String", "mix_panel_token", "\"9e23d380cfd8f4be106e26bf38685c53\""
+            buildConfigField "String", "in_game_normal_banner", "\"ca-app-pub-1818679104699845/5160700445\""
+            buildConfigField "String", "in_game_special_banner", "\"ca-app-pub-1818679104699845/6921338826\""
+            buildConfigField "String", "package_download_interstitial", "\"ca-app-pub-1818679104699845/6435684286\""
+            buildConfigField "String", "add_package_interstitial", "\"ca-app-pub-1818679104699845/7739358793\""
+            buildConfigField "String", "normal_game_interstitial", "\"ca-app-pub-1818679104699845/2097818178\""
+            buildConfigField "String", "special_game_interstitial", "\"ca-app-pub-1818679104699845/6304091848\""
             minifyEnabled false
             //hilt view model ekliyken shrinkResources true olursa retrofit istekleri atılmıyor
             shrinkResources false
@@ -119,12 +119,10 @@ dependencies {
 
     implementation 'com.github.a914-gowtham:compose-ratingbar:1.2.4'
     implementation 'com.google.android.gms:play-services-ads:21.5.0'
-    implementation 'com.mixpanel.android:mixpanel-android:7.+'
     implementation platform('com.google.firebase:firebase-bom:31.2.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.wajahatkarim:flippable:1.0.6'
-    implementation("com.applovin:applovin-sdk:+")
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")

@@ -7,12 +7,10 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -25,11 +23,9 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.PackageDbModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameCategorySelectViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
@@ -38,7 +34,6 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.CardImageWithText
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SpecialGameCategorySelectScreen(
-    mixpanelAPI: MixpanelAPI,
     backClicked: () -> Unit,
     passGameScreen: (String) -> Unit
 ) {
@@ -86,10 +81,6 @@ fun SpecialGameCategorySelectScreen(
         viewModel.packages.forEach {
             events["Selected package"] = it.packageName
         }
-        mixpanelAPI.multiEventSend(
-            localContext.getString(R.string.special_game_mode_selected_package),
-            events
-        )
         passGameScreen(viewModel.getSelectedPackageJSON())
     }
     AnimationDialog(

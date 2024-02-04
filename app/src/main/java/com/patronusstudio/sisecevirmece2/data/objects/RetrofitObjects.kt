@@ -24,7 +24,7 @@ object RetrofitObjects {
     @Provides
     fun getRetrofit():Retrofit{
         return Retrofit.Builder()
-            .baseUrl("https://bottleflip.herokuapp.com")
+            .baseUrl("https://sisecevirmece2-6fd9e08d24c6.herokuapp.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

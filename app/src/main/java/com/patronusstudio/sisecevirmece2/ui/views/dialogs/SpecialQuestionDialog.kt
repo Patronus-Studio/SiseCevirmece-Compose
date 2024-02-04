@@ -1,6 +1,5 @@
 package com.patronusstudio.sisecevirmece2.ui.views.dialogs
 
-import android.content.Context
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
@@ -48,27 +47,24 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.SpecialGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
+import com.patronusstudio.sisecevirmece2.ui.widgets.AdmobInterstialAd
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
 
 @Composable
 fun SpecialQuestionDialog(
-    mixpanelAPI: MixpanelAPI,
     closeClicked: () -> Unit,
     viewModel: SpecialGameScreenViewModel,
-    ) {
+) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
     val localContext = LocalContext.current
     val width = LocalConfiguration.current.screenWidthDp
@@ -136,10 +132,6 @@ fun SpecialQuestionDialog(
                             smallCardHeight,
                             text = stringResource(R.string.replied),
                             clicked = {
-                                sendDataToMixApi(
-                                    viewModel, localContext, mixpanelAPI,
-                                    localContext.getString(R.string.replied)
-                                )
                                 closeClicked()
                             }
                         )
@@ -158,10 +150,6 @@ fun SpecialQuestionDialog(
                         text = stringResource(R.string.show_answer),
                         clicked = {
                             flipController.flip()
-                            sendDataToMixApi(
-                                viewModel, localContext, mixpanelAPI,
-                                localContext.getString(R.string.show_answer)
-                            )
                         }, image = R.drawable.confused
                     )
                 }
@@ -185,21 +173,17 @@ fun SpecialQuestionDialog(
             changeQuestion.value = true
         } else {
             viewModel.setLoadingStatus(true)
-            ApplovinUtils.CreateInterstitialAd(adUnitId = BuildConfig.special_game_interstitial,
-                onAdShowed = {
+            AdmobInterstialAd(
+                context = localContext,
+                addUnitId =BuildConfig.special_game_interstitial,
+                failedLoad = {
                     viewModel.setLoadingStatus(false)
-                }, onAdLoadFailed = {
+                }, adClosed = {
                     localContext.showSample()
                     changeQuestion.value = true
-                }, onAdClosed = {
-                    changeQuestion.value = true
-                })
+                }
+            )
         }
-        sendDataToMixApi(
-            viewModel, localContext, mixpanelAPI,
-            localContext.getString(R.string.change_question)
-        )
-
     }
 }
 
@@ -283,24 +267,6 @@ private fun GeneralCard(
             }
         }
     }
-}
-
-private fun sendDataToMixApi(
-    viewModel: SpecialGameScreenViewModel,
-    localContext: Context,
-    mixpanelAPI: MixpanelAPI,
-    template: String
-) {
-    val events = mapOf(
-        Pair(
-            viewModel.randomPackage.value?.packageName
-                ?: localContext.getString(R.string.special_game_mode_package_name), template
-        )
-    )
-    mixpanelAPI.multiEventSend(
-        localContext.getString(R.string.special_game_mode_question_dialog),
-        events
-    )
 }
 
 @Composable

@@ -36,7 +36,6 @@ import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarConfig
 import com.gowtham.ratingbar.RatingBarStyle
 import com.gowtham.ratingbar.StepSize
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.MainApplication
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
@@ -44,7 +43,6 @@ import com.patronusstudio.sisecevirmece2.data.enums.AnimStatus
 import com.patronusstudio.sisecevirmece2.data.enums.InAppScreenNavEnums
 import com.patronusstudio.sisecevirmece2.data.model.AvatarModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.singleEventSend
 import com.patronusstudio.sisecevirmece2.data.viewModels.HomeViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
@@ -54,7 +52,7 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.UserPic
 import kotlinx.coroutines.*
 
 @Composable
-fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
+fun HomeScreen( route: (InAppScreenNavEnums) -> Unit) {
     val viewModel = hiltViewModel<HomeViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val popupVisibleAnimation = remember { mutableStateOf(AnimStatus.INIT) }
@@ -76,7 +74,6 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
         }
     }
     LaunchedEffect(key1 = destinationStatus.value, block = {
-        mixpanelAPI.singleEventSend(destinationStatus.value.getText(context))
         when (destinationStatus.value) {
             InAppScreenNavEnums.INIT -> return@LaunchedEffect
             InAppScreenNavEnums.LOGOUT -> {
@@ -112,7 +109,7 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
         Space(0.02)
         Title()
         Space(0.05)
-        UserPicHousting(viewModel, mixpanelAPI)
+        UserPicHousting(viewModel)
         Space(0.05)
         Username(viewModel.userGameInfoModel.collectAsState().value?.username ?: "")
         /*LevelBar(
@@ -129,7 +126,6 @@ fun HomeScreen(mixpanelAPI: MixpanelAPI, route: (InAppScreenNavEnums) -> Unit) {
         }
         Space(0.05)
         PlayButton {
-            mixpanelAPI.singleEventSend(context.getString(R.string.play_bigger))
             destinationStatus.value = it
         }
         Space(0.05)
@@ -188,14 +184,13 @@ fun Space(ratio: Double) {
 }
 
 @Composable
-private fun UserPicHousting(viewModel: HomeViewModel, mixpanelAPI: MixpanelAPI) {
+private fun UserPicHousting(viewModel: HomeViewModel) {
     val currentImage = remember { mutableStateOf(viewModel.getCurrentAvatar()) }
     LaunchedEffect(key1 = viewModel.avatar.collectAsState().value, block = {
         currentImage.value = viewModel.getCurrentAvatar()
     })
     val isClicked = remember { mutableStateOf(false) }
     if (isClicked.value) {
-        mixpanelAPI.singleEventSend("Avatar Dialog")
         OpenDialog(viewModel) {
             isClicked.value = false
             if (it != null) {

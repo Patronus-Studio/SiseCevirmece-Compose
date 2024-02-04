@@ -5,12 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -18,9 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.ContentScale
@@ -31,7 +25,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.BottleTouchListener
@@ -45,7 +38,7 @@ import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import kotlin.random.Random
 
 @Composable
-fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
+fun NormalGameScreen(backClicked: () -> Unit) {
     val bottleSoundPlayer = MediaPlayer.create(LocalContext.current, R.raw.bottle_sound_1)
     val viewModel = hiltViewModel<NormalGameScreenViewModel>()
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -80,7 +73,7 @@ fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
     })
     LaunchedEffect(key1 = viewModel.bottleTouchListener.collectAsState().value, block = {
         if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_STARTED) {
-            bottleSoundPlayer.seekTo(0);
+            bottleSoundPlayer.seekTo(0)
             bottleSoundPlayer.start()
         } else if (viewModel.bottleTouchListener.value == BottleTouchListener.ANIM_ENDED) {
             bottleSoundPlayer.pause()
@@ -121,6 +114,7 @@ fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                                 BottleTouchListener.ANIM_STARTED -> {
                                     bottleFlipAnim.value
                                 }
+
                                 else -> degree.value
                             }
                         )
@@ -172,7 +166,7 @@ fun NormalGameScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 ) {
                     TruthDareQuestionDialog(
                         closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
-                        mixpanelAPI = mixpanelAPI, viewModel = viewModel
+                        viewModel = viewModel
                     )
                 }
             }

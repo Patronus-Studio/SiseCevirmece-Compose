@@ -31,16 +31,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.QuestionDbModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.viewModels.NormalGameScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
+import com.patronusstudio.sisecevirmece2.ui.widgets.AdmobInterstialAd
 import com.patronusstudio.sisecevirmece2.ui.widgets.AutoTextSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +46,6 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun TruthDareQuestionDialog(
-    mixpanelAPI: MixpanelAPI,
     closeClicked: () -> Unit,
     viewModel: NormalGameScreenViewModel
 ) {
@@ -131,10 +128,6 @@ fun TruthDareQuestionDialog(
                                     localContext.getString(R.string.replied)
                                 )
                             )
-                            mixpanelAPI.multiEventSend(
-                                localContext.getString(R.string.truth_dare_question_dialog),
-                                events
-                            )
                             closeClicked()
                         }
                     )
@@ -148,10 +141,6 @@ fun TruthDareQuestionDialog(
                                     viewModel.truthDareSelected.value.getText(localContext),
                                     localContext.getString(R.string.change_question)
                                 )
-                            )
-                            mixpanelAPI.multiEventSend(
-                                localContext.getString(R.string.truth_dare_question_dialog),
-                                events
                             )
                             questionChangeClicked.value = true
                         })
@@ -168,10 +157,6 @@ fun TruthDareQuestionDialog(
                                 localContext.getString(R.string.i_wil_ask_question)
                             )
                         )
-                        mixpanelAPI.multiEventSend(
-                            localContext.getString(R.string.truth_dare_question_dialog),
-                            events
-                        )
                         closeClicked()
                     }
                 )
@@ -186,17 +171,17 @@ fun TruthDareQuestionDialog(
             questionChangeListener.value = true
         } else {
             viewModel.setLoadingStatus(true)
-            ApplovinUtils.CreateInterstitialAd(
-                adUnitId = BuildConfig.normal_game_interstitial,
-                onAdShowed = {
-                    viewModel.setLoadingStatus(false)
-                }, onAdClosed = {
+            AdmobInterstialAd(
+                context = localContext,
+                addUnitId = BuildConfig.normal_game_interstitial,
+                failedLoad = {
                     questionChangeListener.value = true
                     viewModel.setLoadingStatus(false)
-                }, onAdLoadFailed = {
+                }, adClosed = {
                     questionChangeListener.value = true
                     viewModel.setLoadingStatus(false)
-                })
+                }
+            )
         }
 
     }

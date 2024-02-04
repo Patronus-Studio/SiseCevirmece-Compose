@@ -59,7 +59,7 @@ import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.viewModels.PackageViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
+import com.patronusstudio.sisecevirmece2.ui.widgets.AdmobInterstialAd
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece2.ui.widgets.PackageDetailCard
 import kotlinx.coroutines.CoroutineScope
@@ -124,10 +124,15 @@ fun StoreScreen(back: () -> Unit) {
 }
 
 @Composable
-private fun PackagePopupControl(viewModel: PackageViewModel, closedAd: () -> Unit,popupDissmissed:()->Unit) {
+private fun PackagePopupControl(
+    viewModel: PackageViewModel,
+    closedAd: () -> Unit,
+    popupDissmissed: () -> Unit
+) {
     val isLoading = remember {
         mutableStateOf(false)
     }
+    val localContext = LocalContext.current
     PackagePopup(viewModel.currentPackage.collectAsState().value!!,
         dismissListener = {
             popupDissmissed()
@@ -136,14 +141,15 @@ private fun PackagePopupControl(viewModel: PackageViewModel, closedAd: () -> Uni
             isLoading.value = true
         })
     if (isLoading.value) {
-        ApplovinUtils.CreateInterstitialAd(
-            adUnitId = BuildConfig.package_download_interstitial,
-            onAdClosed = {
+        AdmobInterstialAd(context = localContext,
+            addUnitId = BuildConfig.package_download_interstitial,
+            failedLoad = {
                 viewModel.setLoadingStatus(false)
                 closedAd()
-            }, onAdShowed = {
-                viewModel.setLoadingStatus(false)
-            })
+            }) {
+            viewModel.setLoadingStatus(false)
+            closedAd()
+        }
     }
 }
 

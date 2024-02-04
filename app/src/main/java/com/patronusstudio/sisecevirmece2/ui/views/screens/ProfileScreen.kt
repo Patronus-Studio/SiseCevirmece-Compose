@@ -31,7 +31,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.AnimMillis
@@ -44,7 +43,6 @@ import com.patronusstudio.sisecevirmece2.data.model.dbmodel.BottleDbModel
 import com.patronusstudio.sisecevirmece2.data.model.dbmodel.ProfileCategoryModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
 import com.patronusstudio.sisecevirmece2.data.utils.getActivity
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.showSample
 import com.patronusstudio.sisecevirmece2.data.viewModels.ProfileScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
@@ -56,12 +54,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
+fun ProfileScreen(backClicked: () -> Unit) {
     val localContext = LocalContext.current
     val viewModel = hiltViewModel<ProfileScreenViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val packageCardWidth = (LocalConfiguration.current.screenWidthDp * 0.4).dp
     val packageCardHeight = (LocalConfiguration.current.screenHeightDp * 0.25).dp
+    val isShowingAds = remember { mutableStateOf(false) }
+    val bottleDbModelSaved:MutableState<BottleDbModel?> = remember { mutableStateOf(null) }
+    val backgroundDbModelSaved:MutableState<BackgroundDbModel?> = remember { mutableStateOf(null) }
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getPackages()
     })
@@ -98,33 +99,8 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                 Bottles(
                     viewModel.bottles.collectAsState().value, bottleCardSize
                 ) { bottleDbModel ->
-                    viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(
-                        localContext.getActivity(),
-                        BuildConfig.package_download_interstitial
-                    ) { ad ->
-                        if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
-                            viewModel.setLoadingStatus(false)
-                        } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
-                            viewModel.setLoadingStatus(false)
-                            coroutineScope.launch(Dispatchers.Main) {
-                                viewModel.setBottleActiveStatuOnDb(bottleDbModel.primaryId)
-                                viewModel.setBottleActiveStatuOnLocal(bottleDbModel.primaryId)
-                            }
-                        } else {
-                            localContext.showSample()
-                            viewModel.setLoadingStatus(false)
-                        }
-                    }
-
-                    val eventName = localContext.getString(R.string.bottles)
-                    val events = mapOf(
-                        Pair(
-                            localContext.getString(R.string.played_bottles),
-                            bottleDbModel.bottleName
-                        )
-                    )
-                    mixpanelAPI.multiEventSend(eventName, events)
+                    bottleDbModelSaved.value = bottleDbModel
+                    isShowingAds.value = true
                 }
             }
             AnimatedVisibility(
@@ -138,37 +114,47 @@ fun ProfileScreen(mixpanelAPI: MixpanelAPI, backClicked: () -> Unit) {
                     packageCardWidth,
                     packageCardHeight
                 ) { backgroundDbModel ->
-                    viewModel.setLoadingStatus(true)
-                    InterstitialAdView.loadInterstitial(
-                        localContext.getActivity(),
-                        BuildConfig.package_download_interstitial
-                    ) { ad ->
-                        if (ad == InterstitialAdViewLoadStatusEnum.SHOWED) {
-                            viewModel.setLoadingStatus(false)
-                        } else if (ad == InterstitialAdViewLoadStatusEnum.DISSMISSED) {
-                            viewModel.setLoadingStatus(false)
-                            viewModel.setBackgroundActiveStatuOnDb(backgroundDbModel)
-                            viewModel.setBackgroundActiveStatuOnLocal(backgroundDbModel)
-                        } else {
-                            localContext.showSample()
-                            viewModel.setLoadingStatus(false)
-                        }
-                    }
-                    val eventName = localContext.getString(R.string.bottles)
-                    val events =
-                        mapOf(
-                            Pair(
-                                localContext.getString(R.string.played_bottles),
-                                backgroundDbModel.backgroundName
-                            )
-                        )
-                    mixpanelAPI.multiEventSend(eventName, events)
+                    backgroundDbModelSaved.value = backgroundDbModel
+                    isShowingAds.value = true
                 }
             }
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                 LoadingAnimation()
             }
         })
+
+    if(isShowingAds.value){
+        viewModel.setLoadingStatus(true)
+        AdmobInterstialAd(
+            context = localContext,
+            addUnitId = BuildConfig.package_download_interstitial,
+            failedLoad = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    if(bottleDbModelSaved.value!= null){
+                        viewModel.setBottleActiveStatuOnDb(bottleDbModelSaved.value!!.primaryId)
+                        viewModel.setBottleActiveStatuOnLocal(bottleDbModelSaved.value!!.primaryId)
+                    }
+                    if(backgroundDbModelSaved.value!= null){
+                        viewModel.setBackgroundActiveStatuOnDb(backgroundDbModelSaved.value!!)
+                        viewModel.setBackgroundActiveStatuOnLocal(backgroundDbModelSaved.value!!)
+                    }
+                    viewModel.setLoadingStatus(false)
+                }
+            },
+            adClosed = {
+                coroutineScope.launch(Dispatchers.Main) {
+                    if(bottleDbModelSaved.value!= null){
+                        viewModel.setBottleActiveStatuOnDb(bottleDbModelSaved.value!!.primaryId)
+                        viewModel.setBottleActiveStatuOnLocal(bottleDbModelSaved.value!!.primaryId)
+                    }
+                    if(backgroundDbModelSaved.value!= null){
+                        viewModel.setBackgroundActiveStatuOnDb(backgroundDbModelSaved.value!!)
+                        viewModel.setBackgroundActiveStatuOnLocal(backgroundDbModelSaved.value!!)
+                    }
+                    viewModel.setLoadingStatus(false)
+                }
+            })
+    }
 }
 
 @Composable
@@ -207,7 +193,7 @@ private fun Titles(list: List<BaseCategoryModel>, clicked: (ProfileCategoryModel
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Packages(
     packageCardWidth: Dp,
@@ -329,7 +315,7 @@ private fun Packages(
                                     Text(
                                         text = it.question,
                                         modifier = Modifier.weight(0.7f),
-                                        color = AppColor.DavysGrey,fontFamily = BetmRounded,
+                                        color = AppColor.DavysGrey, fontFamily = BetmRounded,
                                         fontWeight = FontWeight.Normal
                                     )
                                     if (it.isShowed == 1) {
@@ -448,7 +434,8 @@ private fun SampleBottleCard(cardSize: Dp) {
 private fun Backgrounds(
     backgrounds: List<BackgroundDbModel>,
     packageCardWidth: Dp,
-    packageCardHeight: Dp, clicked: (BackgroundDbModel) -> Unit
+    packageCardHeight: Dp,
+    clicked: (BackgroundDbModel) -> Unit
 ) {
     val scroolState = rememberScrollState()
     FlowRow(

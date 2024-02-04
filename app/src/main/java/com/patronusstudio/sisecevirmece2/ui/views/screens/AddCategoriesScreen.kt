@@ -69,19 +69,17 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.BuildConfig
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.model.PackageCategoryModel
 import com.patronusstudio.sisecevirmece2.data.model.QuestionModel
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
 import com.patronusstudio.sisecevirmece2.data.utils.resize
 import com.patronusstudio.sisecevirmece2.data.utils.showLog
 import com.patronusstudio.sisecevirmece2.data.viewModels.AddCategoriesScreenViewModel
 import com.patronusstudio.sisecevirmece2.ui.screens.LoadingAnimation
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
-import com.patronusstudio.sisecevirmece2.ui.widgets.ApplovinUtils
+import com.patronusstudio.sisecevirmece2.ui.widgets.AdmobInterstialAd
 import com.patronusstudio.sisecevirmece2.ui.widgets.BaseBackground
 import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithDot
 import com.patronusstudio.sisecevirmece2.ui.widgets.ButtonWithPassive
@@ -93,7 +91,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 @Composable
-fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
+fun AddCategoriesScreen(back: () -> Unit) {
     val width = LocalConfiguration.current.screenWidthDp
     val questionCardMaxHeight = LocalConfiguration.current.screenHeightDp * 0.55
     val questionCardMaxWidth = width * 0.9
@@ -143,7 +141,7 @@ fun AddCategoriesScreen(mixpanelAPI: MixpanelAPI, back: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             CategoryType(viewModel = viewModel, dotButtonHeight = dotButtonHeight)
             Spacer(modifier = Modifier.height(8.dp))
-            QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel, mixpanelAPI)
+            QuestionsCard(questionCardMaxHeight, questionCardMaxWidth, viewModel)
             AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
                 LoadingAnimation()
             }
@@ -236,7 +234,6 @@ private fun QuestionsCard(
     questionCardMaxHeight: Double,
     questionCardMaxWidth: Double,
     viewModel: AddCategoriesScreenViewModel,
-    mixpanelAPI: MixpanelAPI
 ) {
     val localFocus = LocalFocusManager.current
     val localContext = LocalContext.current
@@ -322,33 +319,40 @@ private fun QuestionsCard(
                         viewModel.packageCategoryModel.value?.name ?: ""
                     )
                 )
-                mixpanelAPI.multiEventSend(eventName, events)
             }
         }
     })
     if (saveQuestionClicked.value) {
         viewModel.setLoadingStatus(true)
-        ApplovinUtils.CreateInterstitialAd(adUnitId = BuildConfig.add_package_interstitial,
-            onAdClosed = {
+        AdmobInterstialAd(
+            context = localContext,
+            addUnitId = BuildConfig.normal_game_interstitial,
+            failedLoad = {
+            }, adClosed = {
+
+            }
+        )
+
+
+        AdmobInterstialAd(
+            context = localContext,
+            addUnitId = BuildConfig.normal_game_interstitial,
+            failedLoad = {
                 coroutineScope.launch(Dispatchers.Main) {
                     viewModel.saveQuestions(localContext)
                     localFocus.clearFocus()
                     viewModel.setLoadingStatus(false)
                     saveQuestionClicked.value = false
                 }
-            },
-            onAdLoadFailed = {
+            }, adClosed = {
                 coroutineScope.launch(Dispatchers.Main) {
                     viewModel.saveQuestions(localContext)
                     localFocus.clearFocus()
                     viewModel.setLoadingStatus(false)
                     saveQuestionClicked.value = false
                 }
-            },
-            onAdShowed = {
-                viewModel.setLoadingStatus(false)
-                saveQuestionClicked.value = false
-            })
+            }
+        )
     }
 }
 

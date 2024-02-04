@@ -19,18 +19,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.R
 import com.patronusstudio.sisecevirmece2.data.enums.GameMode
 import com.patronusstudio.sisecevirmece2.data.utils.BetmRounded
-import com.patronusstudio.sisecevirmece2.data.utils.multiEventSend
-import com.patronusstudio.sisecevirmece2.data.utils.singleEventSend
 import com.patronusstudio.sisecevirmece2.ui.theme.AppColor
 import com.patronusstudio.sisecevirmece2.ui.widgets.CardTitle
 
 @Composable
 fun GameTypeSelection(
-    mixpanelAPI: MixpanelAPI,
     back: () -> Unit,
     gameModeSelection: (GameMode) -> Unit
 ) {
@@ -56,14 +52,10 @@ fun GameTypeSelection(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CardButton(cardWidth, cardHeight, GameMode.NORMAL_MODE){
-                    val eventName = localContext.getString(R.string.play_normal_title)
-                    mixpanelAPI.singleEventSend(eventName)
                     gameModeSelection(it)
                 }
                 Spacer(modifier = Modifier.height(spacerHeight))
                 CardButton(cardWidth, cardHeight, GameMode.SPECIAL_MODE){
-                    val eventName = localContext.getString(R.string.play_special_title)
-                    mixpanelAPI.singleEventSend(eventName)
                     gameModeSelection(it)
                 }
             }

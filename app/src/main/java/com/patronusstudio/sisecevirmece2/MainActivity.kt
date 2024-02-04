@@ -1,6 +1,8 @@
 package com.patronusstudio.sisecevirmece2
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
@@ -20,18 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
-import com.applovin.sdk.AppLovinSdk
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.patronusstudio.sisecevirmece2.nav.ScreenHost
 import com.patronusstudio.sisecevirmece2.ui.theme.SiseCevirmeceTheme
 import com.patronusstudio.sisecevirmece2.ui.widgets.SampleErrorNotClosable
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Collections
 
 
 @AndroidEntryPoint
@@ -41,15 +41,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppLovinSdk.getInstance(this).mediationProvider = "max"
-        AppLovinSdk.getInstance(this).initializeSdk()
         MobileAds.initialize(this)
         val configuration = RequestConfiguration.Builder()
             .setTestDeviceIds(Collections.singletonList("B843F895E94E5BEDEAD125878F53D9E6"))
             .build()
         MobileAds.setRequestConfiguration(configuration)
-        val mixpanel: MixpanelAPI =
-            MixpanelAPI.getInstance(this, BuildConfig.mix_panel_token, true)
         firebaseAnalytics = Firebase.analytics
         connectivityManager =
             this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -61,7 +57,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    ScreenHost(navController = navController, mixpanel)
+                    ScreenHost(navController = navController)
                     InternetConnectionListener()
                 }
             }
@@ -102,4 +98,13 @@ class MainActivity : ComponentActivity() {
             connectivityManager.registerNetworkCallback(request, networkCallback)
         }
     }
+}
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("no activity")
 }
