@@ -2,16 +2,24 @@ package com.patronusstudio.sisecevirmece2.ui.views.screens
 
 import android.media.MediaPlayer
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -55,7 +63,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
         targetValue = degree.value,
         animationSpec = tween(durationMillis = 5000), finishedListener = {
             animFinished()
-        }
+        }, label = ""
     )
     BackHandler {
         bottleSoundPlayer.stop()
@@ -98,7 +106,7 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
             ) {
-                BannerAdView(BuildConfig.in_game_normal_banner)
+                BannerAdView(BuildConfig.in_game_normal_banner, Alignment.BottomCenter)
             }
         },
         contentOnTitleBottom = {
@@ -162,15 +170,19 @@ fun NormalGameScreen(backClicked: () -> Unit) {
                 Dialog(
                     onDismissRequest = {
                         viewModel.setBottleTouchListener(BottleTouchListener.INIT)
+                        viewModel.setLoadingStatus(false)
                     }, properties = DialogProperties(usePlatformDefaultWidth = false)
                 ) {
                     TruthDareQuestionDialog(
-                        closeClicked = { viewModel.setBottleTouchListener(BottleTouchListener.INIT) },
+                        closeClicked = {
+                            viewModel.setBottleTouchListener(BottleTouchListener.INIT)
+                            viewModel.setLoadingStatus(false)
+                        },
                         viewModel = viewModel
                     )
                 }
             }
-            AnimatedVisibility(visible = viewModel.isLoading.collectAsState().value) {
+            AnimatedVisibility(visible = viewModel.isLoading.value) {
                 LoadingAnimation()
             }
         })

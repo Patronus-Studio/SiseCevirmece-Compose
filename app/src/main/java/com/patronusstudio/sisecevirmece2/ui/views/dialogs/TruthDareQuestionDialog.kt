@@ -49,6 +49,9 @@ fun TruthDareQuestionDialog(
     closeClicked: () -> Unit,
     viewModel: NormalGameScreenViewModel
 ) {
+    val userShowAds = remember {
+        mutableStateOf(false)
+    }
     val width = LocalConfiguration.current.screenWidthDp
     val height = LocalConfiguration.current.screenHeightDp
     val smallCardHeight = (height * 0.06).dp
@@ -56,7 +59,6 @@ fun TruthDareQuestionDialog(
     val currentQuestion = remember { mutableStateOf<QuestionDbModel?>(null) }
     val questionChangeClicked = remember { mutableStateOf(false) }
     val questionChangeListener = remember { mutableStateOf(false) }
-    val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
     val localContext = LocalContext.current
     LaunchedEffect(key1 = Unit, block = {
         val question = withContext(Dispatchers.IO) {
@@ -165,25 +167,31 @@ fun TruthDareQuestionDialog(
     }
     if (questionChangeClicked.value) {
         questionChangeClicked.value = false
-        val random = (0..10).random()
-        showLog(random.toString())
-        if (random < 1) {
+        if(userShowAds.value){
             questionChangeListener.value = true
-        } else {
-            viewModel.setLoadingStatus(true)
-            AdmobInterstialAd(
-                context = localContext,
-                addUnitId = BuildConfig.normal_game_interstitial,
-                failedLoad = {
-                    questionChangeListener.value = true
-                    viewModel.setLoadingStatus(false)
-                }, adClosed = {
-                    questionChangeListener.value = true
-                    viewModel.setLoadingStatus(false)
-                }
-            )
+            viewModel.setLoadingStatus(false)
+        } else{
+            val random = (0..10).random()
+            showLog(random.toString())
+            if (random < 6) {
+                questionChangeListener.value = true
+            } else {
+                viewModel.setLoadingStatus(true)
+                AdmobInterstialAd(
+                    context = localContext,
+                    addUnitId = BuildConfig.normal_game_interstitial,
+                    failedLoad = {
+                        userShowAds.value = true
+                        questionChangeListener.value = true
+                        viewModel.setLoadingStatus(false)
+                    }, adClosed = {
+                        userShowAds.value = true
+                        questionChangeListener.value = true
+                        viewModel.setLoadingStatus(false)
+                    }
+                )
+            }
         }
-
     }
 }
 

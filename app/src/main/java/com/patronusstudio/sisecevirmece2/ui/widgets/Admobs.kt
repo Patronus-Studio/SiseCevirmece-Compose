@@ -1,10 +1,14 @@
 package com.patronusstudio.sisecevirmece2.ui.widgets
 
 import android.content.Context
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -15,15 +19,17 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.patronusstudio.sisecevirmece2.findActivity
 
 @Composable
-fun BannerAdView(bannerId: String) {
-    AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
-        // on below line specifying ad view.
-        AdView(context).apply {
-            setAdSize(AdSize.BANNER)
-            adUnitId = bannerId
-            loadAd(AdRequest.Builder().build())
-        }
-    })
+fun BannerAdView(bannerId: String,alignment: Alignment) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = alignment){
+        AndroidView(modifier = Modifier.fillMaxWidth(), factory = { context ->
+            // on below line specifying ad view.
+            AdView(context).apply {
+                setAdSize(AdSize.BANNER)
+                adUnitId = bannerId
+                loadAd(AdRequest.Builder().build())
+            }
+        })
+    }
 }
 
 
@@ -40,13 +46,23 @@ fun AdmobInterstialAd(
             }
 
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                try {
-                    context.findActivity().let {
-                        interstitialAd.show(it)
+                interstitialAd.fullScreenContentCallback = object: FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        super.onAdDismissedFullScreenContent()
+                        adClosed()
                     }
-                    adClosed()
-                } catch (e: Exception) {
-                    failedLoad()
+
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                        super.onAdFailedToShowFullScreenContent(p0)
+                        failedLoad()
+                    }
+
+                    override fun onAdShowedFullScreenContent() {
+                        super.onAdShowedFullScreenContent()
+                    }
+                }
+                context.findActivity().let {
+                    interstitialAd.show(it)
                 }
             }
         })
