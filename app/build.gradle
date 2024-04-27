@@ -122,7 +122,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.wajahatkarim:flippable:1.0.6'
+    implementation 'com.wajahatkarim:flippable:1.5.4'
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
