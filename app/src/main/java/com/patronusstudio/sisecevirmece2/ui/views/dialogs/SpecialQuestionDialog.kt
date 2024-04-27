@@ -144,15 +144,16 @@ fun SpecialQuestionDialog(
                             })
                     }
                     Spacer(modifier = Modifier.height(smallPaddingHeight))
-                    GeneralCard(
-                        (width * 0.9).dp,
-                        smallCardHeight,
-                        text = stringResource(R.string.show_answer),
-                        clicked = {
-                            flipController.flip()
-                        }, image = R.drawable.confused
-                    )
-                }
+                    if(viewModel.randomQuestion.value?.correctAnswer.isNullOrEmpty().not()) {
+                        GeneralCard(
+                            (width * 0.9).dp,
+                            smallCardHeight,
+                            text = stringResource(R.string.show_answer),
+                            clicked = {
+                                flipController.flip()
+                            }, image = R.drawable.confused
+                        )
+                    }                }
             },
             backSide = {
                 AnswerCard(viewModel.randomQuestion.collectAsState().value!!) {
@@ -175,7 +176,7 @@ fun SpecialQuestionDialog(
             viewModel.setLoadingStatus(true)
             AdmobInterstialAd(
                 context = localContext,
-                addUnitId =BuildConfig.special_game_interstitial,
+                addUnitId = BuildConfig.special_game_interstitial,
                 failedLoad = {
                     viewModel.setLoadingStatus(false)
                 }, adClosed = {
@@ -282,7 +283,9 @@ private fun AnswerCard(questionDbModel: QuestionDbModel, clicked: () -> Unit) {
                     AppColor.Mustard, shape
                 )
                 .clip(shape)
-                .clickable(interactionSource = MutableInteractionSource(), indication = null) {
+                .clickable(interactionSource = remember {
+                    MutableInteractionSource()
+                }, indication = null) {
                     clicked()
                 }
         ) {
